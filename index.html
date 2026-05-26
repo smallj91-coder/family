@@ -26,6 +26,12 @@
   --r:20px; --r-sm:12px; --r-xs:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+textarea,select{font-family:'Nunito',sans-serif;}
+textarea:focus,select:focus{outline:none;}
+#share-wall::-webkit-scrollbar{width:4px}
+#share-wall::-webkit-scrollbar-track{background:transparent}
+#share-wall::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:2px}
+.task-item,.btn,.dot,.rec-check,.rtab,.book-emoji,.log-del,.rec-del,.switch{touch-action:manipulation;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
 /* ═══ FLOATING PARTICLES ═══ */
@@ -325,8 +331,8 @@ input:checked+.slider:before{transform:translateX(20px)}
   <div id="ge-ontime-wrap" style="display:none">
     <div class="toggle-row">
       <div class="toggle-info">
-        <div class="toggle-title">🕗 Vic 20:00 前回家</div>
-        <div class="toggle-sub">媽媽確認後開啟，才能解鎖平日 3C</div>
+        <div class="toggle-title">🕗 Vic 20:00 前回家 + 21:15 準時上床</div>
+        <div class="toggle-sub">媽媽確認勾選 → 週六直接加碼 +15 分鐘！</div>
       </div>
       <label class="switch"><input type="checkbox" id="ge-ontime" onchange="onOntimeChange()"><span class="slider"></span></label>
     </div>
@@ -343,6 +349,8 @@ input:checked+.slider:before{transform:translateX(20px)}
       </div>
     </div>
     <div id="tasks-ge"></div>
+    <div id="ge-login-streak" style="font-size:11px;font-weight:800;color:var(--vic-neon);text-align:right;margin-top:-10px;margin-bottom:4px"></div>
+    <div id="ge-read-streak" style="font-size:12px;font-weight:800;color:var(--vic-neon);margin-top:10px;text-align:center;min-height:18px"></div>
   </div>
 
   <!-- JOY CARD -->
@@ -356,6 +364,43 @@ input:checked+.slider:before{transform:translateX(20px)}
       </div>
     </div>
     <div id="tasks-mei"></div>
+    <div id="mei-login-streak" style="font-size:11px;font-weight:800;color:var(--joy-heart);text-align:right;margin-top:-10px;margin-bottom:4px"></div>
+    <div id="mei-read-streak" style="font-size:12px;font-weight:800;color:var(--joy-heart);margin-top:10px;text-align:center;min-height:18px"></div>
+  </div>
+
+  <!-- 榮譽解鎖按鈕 -->
+  <div style="margin-bottom:10px">
+    <div style="font-size:11px;color:var(--vic-neon);font-weight:800;margin-bottom:6px;padding:0 2px">✨ Vic 今日榮譽解鎖</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" style="background:#FFD166;color:#1A1A2E;flex:1;font-size:12px;border:none;border-radius:var(--r-xs)" onclick="addHonorPoints('ge',2,'📢 黃金開口',event)">📢 講故事 +2</button>
+      <button class="btn btn-sm" style="background:var(--vic);color:white;flex:1;font-size:12px;border:none;border-radius:var(--r-xs)" onclick="addHonorPoints('ge',3,'🌟 閃亮超人',event)">🌟 好表現 +3</button>
+    </div>
+  </div>
+  <div style="margin-bottom:14px">
+    <div style="font-size:11px;color:var(--joy-heart);font-weight:800;margin-bottom:6px;padding:0 2px">✨ Joy 今日榮譽解鎖</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" style="background:#FFD166;color:#1A1A2E;flex:1;font-size:12px;border:none;border-radius:var(--r-xs)" onclick="addHonorPoints('mei',2,'📢 黃金開口',event)">📢 講故事 +2</button>
+      <button class="btn btn-sm" style="background:var(--joy);color:white;flex:1;font-size:12px;border:none;border-radius:var(--r-xs)" onclick="addHonorPoints('mei',3,'🌟 閃亮超人',event)">🌟 好表現 +3</button>
+    </div>
+  </div>
+
+  <!-- 心情報告牆 -->
+  <div class="card" style="background:linear-gradient(135deg,#1A1A2E 0%,#2D0A2D 100%);border-color:rgba(255,209,102,0.3);margin-bottom:14px">
+    <div style="font-size:14px;font-weight:900;color:var(--yellow);margin-bottom:10px">💬 許家心情報告牆</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <select id="share-who" style="width:100%;padding:9px 10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:white;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px">
+        <option value="ge" style="color:black">🏎️ Vic（哥哥）</option>
+        <option value="mei" style="color:black">🩺 Joy（妹妹）</option>
+        <option value="mama" style="color:black">👩 媽媽</option>
+        <option value="baba" style="color:black">👨 爸爸</option>
+      </select>
+      <textarea id="share-text" placeholder="✍️ 寫下今天的事（學校趣事、心情、畫畫、語音輸入都可以！）" style="width:100%;height:70px;padding:10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;resize:none"></textarea>
+      <button class="btn btn-primary" style="padding:11px;font-size:13px;border-radius:var(--r-xs)" onclick="submitShare(event)">🚀 發送！孩子自動得 +2 點</button>
+    </div>
+    <div style="font-size:11px;color:var(--text3);font-weight:800;margin:12px 0 6px">📌 大家的心情動態</div>
+    <div id="share-wall" style="max-height:160px;overflow-y:auto;background:rgba(0,0,0,0.2);border-radius:var(--r-xs);padding:8px">
+      <div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:10px">還沒有動態，來留下第一則心情吧！💭</div>
+    </div>
   </div>
 
   <div class="sec-label">今日 3C 狀態 🎮</div>
@@ -364,6 +409,7 @@ input:checked+.slider:before{transform:translateX(20px)}
       <span class="sc-icon">🏎️</span>
       <div class="sc-val" id="ge-time">—</div>
       <div class="sc-note" id="ge-time-note"></div>
+      <div style="font-size:10px;color:rgba(125,249,255,0.5);margin-top:4px">平日不開 · 週末加碼累積</div>
     </div>
     <div class="sc-card joy-sc">
       <span class="sc-icon">🩺</span>
@@ -374,6 +420,9 @@ input:checked+.slider:before{transform:translateX(20px)}
   <div class="info-bar pending" id="reward-bar">
     <span class="bar-icon">⭐</span>
     <span id="reward-msg"></span>
+  </div>
+  <div id="fri-bonus-bar" style="display:none;margin-top:10px;background:linear-gradient(135deg,#FFD700,#FF6B35);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;font-weight:800;color:white;text-align:center;animation:hearts-pulse 1.5s ease infinite">
+    ⭐ 今天是週五！閱讀任務完成可獲得翻倍點數！⭐
   </div>
 </div>
 
@@ -438,6 +487,36 @@ input:checked+.slider:before{transform:translateX(20px)}
   <div class="card">
     <div style="font-size:16px;font-weight:900;margin-bottom:12px">🎁 週末 3C 獎勵試算</div>
     <div id="weekend-calc"></div>
+  </div>
+
+  <!-- 兄妹攜手箱 -->
+  <div class="card" id="teamwork-card" style="background:linear-gradient(135deg,#0D0D1A,#1A0A1A);border:2px solid rgba(255,215,0,0.3)">
+    <div style="font-size:15px;font-weight:900;color:#FFD700;margin-bottom:10px">🤝 兄妹攜手箱</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Vic + Joy 本週運動合計達 150 分鐘 → 兩人各得大禮包 +20 分鐘！</div>
+    <div id="teamwork-bar-wrap" style="background:rgba(255,255,255,0.05);border-radius:30px;height:14px;overflow:hidden;margin-bottom:8px">
+      <div id="teamwork-bar" style="height:100%;border-radius:30px;background:linear-gradient(90deg,#4A6CF7,#E8619A);width:0%;transition:width .6s ease"></div>
+    </div>
+    <div id="teamwork-label" style="font-size:12px;font-weight:800;text-align:center;color:white"></div>
+  </div>
+
+  <!-- 神秘盲盒 -->
+  <div class="card" style="background:linear-gradient(135deg,#1A0A2E,#2E1A0A);border:2px solid rgba(155,89,182,0.4)">
+    <div style="font-size:15px;font-weight:900;color:#DA70D6;margin-bottom:8px">🎲 媽媽神秘盲盒</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">累積夠多閱讀🏆連勝，解鎖盲盒！內有驚喜獎勵由媽媽決定 ✨</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="text-align:center">
+        <div style="font-size:12px;font-weight:800;color:var(--vic-neon);margin-bottom:6px">🏎️ Vic 盲盒</div>
+        <div id="ge-blindbox-count" style="font-size:28px;font-weight:900;color:white">0</div>
+        <div style="font-size:11px;color:var(--text3)">個可開盒</div>
+        <button class="btn btn-sm btn-vic" style="margin-top:8px;width:100%" onclick="openBlindbox('ge')">🎲 開盒！</button>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:12px;font-weight:800;color:var(--joy-heart);margin-bottom:6px">🌸 Joy 盲盒</div>
+        <div id="mei-blindbox-count" style="font-size:28px;font-weight:900;color:white">0</div>
+        <div style="font-size:11px;color:var(--text3)">個可開盒</div>
+        <button class="btn btn-sm btn-joy" style="margin-top:8px;width:100%" onclick="openBlindbox('mei')">🎲 開盒！</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -524,22 +603,22 @@ const isFri=TODAY===5;
 const isWeekday14=TODAY>=1&&TODAY<=4;
 
 const GE_TASKS=[
-  {id:'ge1',label:'📝 作業完成'},
-  {id:'ge2',label:'🚿 洗澡'},
-  {id:'ge3',label:'🎒 整理書包'},
-  {id:'ge4',label:'🔤 英文複習'},
-  {id:'ge5',label:'📖 課外讀物 20 分鐘'},
+  {id:'ge1',label:'📝 作業與聯絡簿定位'},
+  {id:'ge2',label:'🚿 20分鐘洗澡刷牙挑戰'},
+  {id:'ge3',label:'🎒 睡前書包制服大點名'},
+  {id:'ge4',label:'🧠 15分鐘大腦快問快答（不拿筆）'},
+  {id:'ge5',label:'📖 睡前黃金閱讀 20 分鐘 ⚡雙倍點數！'},
 ];
 const MEI_TASKS=[
-  {id:'mei1',label:'📝 作業完成'},
-  {id:'mei2',label:'🚿 洗澡'},
-  {id:'mei3',label:'🎒 整理書包'},
-  {id:'mei4',label:'🔤 英文複習'},
-  {id:'mei5',label:'📖 閱讀 15 分鐘'},
+  {id:'mei1',label:'📝 作業與聯絡簿定位'},
+  {id:'mei2',label:'🚿 洗澡刷牙小儀式'},
+  {id:'mei3',label:'🎒 書包制服大點名'},
+  {id:'mei4',label:'🌟 15分鐘知識小老師'},
+  {id:'mei5',label:'📖 睡前閱讀 15 分鐘 ⚡雙倍點數！'},
 ];
 const WEEKLY_TASKS={
-  ge:['作業完成','洗澡整理','英文複習','閱讀達成'],
-  mei:['作業完成','洗澡整理','英文複習','閱讀達成'],
+  ge:['作業定位','洗澡挑戰','大腦充電','黃金閱讀'],
+  mei:['作業定位','洗澡儀式','知識小老師','睡前閱讀'],
 };
 const SPORT_GOAL={ge:90,mei:60};
 const CIRC=201;
@@ -548,7 +627,37 @@ let state={
   daily:{},geOntime:false,
   weekly:{ge:{},mei:{}},
   sport:{ge:[],mei:[]},
-  recommend:{ge:[],mei:[]},
+  ontimeDays:0,
+  ontimeDayKeys:{},
+  streaks:{ge:0,mei:0},
+  lastStreakDate:{ge:'',mei:''},
+  blindbox:{ge:0,mei:0},
+  recommend:{
+    ge:[
+      {title:'怪傑佐羅力系列',tag:'幽默冒險',checked:false},
+      {title:'神奇酷科學系列',tag:'爆笑科學',checked:false},
+      {title:'機智小學生100招',tag:'時間管理',checked:false},
+      {title:'達克比辦案系列',tag:'科普偵探',checked:false},
+      {title:'查理九世系列',tag:'懸疑冒險',checked:false},
+      {title:'屁股偵探系列',tag:'幽默推理',checked:false},
+      {title:'湯姆叔叔的小屋',tag:'歷史人文',checked:false},
+      {title:'賽車手的科學',tag:'賽車科技',checked:false},
+      {title:'棒球大聯盟系列',tag:'運動熱血',checked:false},
+      {title:'我的英雄學院漫畫版',tag:'熱血成長',checked:false},
+    ],
+    mei:[
+      {title:'屁屁偵探讀本系列',tag:'觀察解謎',checked:false},
+      {title:'露露與菈菈系列',tag:'溫馨甜點',checked:false},
+      {title:'二年級問題多',tag:'校園生活',checked:false},
+      {title:'什麼都行巫婆',tag:'魔法想像',checked:false},
+      {title:'小醫師大急救系列',tag:'醫學科普',checked:false},
+      {title:'人體大探索',tag:'醫學知識',checked:false},
+      {title:'庫洛魔法使漫畫版',tag:'魔法少女',checked:false},
+      {title:'神奇的人體',tag:'科學醫學',checked:false},
+      {title:'茉莉花開系列',tag:'溫馨成長',checked:false},
+      {title:'大家來玩Roblox',tag:'遊戲創作',checked:false},
+    ],
+  },
   books:[
     {id:1,title:'達克比辦案',who:'哥哥',status:'借閱中'},
     {id:2,title:'神奇樹屋',who:'妹妹',status:'借閱中'},
@@ -574,6 +683,12 @@ function startListening(){
       state.weekly=data.weekly||{ge:{},mei:{}};
       state.sport=data.sport||{ge:[],mei:[]};
       state.recommend=data.recommend||{ge:[],mei:[]};
+      state.ontimeDays=data.ontimeDays||0;
+      state.ontimeDayKeys=data.ontimeDayKeys||{};
+      state.streaks=data.streaks||{ge:0,mei:0};
+      state.lastStreakDate=data.lastStreakDate||{ge:'',mei:''};
+      state.blindbox=data.blindbox||{ge:0,mei:0};
+      state.shares=data.shares||[];
       state.books=data.books||state.books;
       state.bookId=data.bookId||state.bookId;
     }
@@ -581,34 +696,68 @@ function startListening(){
     renderAll();
   });
   db.ref('.info/connected').on('value',snap=>{if(!snap.val())setSyncStatus('offline');});
+  // Listen to share wall in realtime
+  db.ref('family/shares').limitToLast(15).on('value',snap=>{
+    renderShareWallData(snap.val());
+  });
 }
 
 // ── CONFETTI BURST ──
 function burst(x,y,emojis){
-  emojis.forEach((em,i)=>{
+  // Expand to 12 particles for more impact
+  const pool=[...emojis,...emojis,...emojis].slice(0,12);
+  pool.forEach((em,i)=>{
     const el=document.createElement('div');
-    el.className='burst'; el.textContent=em;
-    const angle=(i/emojis.length)*360;
-    const dist=40+Math.random()*40;
-    el.style.cssText=`left:${x}px;top:${y}px;position:fixed;z-index:9999;pointer-events:none;font-size:20px;animation:burst-out .8s ease-out forwards;--tx:${Math.cos(angle*Math.PI/180)*dist}px;--ty:${Math.sin(angle*Math.PI/180)*dist}px`;
+    el.textContent=em;
+    const angle=(i/pool.length)*360+(Math.random()*20-10);
+    const dist=50+Math.random()*60;
+    const size=16+Math.random()*12;
+    el.style.cssText=`left:${x}px;top:${y}px;position:fixed;z-index:9999;pointer-events:none;font-size:${size}px;animation:burst-out ${.6+Math.random()*.4}s ease-out forwards;--tx:${Math.cos(angle*Math.PI/180)*dist}px;--ty:${Math.sin(angle*Math.PI/180)*dist}px`;
     document.body.appendChild(el);
-    setTimeout(()=>el.remove(),900);
+    setTimeout(()=>el.remove(),1100);
   });
 }
 
 // ── TASKS ──
-function isChecked(id){return!!state.daily[id];}
+function isChecked(id){
+  return !!(state.daily && state.daily[id]);
+}
 function toggleTask(id,event){
-  const wasChecked=state.daily[id];
+  const wasChecked=!!state.daily[id];
   state.daily[id]=!wasChecked;
   syncUp('daily',state.daily);
-  if(!wasChecked&&event){
+  if(!wasChecked){
     const isVic=id.startsWith('ge');
-    burst(event.clientX,event.clientY,isVic?['🏎️','⚡','🎮','💥','🌟']:['🌸','💜','🩺','💕','✨']);
+    const emojis=isVic?['🏎️','⚡','🎮','💥','🌟']:['🌸','💜','🩺','💕','✨'];
+    if(event&&event.clientX){
+      burst(event.clientX,event.clientY,emojis);
+    } else {
+      // fallback for touch without coords
+      burst(window.innerWidth/2,window.innerHeight/2,emojis);
+    }
   }
   renderDaily();
 }
-function onOntimeChange(){state.geOntime=document.getElementById('ge-ontime').checked;syncUp('geOntime',state.geOntime);renderDaily();}
+function onOntimeChange(){
+  const checked=document.getElementById('ge-ontime').checked;
+  state.geOntime=checked;
+  // Track weekly ontime days
+  if(checked){
+    if(!state.ontimeDays) state.ontimeDays=0;
+    // Only count once per day using todayIdx
+    const dayKey='ontime_'+getWeekKey()+'_'+todayIdx;
+    if(!state.ontimeDayKeys) state.ontimeDayKeys={};
+    if(!state.ontimeDayKeys[dayKey]){
+      state.ontimeDayKeys[dayKey]=true;
+      state.ontimeDays=(state.ontimeDays||0)+1;
+      syncUp('ontimeDays',state.ontimeDays);
+      syncUp('ontimeDayKeys',state.ontimeDayKeys);
+    }
+  }
+  syncUp('geOntime',state.geOntime);
+  renderDaily();
+  renderWeekly();
+}
 
 function renderTasks(tasks,cid){
   const el=document.getElementById(cid);
@@ -617,7 +766,7 @@ function renderTasks(tasks,cid){
     const done=isChecked(t.id);
     const row=document.createElement('div');
     row.className='task-item';
-    row.onclick=(e)=>toggleTask(t.id,e);
+    row.addEventListener('click',function(e){toggleTask(t.id,e);},{passive:true});
     row.innerHTML=`<div class="task-check ${done?'done'}">${done?'✓':''}</div><div class="task-label${done?' done':''}">${t.label}</div>`;
     el.appendChild(row);
   });
@@ -630,16 +779,44 @@ function renderDaily(){
   renderTasks(MEI_TASKS,'tasks-mei');
   const geAll=GE_TASKS.every(t=>isChecked(t.id));
   const meiAll=MEI_TASKS.every(t=>isChecked(t.id));
+  // Update daily login streak
+  const todayStr=new Date().toISOString().slice(0,10);
+  ['ge','mei'].forEach(kid=>{
+    const tasks=kid==='ge'?GE_TASKS:MEI_TASKS;
+    const allDone=tasks.every(t=>isChecked(t.id));
+    if(allDone && state.lastStreakDate[kid]!==todayStr){
+      const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+      const yStr=yesterday.toISOString().slice(0,10);
+      state.streaks[kid]=(state.lastStreakDate[kid]===yStr?(state.streaks[kid]||0)+1:1);
+      state.lastStreakDate[kid]=todayStr;
+      syncUp('streaks',state.streaks);
+      syncUp('lastStreakDate',state.lastStreakDate);
+    }
+  });
+
+  // Show reading streak badge
+  const geStreak=calcReadStreak('ge'),meiStreak=calcReadStreak('mei');
+  const geStreakEl=document.getElementById('ge-read-streak');
+  const meiStreakEl=document.getElementById('mei-read-streak');
+  if(geStreakEl) geStreakEl.textContent=geStreak>=3?`🏆 閱讀小隊長！連勝${geStreak}天`:geStreak>0?`🔥 連勝${geStreak}天，還差${3-geStreak}天觸發！`:'';
+  if(meiStreakEl) meiStreakEl.textContent=meiStreak>=3?`🏆 閱讀小隊長！連勝${meiStreak}天`:meiStreak>0?`🔥 連勝${meiStreak}天，還差${3-meiStreak}天觸發！`:'';
+
+  // Login streak flames
+  const gLS=state.streaks?.ge||0, mLS=state.streaks?.mei||0;
+  const gLSEl=document.getElementById('ge-login-streak');
+  const mLSEl=document.getElementById('mei-login-streak');
+  if(gLSEl) gLSEl.textContent=gLS>=2?`${'🔥'.repeat(Math.min(gLS,5))} 連續${gLS}天全完成！`:'';
+  if(mLSEl) mLSEl.textContent=mLS>=2?`${'🔥'.repeat(Math.min(mLS,5))} 連續${mLS}天全完成！`:'';
   const ontime=!!state.geOntime;
   let gt,gn,gC,mt,mn,mC;
   if(isWeekend){gt='60 分鐘';gn='🎉 週末開放！';gC='earned';}
-  else if(isFri&&geAll){gt='30 分鐘';gn='🎉 週五完成！';gC='earned';}
+  else if(isFri&&geAll){gt='30 分鐘';gn='🎉 週五任務完成！';gC='earned';}
   else if(isWeekday14){
-    if(geAll&&ontime){gt='10 分鐘';gn='🎉 準時回家＋全完成！';gC='earned';}
-    else if(geAll&&!ontime){gt='等確認';gn='任務完成，等媽媽開啟開關';gC='maybe';}
-    else if(ontime&&!geAll){const l=GE_TASKS.filter(t=>!isChecked(t.id)).length;gt='🔒 鎖定';gn=`還差 ${l} 項任務`;gC='locked';}
-    else{gt='🔒 鎖定';gn='準時回家＋完成任務才開放';gC='locked';}
-  }else{gt='🔒 鎖定';gn='今天不開放';gC='locked';}
+    if(geAll&&ontime){gt='週六 +15分';gn='🏆 準時回家＋任務全完成！週六加碼！';gC='earned';}
+    else if(geAll&&!ontime){gt='任務達成！';gn='等媽媽確認準時回家，週六加碼 +15';gC='maybe';}
+    else if(ontime&&!geAll){const l=GE_TASKS.filter(t=>!isChecked(t.id)).length;gt='累積中…';gn=`還差 ${l} 項，完成就加碼！`;gC='maybe';}
+    else{gt='💤 好好休息';gn='平日不開 3C，大腦儲能中！';gC='locked';}
+  }else{gt='💤 好好休息';gn='平日不開 3C，大腦儲能中！';gC='locked';}
   if(isWeekend){mt='45 分鐘';mn='🎉 週末開放！';mC='earned';}
   else if(meiAll){mt='30 分鐘';mn='🎉 任務全完成！';mC='earned';}
   else{const l=MEI_TASKS.filter(t=>!isChecked(t.id)).length;mt='待完成';mn=`還差 ${l} 項任務`;mC='locked';}
@@ -649,6 +826,10 @@ function renderDaily(){
   document.getElementById('mei-time').textContent=mt;
   document.getElementById('mei-time').className='sc-val '+mC;
   document.getElementById('mei-time-note').textContent=mn;
+  // Friday bonus bar
+  const friBar=document.getElementById('fri-bonus-bar');
+  if(friBar) friBar.style.display=isFri?'block':'none';
+
   const bar=document.getElementById('reward-bar');
   const left=GE_TASKS.filter(t=>!isChecked(t.id)).length+MEI_TASKS.filter(t=>!isChecked(t.id)).length;
   if(geAll&&meiAll){
@@ -669,7 +850,8 @@ function sumSport(kid){return getWeekSport(kid).reduce((a,e)=>a+e.min,0);}
 function renderSport(){
   ['ge','mei'].forEach(kid=>{
     const total=sumSport(kid),goal=SPORT_GOAL[kid];
-    const offset=Math.round(CIRC*(1-Math.min(total/goal,1)));
+    const pct=Math.min(Math.max(total/goal,0),1);
+    const offset=Math.round(CIRC*(1-pct));
     document.getElementById(kid+'-ring').setAttribute('stroke-dashoffset',offset);
     document.getElementById(kid+'-sport-val').textContent=`${total} / ${goal} 分`;
     const left=Math.max(goal-total,0);
@@ -694,11 +876,25 @@ function logSport(kid){
   if(!state.sport[kid])state.sport[kid]=[];
   state.sport[kid].push({id:Date.now()+'',week:getWeekKey(),min,act,day:'週'+days[new Date().getDay()]});
   minEl.value='';actEl.value='';
-  syncUp('sport',state.sport);renderSport();
+  syncUp('sport',state.sport);renderSport();renderTeamwork();
 }
-function delSport(kid,id){state.sport[kid]=state.sport[kid].filter(e=>e.id!==id);syncUp('sport',state.sport);renderSport();}
+function delSport(kid,id){state.sport[kid]=state.sport[kid].filter(e=>e.id!==id);syncUp('sport',state.sport);renderSport();renderTeamwork();}
 
 // ── WEEKLY ──
+function calcReadStreak(kid){
+  // Count consecutive days with reading task checked this week
+  const readKey=kid==='ge'?'ge5':'mei5';
+  let streak=0;
+  for(let i=Math.min(todayIdx,4);i>=0;i--){
+    // Use weekly dots for reading task
+    const taskLabel=kid==='ge'?'黃金閱讀':'睡前閱讀';
+    const key=kid+'_'+taskLabel+'_'+i;
+    if((state.weekly[kid]||{})[key]) streak++;
+    else break;
+  }
+  return streak;
+}
+
 function renderWeekly(){
   ['ge','mei'].forEach(kid=>{
     const el=document.getElementById('weekly-'+kid);el.innerHTML='';
@@ -714,14 +910,25 @@ function renderWeekly(){
   const cnt=kid=>{let d=0,t=0;WEEKLY_TASKS[kid].forEach(tk=>DAYS.forEach((_,i)=>{t++;if((state.weekly[kid]||{})[kid+'_'+tk+'_'+i])d++}));return{d,t}};
   const ge=cnt('ge'),mei=cnt('mei');
   const gSB=sumSport('ge')>=SPORT_GOAL.ge?15:0,mSB=sumSport('mei')>=SPORT_GOAL.mei?10:0;
+  // Count ontime days this week
+  const geOntimeDays=state.ontimeDays||0;
+  const geOntimeBonus=geOntimeDays*15;
+  // Reading streak bonus
+  const geReadStreak=calcReadStreak('ge'),meiReadStreak=calcReadStreak('mei');
+  const geReadBonus=geReadStreak>=3?20:0,meiReadBonus=meiReadStreak>=3?20:0;
+  const geTotal=Math.round(ge.d/ge.t*60)+gSB+geOntimeBonus+geReadBonus;
+  const meiTotal=Math.round(mei.d/mei.t*45)+mSB+meiReadBonus;
   document.getElementById('weekend-calc').innerHTML=`
     <div class="calc-row"><span>🏎️ Vic 任務 ${ge.d}/${ge.t}</span><span>${Math.round(ge.d/ge.t*60)} 分鐘</span></div>
-    <div class="calc-row"><span>🏃 Vic 運動達標${gSB?'':'（未達）'}</span><span>${gSB?'+'+gSB+' 分鐘':'＋0'}</span></div>
-    <div class="calc-row"><span>🏎️ Vic 週末總計</span><span class="calc-total">${Math.round(ge.d/ge.t*60)+gSB} 分鐘 🎮</span></div>
+    <div class="calc-row"><span>🏃 Vic 運動達標${gSB?'':'（未達）'}</span><span style="color:${gSB?'var(--green)':'var(--text3)'}">${gSB?'+'+gSB+' 分鐘':'＋0'}</span></div>
+    <div class="calc-row"><span>🕗 Vic 準時回家（本週 ${geOntimeDays} 天）</span><span style="color:${geOntimeBonus?'var(--green)':'var(--text3)'}">${geOntimeBonus?'+'+geOntimeBonus+' 分鐘':'＋0'}</span></div>
+    <div class="calc-row"><span>📖 Vic 閱讀連勝 ${geReadStreak} 天${geReadBonus?'🏆':'（滿3天觸發）'}</span><span style="color:${geReadBonus?'#FFD700':'var(--text3)'}">${geReadBonus?'+'+geReadBonus+' 分鐘！':'＋0'}</span></div>
+    <div class="calc-row"><span>🏎️ <strong>Vic 週末總計</strong></span><span class="calc-total">${geTotal} 分鐘 🎮</span></div>
     <div style="height:10px"></div>
     <div class="calc-row"><span>🌸 Joy 任務 ${mei.d}/${mei.t}</span><span>${Math.round(mei.d/mei.t*45)} 分鐘</span></div>
-    <div class="calc-row"><span>🏃 Joy 運動達標${mSB?'':'（未達）'}</span><span>${mSB?'+'+mSB+' 分鐘':'＋0'}</span></div>
-    <div class="calc-row"><span>🌸 Joy 週末總計</span><span class="calc-total" style="color:var(--joy)">${Math.round(mei.d/mei.t*45)+mSB} 分鐘 🎮</span></div>`;
+    <div class="calc-row"><span>🏃 Joy 運動達標${mSB?'':'（未達）'}</span><span style="color:${mSB?'var(--green)':'var(--text3)'}">${mSB?'+'+mSB+' 分鐘':'＋0'}</span></div>
+    <div class="calc-row"><span>📖 Joy 閱讀連勝 ${meiReadStreak} 天${meiReadBonus?'🏆':'（滿3天觸發）'}</span><span style="color:${meiReadBonus?'#FFD700':'var(--text3)'}">${meiReadBonus?'+'+meiReadBonus+' 分鐘！':'＋0'}</span></div>
+    <div class="calc-row"><span>🌸 <strong>Joy 週末總計</strong></span><span class="calc-total" style="color:var(--joy)">${meiTotal} 分鐘 🎮</span></div>`;
 }
 function toggleWeekly(kid,task,i){
   if(!state.weekly[kid])state.weekly[kid]={};
@@ -801,7 +1008,9 @@ async function generateRecommend(kid){
   btn.disabled=true;btn.textContent='⏳ 產生中...';
   document.getElementById('loading').classList.add('show');
   const isVic=kid==='ge';
-  const prompt=`請為台灣${isVic?'10歲男生 Vic，喜歡射擊遊戲和賽車':'8歲女生 Joy，喜歡 Roblox、庫洛米、想當醫生'}推薦12本適合的繁體中文兒童書籍。只回傳 JSON 陣列，不要有其他文字：[{"title":"書名","tag":"類型"},...] 類型用2到4個字。`;
+  const prompt=isVic
+    ?`請為台灣10歲男生 Vic 推薦12本繁體中文兒童書籍，他喜歡射擊遊戲和賽車，個性活潑好動，不喜歡太文學性的書。請推薦冒險、科學、偵探、幽默、運動類書籍。只回傳 JSON 陣列，不要有其他文字或 markdown：[{"title":"書名","tag":"類型"},...] 類型用2到4個字。`
+    :`請為台灣8歲女生 Joy 推薦12本繁體中文兒童書籍，她喜歡 Roblox 遊戲、庫洛米、夢想成為醫生。請推薦醫學科普、魔法、解謎、可愛動物、成長類書籍。只回傳 JSON 陣列，不要有其他文字或 markdown：[{"title":"書名","tag":"類型"},...] 類型用2到4個字。`;
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
@@ -816,6 +1025,134 @@ async function generateRecommend(kid){
   btn.disabled=false;btn.textContent='🤖 Claude 推薦';
 }
 
+// ── HONOR POINTS ──
+function addHonorPoints(kid, points, reason, evt) {
+  const emojis=kid==='ge'?['👑','🏎️','⚡','🔥','🎉']:['🌸','🩺','💖','✨','🎉'];
+  const x=evt?evt.clientX:window.innerWidth/2;
+  const y=evt?evt.clientY:window.innerHeight/2;
+  burst(x,y,emojis);
+  const honorId=`honor_${kid}_${new Date().toISOString().slice(0,10)}_${reason}`;
+  if(!state.daily[honorId]){
+    state.daily[honorId]=true;
+    syncUp('daily',state.daily);
+    setTimeout(()=>alert(`🎉 ${kid==='ge'?'Vic':'Joy'} 達成【${reason}】！太棒了！`),300);
+  } else {
+    setTimeout(()=>alert(`今天已經拿過【${reason}】囉！明天繼續加油！`),300);
+  }
+}
+
+// ── SHARE WALL ──
+function submitShare(evt) {
+  const who=document.getElementById('share-who').value;
+  const text=document.getElementById('share-text').value.trim();
+  if(!text){alert('請先輸入心情或文字喔！✍️');return;}
+
+  const senderMap={ge:'🏎️ Vic',mei:'🩺 Joy',mama:'👩 媽媽',baba:'👨 爸爸'};
+  const colorMap={ge:'var(--vic-neon)',mei:'var(--joy-heart)',mama:'#FFD166',baba:'#4EAEFF'};
+  const newShare={
+    sender:senderMap[who]||who,
+    color:colorMap[who]||'white',
+    content:text,
+    time:new Date().toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),
+    ts:Date.now(),
+  };
+
+  // Burst effect
+  const bx=evt?evt.clientX:window.innerWidth/2;
+  const by=evt?evt.clientY:window.innerHeight/2;
+  burst(bx,by,['💬','✨','🚀','🎉','💕']);
+
+  // Save to Firebase
+  if(db){
+    db.ref('family/shares').push(newShare);
+  } else {
+    if(!state.shares)state.shares=[];
+    state.shares.unshift(newShare);
+    renderShareWallData(null);
+  }
+
+  // Auto bonus for kids
+  if(who==='ge'||who==='mei') addHonorPoints(who,2,'📢 黃金開口',null);
+
+  document.getElementById('share-text').value='';
+}
+
+function renderShareWallData(data) {
+  const wall=document.getElementById('share-wall');
+  if(!wall) return;
+  const items=data?Object.values(data).sort((a,b)=>(b.ts||0)-(a.ts||0)):
+    (state.shares||[]);
+  if(!items.length){
+    wall.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:10px">還沒有動態，來留下第一則心情吧！💭</div>';
+    return;
+  }
+  wall.innerHTML=items.slice(0,15).map(item=>`
+    <div style="font-size:12px;border-bottom:1px dashed rgba(255,255,255,0.1);padding:7px 0">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+        <span style="font-weight:900;color:${item.color||'var(--vic-neon)'}">${item.sender}</span>
+        <span style="color:rgba(255,255,255,0.3);font-size:10px">${item.time}</span>
+      </div>
+      <div style="color:#E0E8FF;padding-left:4px;line-height:1.5">${item.content}</div>
+    </div>`).join('');
+}
+
+// ── TEAMWORK + BLINDBOX ──
+const BLINDBOX_PRIZES = [
+  '🍟 週末可以自己點一份大薯！',
+  '🛁 媽媽幫你洗頭一次！',
+  '🎮 額外解鎖 3C 15 分鐘！',
+  '🍦 全家一起去吃冰淇淋！',
+  '😴 週末晚上可以晚睡 30 分鐘！',
+  '🎬 全家一起看一部電影！',
+  '🛍️ 可以在便利商店自選一樣點心！',
+  '⏰ 今天的任務媽媽幫你完成一項！',
+];
+
+function renderTeamwork(){
+  const totalSport=sumSport('ge')+sumSport('mei');
+  const goal=150;
+  const pct=Math.min(totalSport/goal,1)*100;
+  const bar=document.getElementById('teamwork-bar');
+  const label=document.getElementById('teamwork-label');
+  if(bar) bar.style.width=pct.toFixed(0)+'%';
+  if(label){
+    if(totalSport>=goal){
+      label.textContent=`🎉 目標達成！${totalSport} 分鐘 — 兩人各得 +20 分鐘大禮包！`;
+      label.style.color='#FFD700';
+    } else {
+      label.textContent=`目前 ${totalSport} / ${goal} 分鐘，還差 ${goal-totalSport} 分鐘！`;
+      label.style.color='var(--text3)';
+    }
+  }
+  // Update blindbox counts (1 per 3-day reading streak)
+  ['ge','mei'].forEach(kid=>{
+    const streak=calcReadStreak(kid);
+    const boxes=Math.floor(streak/3);
+    const el=document.getElementById(kid+'-blindbox-count');
+    if(el) el.textContent=boxes;
+  });
+}
+
+function openBlindbox(kid){
+  const streak=calcReadStreak(kid);
+  const boxes=Math.floor(streak/3);
+  if(boxes<=0){
+    alert('還沒有盲盒可以開喔！閱讀連續 3 天就能解鎖一個 🎲');
+    return;
+  }
+  const prize=BLINDBOX_PRIZES[Math.floor(Math.random()*BLINDBOX_PRIZES.length)];
+  // Burst celebration
+  burst(window.innerWidth/2, window.innerHeight/2,
+    kid==='ge'?['🎲','🏎️','⚡','🎮','🌟']:['🎲','🌸','💜','🩺','✨']);
+  setTimeout(()=>{
+    alert(`🎁 恭喜解鎖神秘盲盒！
+
+獎勵是：${prize}
+
+記得告訴媽媽來兌換！`);
+  },400);
+}
+
 // ── TABS ──
 function switchTab(name){
   const names=['daily','sport','weekly','books','recommend'];
@@ -823,7 +1160,7 @@ function switchTab(name){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
 }
-function renderAll(){renderDaily();renderSport();renderWeekly();renderBooks();renderRecommend('ge');renderRecommend('mei');}
+function renderAll(){renderDaily();renderSport();renderWeekly();renderTeamwork();renderBooks();renderRecommend('ge');renderRecommend('mei');if(!db)renderShareWallData(null);}
 startListening();
 </script>
 </body>
