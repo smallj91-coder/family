@@ -1,16 +1,7 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-title" content="許家任務板"/>
-<title>許家任務板 🏠</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-<style>
-:root {
+<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-title" content="許家任務板"/><title>許家任務板 🏠</title><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<style>:root {
   --vic:#4A6CF7; --vic-light:#EEF0FF; --vic-dark:#2A3FA0;
   --vic-neon:#7DF9FF; --vic-fire:#FF6B35;
   --joy:#E8619A; --joy-light:#FFF0F6; --joy-dark:#B03070;
@@ -25,287 +16,45 @@
   --shadow-sm:0 2px 10px rgba(74,108,247,0.08);
   --r:20px; --r-sm:12px; --r-xs:8px;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-textarea,select{font-family:'Nunito',sans-serif;}
-textarea:focus,select:focus{outline:none;}
-#share-wall::-webkit-scrollbar{width:4px}
-#share-wall::-webkit-scrollbar-track{background:transparent}
-#share-wall::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:2px}
-.task-item,.btn,.dot,.rec-check,.rtab,.book-emoji,.log-del,.rec-del,.switch{touch-action:manipulation;}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-
-/* ═══ FLOATING PARTICLES ═══ */
-.particle{position:fixed;pointer-events:none;z-index:0;font-size:18px;animation:float-up 6s ease-in infinite;opacity:0}
-@keyframes float-up{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:.6}90%{opacity:.2}100%{transform:translateY(-20px) rotate(360deg);opacity:0}}
-
-/* ═══ HEADER ═══ */
-.header{
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}textarea,select{font-family:'Nunito',sans-serif;}textarea:focus,select:focus{outline:none;}#share-wall::-webkit-scrollbar{width:4px}#share-wall::-webkit-scrollbar-track{background:transparent}#share-wall::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:2px}.task-item,.btn,.dot,.rec-check,.rtab,.book-emoji,.log-del,.rec-del,.switch{touch-action:manipulation;}body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}/* ═══ FLOATING PARTICLES ═══ */.particle{position:fixed;pointer-events:none;z-index:0;font-size:18px;animation:float-up 6s ease-in infinite;opacity:0}@keyframes float-up{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:.6}90%{opacity:.2}100%{transform:translateY(-20px) rotate(360deg);opacity:0}}/* ═══ HEADER ═══ */.header{
   background:linear-gradient(135deg,#1A1A2E 0%,#4A6CF7 50%,#E8619A 100%);
   padding:14px 16px 18px;position:sticky;top:0;z-index:100;
   box-shadow:0 4px 30px rgba(74,108,247,0.4);
   overflow:hidden;
-}
-.header::before{
+}.header::before{
   content:'';position:absolute;top:-40px;right:-40px;
   width:120px;height:120px;border-radius:50%;
   background:rgba(125,249,255,0.15);
   animation:pulse-ring 3s ease infinite;
-}
-.header::after{
+}.header::after{
   content:'';position:absolute;bottom:-30px;left:20px;
   width:80px;height:80px;border-radius:50%;
   background:rgba(255,133,194,0.15);
   animation:pulse-ring 3s ease infinite .5s;
-}
-@keyframes pulse-ring{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.3);opacity:.2}}
-.header-inner{display:flex;align-items:center;justify-content:space-between;max-width:600px;margin:0 auto;position:relative;z-index:1}
-.header-title{font-size:20px;font-weight:900;color:white;display:flex;align-items:center;gap:8px}
-.header-home{font-size:26px;animation:bounce-home 2s ease infinite}
-@keyframes bounce-home{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.sync-pill{background:rgba(255,255,255,0.18);backdrop-filter:blur(10px);border-radius:20px;padding:4px 12px;font-size:12px;color:white;font-weight:700;display:flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.25)}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:#666}
-.sync-dot.online{background:#7FFFB8;box-shadow:0 0 6px #7FFFB8}
-.sync-dot.syncing{background:var(--yellow);animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* ═══ TABS ═══ */
-.tabs{background:var(--card);border-bottom:2px solid var(--border);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:70px;z-index:99;box-shadow:var(--shadow-sm)}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex:1;min-width:64px;padding:10px 4px 8px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--text3);border-bottom:3px solid transparent;white-space:nowrap;transition:all .25s}
-.tab .tab-icon{font-size:20px;display:block;margin-bottom:2px;transition:transform .25s}
-.tab.active{color:var(--vic);border-bottom-color:var(--vic)}
-.tab.active .tab-icon{transform:scale(1.2)}
-.tab:hover .tab-icon{transform:scale(1.1)}
-.panel{display:none;padding:16px;max-width:600px;margin:0 auto;padding-bottom:50px}
-.panel.active{display:block;animation:slide-in .3s cubic-bezier(.34,1.56,.64,1)}
-@keyframes slide-in{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
-
-/* ═══ CARDS ═══ */
-.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;border:1.5px solid var(--border);transition:transform .2s}
-.card:active{transform:scale(.99)}
-
-/* ═══ VIC CARD THEME ═══ */
-.vic-card{
+}@keyframes pulse-ring{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.3);opacity:.2}}.header-inner{display:flex;align-items:center;justify-content:space-between;max-width:600px;margin:0 auto;position:relative;z-index:1}.header-title{font-size:20px;font-weight:900;color:white;display:flex;align-items:center;gap:8px}.header-home{font-size:26px;animation:bounce-home 2s ease infinite}@keyframes bounce-home{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}.sync-pill{background:rgba(255,255,255,0.18);backdrop-filter:blur(10px);border-radius:20px;padding:4px 12px;font-size:12px;color:white;font-weight:700;display:flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.25)}.sync-dot{width:7px;height:7px;border-radius:50%;background:#666}.sync-dot.online{background:#7FFFB8;box-shadow:0 0 6px #7FFFB8}.sync-dot.syncing{background:var(--yellow);animation:blink 1s infinite}@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}/* ═══ TABS ═══ */.tabs{background:var(--card);border-bottom:2px solid var(--border);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:62px;z-index:99;box-shadow:var(--shadow-sm)}.tabs::-webkit-scrollbar{display:none}.tab{flex:1;min-width:64px;padding:10px 4px 8px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--text3);border-bottom:3px solid transparent;white-space:nowrap;transition:all .25s}.tab .tab-icon{font-size:20px;display:block;margin-bottom:2px;transition:transform .25s}.tab.active{color:var(--vic);border-bottom-color:var(--vic)}.tab.active .tab-icon{transform:scale(1.2)}.tab:hover .tab-icon{transform:scale(1.1)}.panel{display:none;padding:16px;max-width:600px;margin:0 auto;padding-bottom:50px}.panel.active{display:block;animation:slide-in .3s cubic-bezier(.34,1.56,.64,1)}@keyframes slide-in{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}/* ═══ CARDS ═══ */.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;border:1.5px solid var(--border);transition:transform .2s}.card:active{transform:scale(.99)}/* ═══ VIC CARD THEME ═══ */.vic-card{
   background:linear-gradient(135deg,#0D0D1A 0%,#1A1A2E 100%);
   border:1.5px solid rgba(74,108,247,0.4);
   box-shadow:0 6px 30px rgba(74,108,247,0.2),inset 0 1px 0 rgba(125,249,255,0.1);
   position:relative;overflow:hidden;
-}
-.vic-card::before{
+}.vic-card::before{
   content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
   background:linear-gradient(90deg,transparent,rgba(125,249,255,0.06),transparent);
   animation:scan-line 4s linear infinite;
-}
-@keyframes scan-line{to{left:200%}}
-.vic-card .kid-header{background:rgba(74,108,247,0.15);border:1px solid rgba(125,249,255,0.2);border-radius:var(--r-sm)}
-.vic-card .kid-name{color:var(--vic-neon);text-shadow:0 0 10px rgba(125,249,255,0.5)}
-.vic-card .kid-age{color:rgba(125,249,255,0.6)}
-.vic-card .task-item{border-bottom-color:rgba(74,108,247,0.2)}
-.vic-card .task-label{color:#E0E8FF}
-.vic-card .task-label.done{color:rgba(125,249,255,0.4)}
-.vic-card .task-check{background:#1A1A2E;border-color:rgba(74,108,247,0.5)}
-.vic-card .task-check.done{background:var(--vic);border-color:var(--vic-neon);box-shadow:0 0 12px rgba(74,108,247,0.6)}
-
-/* ═══ JOY CARD THEME ═══ */
-.joy-card{
+}@keyframes scan-line{to{left:200%}}.vic-card .kid-header{background:rgba(74,108,247,0.15);border:1px solid rgba(125,249,255,0.2);border-radius:var(--r-sm)}.vic-card .kid-name{color:var(--vic-neon);text-shadow:0 0 10px rgba(125,249,255,0.5)}.vic-card .kid-age{color:rgba(125,249,255,0.6)}.vic-card .task-item{border-bottom-color:rgba(74,108,247,0.2)}.vic-card .task-label{color:#E0E8FF}.vic-card .task-label.done{color:rgba(125,249,255,0.4)}.vic-card .task-check{background:#1A1A2E;border-color:rgba(74,108,247,0.5)}.vic-card .task-check.done{background:var(--vic);border-color:var(--vic-neon);box-shadow:0 0 12px rgba(74,108,247,0.6)}/* ═══ JOY CARD THEME ═══ */.joy-card{
   background:linear-gradient(135deg,#1A0A1A 0%,#2D0A2D 100%);
   border:1.5px solid rgba(232,97,154,0.4);
   box-shadow:0 6px 30px rgba(232,97,154,0.2),inset 0 1px 0 rgba(255,133,194,0.1);
   position:relative;overflow:hidden;
-}
-.joy-card::before{
+}.joy-card::before{
   content:'🌸';position:absolute;right:-10px;top:-10px;font-size:60px;opacity:.05;
   animation:rotate-slow 20s linear infinite;
-}
-@keyframes rotate-slow{to{transform:rotate(360deg)}}
-.joy-card::after{
+}@keyframes rotate-slow{to{transform:rotate(360deg)}}.joy-card::after{
   content:'';position:absolute;bottom:-20px;left:-20px;
   width:80px;height:80px;border-radius:50%;
   background:radial-gradient(circle,rgba(155,89,182,0.15),transparent);
-}
-.joy-card .kid-header{background:rgba(232,97,154,0.15);border:1px solid rgba(255,133,194,0.2);border-radius:var(--r-sm)}
-.joy-card .kid-name{color:var(--joy-heart);text-shadow:0 0 10px rgba(255,133,194,0.5)}
-.joy-card .kid-age{color:rgba(255,133,194,0.6)}
-.joy-card .task-item{border-bottom-color:rgba(232,97,154,0.2)}
-.joy-card .task-label{color:#FFE0EF}
-.joy-card .task-label.done{color:rgba(255,133,194,0.4)}
-.joy-card .task-check{background:#1A0A1A;border-color:rgba(232,97,154,0.5)}
-.joy-card .task-check.done{background:var(--joy);border-color:var(--joy-heart);box-shadow:0 0 12px rgba(232,97,154,0.6)}
-
-/* ═══ KID HEADER ═══ */
-.kid-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;font-weight:800}
-.kid-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.vic-avatar{background:linear-gradient(135deg,var(--vic),var(--vic-dark));box-shadow:0 4px 14px rgba(74,108,247,0.5)}
-.joy-avatar{background:linear-gradient(135deg,var(--joy),var(--joy-accent));box-shadow:0 4px 14px rgba(232,97,154,0.5)}
-.kid-name{font-size:17px;font-weight:900}
-.kid-age{font-size:11px;opacity:.7;margin-top:1px}
-
-/* ═══ TASKS ═══ */
-.task-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1.5px dashed var(--border);cursor:pointer;transition:all .2s;position:relative}
-.task-item:last-child{border-bottom:none}
-.task-item:active{opacity:.7}
-.task-check{width:28px;height:28px;border-radius:50%;border:2.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .3s cubic-bezier(.34,1.56,.64,1);background:white}
-.task-check.done{transform:scale(1.1)}
-.task-label{font-size:14px;font-weight:700;flex:1;transition:all .3s}
-.task-label.done{text-decoration:line-through;opacity:.5}
-
-/* ═══ CONFETTI BURST ═══ */
-.burst{position:fixed;pointer-events:none;z-index:9999;font-size:20px;animation:burst-out .8s ease-out forwards}
-@keyframes burst-out{0%{transform:translate(0,0) scale(0);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(1);opacity:0}}
-
-/* ═══ TOGGLE ═══ */
-.toggle-row{display:flex;align-items:center;gap:12px;background:rgba(255,209,102,0.15);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:12px;border:1.5px solid rgba(255,209,102,0.4)}
-.toggle-info{flex:1}
-.toggle-title{font-size:14px;font-weight:800}
-.toggle-sub{font-size:11px;color:var(--text2)}
-.switch{position:relative;width:48px;height:28px;flex-shrink:0}
-.switch input{opacity:0;width:0;height:0}
-.slider{position:absolute;inset:0;background:#DDD;border-radius:14px;cursor:pointer;transition:.3s}
-.slider:before{content:'';position:absolute;width:22px;height:22px;left:3px;top:3px;background:white;border-radius:50%;transition:.3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 6px rgba(0,0,0,.25)}
-input:checked+.slider{background:var(--green)}
-input:checked+.slider:before{transform:translateX(20px)}
-
-/* ═══ 3C STATUS ═══ */
-.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.sc-card{border-radius:var(--r-sm);padding:16px;text-align:center;border:2px solid transparent;position:relative;overflow:hidden}
-.sc-card.vic-sc{background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3)}
-.sc-card.joy-sc{background:linear-gradient(135deg,#1A0A1A,#2D0A2D);border-color:rgba(232,97,154,0.3)}
-.sc-icon{font-size:28px;display:block;margin-bottom:4px;animation:bounce-icon 2s ease infinite}
-@keyframes bounce-icon{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-.sc-val{font-size:18px;font-weight:900;margin:4px 0}
-.sc-val.earned{color:var(--green);text-shadow:0 0 10px rgba(46,204,138,0.4)}
-.sc-val.locked{color:var(--red)}
-.sc-val.maybe{color:var(--yellow)}
-.sc-note{font-size:11px;color:var(--text3);font-weight:600;line-height:1.4}
-
-/* ═══ INFO BAR ═══ */
-.info-bar{border-radius:var(--r-sm);padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;transition:all .4s}
-.info-bar.good{background:linear-gradient(135deg,#E8FBF3,#D0F5E8);color:#1A8C60;box-shadow:0 4px 14px rgba(46,204,138,0.2)}
-.info-bar.pending{background:rgba(255,209,102,0.15);color:#8C6E00}
-.bar-icon{font-size:24px;flex-shrink:0;animation:spin-star 3s linear infinite}
-@keyframes spin-star{0%,100%{transform:rotate(0)}25%{transform:rotate(10deg)}75%{transform:rotate(-10deg)}}
-
-/* ═══ SPORT ═══ */
-.sport-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.sport-card{border-radius:var(--r);box-shadow:var(--shadow-sm);padding:16px;border:2px solid var(--border);text-align:center;transition:all .4s}
-.sport-card.vic-sport{background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3)}
-.sport-card.mei-sport{background:linear-gradient(135deg,#1A0A1A,#2D0A2D);border-color:rgba(232,97,154,0.3)}
-.sport-card.goal-met{border-color:var(--green)!important;box-shadow:0 0 20px rgba(46,204,138,0.3)!important}
-.ring-wrap{display:flex;flex-direction:column;align-items:center;margin:8px 0 10px}
-.ring-val{font-size:13px;font-weight:800;margin-top:6px;color:white}
-.ring-sub{font-size:11px;color:var(--text3);font-weight:600}
-.sport-log-row{display:flex;gap:6px;margin-top:10px}
-.sport-log-row input{flex:1;font-size:13px;padding:8px 10px;border:1.5px solid rgba(255,255,255,0.15);border-radius:var(--r-xs);background:rgba(255,255,255,0.08);color:white;font-family:'Nunito',sans-serif;font-weight:700}
-.sport-log-row input::placeholder{color:rgba(255,255,255,0.35)}
-.sport-log-row input:focus{outline:none;border-color:var(--vic-neon)}
-.log-entry{font-size:12px;font-weight:700;color:var(--text3);padding:5px 0;border-bottom:1px dashed rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center}
-.log-entry:last-child{border-bottom:none}
-.log-del{cursor:pointer;color:rgba(255,255,255,0.3);font-size:16px;padding:0 4px}
-
-/* ═══ WEEKLY DOTS ═══ */
-.week-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1.5px dashed var(--border)}
-.week-row:last-child{border-bottom:none}
-.week-label{flex:1;font-size:13px;font-weight:800}
-.day-dots{display:flex;gap:4px}
-.dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;cursor:pointer;border:2px solid var(--border);color:var(--text3);background:white;transition:all .25s cubic-bezier(.34,1.56,.64,1)}
-.dot.done{background:var(--green);border-color:var(--green);color:white;transform:scale(1.1)}
-.dot.today{border-color:var(--vic);color:var(--vic)}
-.dot:active{transform:scale(.9)}
-
-/* ═══ CALC ═══ */
-.calc-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1.5px dashed var(--border);font-size:14px;font-weight:700}
-.calc-row:last-child{border-bottom:none}
-.calc-total{font-weight:900;color:var(--vic);font-size:16px}
-
-/* ═══ BOOKS ═══ */
-.book-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1.5px dashed var(--border);animation:slide-in .3s ease}
-.book-item:last-child{border-bottom:none}
-.book-emoji{font-size:26px;flex-shrink:0;transition:transform .2s}
-.book-emoji:hover{transform:rotate(10deg) scale(1.2)}
-.book-info{flex:1}
-.book-title{font-size:14px;font-weight:800}
-.book-who{font-size:11px;font-weight:600;color:var(--text2);margin-top:2px}
-.book-status{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.status-借閱中{background:var(--blue-light);color:#1A70CC}
-.status-已還書{background:var(--green-light);color:#1A8C60}
-
-/* ═══ BUTTONS ═══ */
-.btn{padding:9px 16px;border-radius:var(--r-xs);border:2px solid var(--border);background:white;color:var(--text);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s}
-.btn:active{transform:scale(.95)}
-.btn-vic{background:linear-gradient(135deg,var(--vic),#2A3FA0);color:white;border:none;box-shadow:0 4px 14px rgba(74,108,247,0.4)}
-.btn-vic:hover{box-shadow:0 6px 20px rgba(74,108,247,0.5)}
-.btn-joy{background:linear-gradient(135deg,var(--joy),var(--joy-accent));color:white;border:none;box-shadow:0 4px 14px rgba(232,97,154,0.4)}
-.btn-primary{background:linear-gradient(135deg,var(--vic),var(--joy));color:white;border:none;box-shadow:0 4px 14px rgba(124,111,212,0.35)}
-.btn-green{background:var(--green);color:white;border:none}
-.btn-sm{padding:5px 11px;font-size:12px}
-.btn-full{width:100%;padding:14px;font-size:15px;border-radius:var(--r-sm);margin-top:14px}
-
-/* ═══ ADD ROW ═══ */
-.add-row{display:flex;gap:8px;margin-top:12px}
-.add-row input,.add-row select{flex:1;font-size:14px;padding:10px 12px;border:2px solid var(--border);border-radius:var(--r-xs);background:white;color:var(--text);font-family:'Nunito',sans-serif;font-weight:700}
-.add-row input:focus,.add-row select:focus{outline:none;border-color:var(--vic)}
-
-/* ═══ RECOMMEND ═══ */
-.rtabs{display:flex;gap:10px;margin-bottom:14px}
-.rtab{flex:1;padding:12px;border-radius:var(--r-sm);text-align:center;font-size:13px;font-weight:800;cursor:pointer;border:2.5px solid var(--border);background:white;color:var(--text2);transition:all .25s}
-.rtab.vic-active{background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:var(--vic);color:var(--vic-neon)}
-.rtab.joy-active{background:linear-gradient(135deg,#1A0A1A,#2D0A2D);border-color:var(--joy);color:var(--joy-heart)}
-.rec-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1.5px dashed var(--border);animation:slide-in .3s ease}
-.rec-item:last-child{border-bottom:none}
-.rec-check{width:26px;height:26px;border-radius:8px;border:2.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);background:white}
-.rec-check.vic-checked{background:var(--vic);border-color:var(--vic-neon);transform:scale(1.1);box-shadow:0 0 10px rgba(74,108,247,0.4)}
-.rec-check.joy-checked{background:var(--joy);border-color:var(--joy-heart);transform:scale(1.1);box-shadow:0 0 10px rgba(232,97,154,0.4)}
-.rec-title{flex:1;font-size:14px;font-weight:700}
-.rec-tag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px}
-.rec-tag.vic-tag{background:rgba(74,108,247,0.15);color:var(--vic)}
-.rec-tag.joy-tag{background:rgba(232,97,154,0.15);color:var(--joy)}
-.rec-del{cursor:pointer;color:var(--text3);font-size:18px;padding:0 4px}
-
-/* ═══ TIP BAR ═══ */
-.tip-bar{background:rgba(255,140,66,0.12);border-radius:var(--r-sm);padding:12px 14px;font-size:13px;font-weight:700;color:#8C4A00;margin-bottom:14px;border:1.5px solid rgba(255,140,66,0.2);display:flex;align-items:flex-start;gap:8px}
-
-/* ═══ SECTION LABEL ═══ */
-.sec-label{font-size:12px;font-weight:900;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px}
-
-/* ═══ LOADING ═══ */
-.loading-overlay{display:none;position:fixed;inset:0;background:rgba(15,15,30,0.85);backdrop-filter:blur(8px);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-.loading-overlay.show{display:flex}
-.loading-spinner{font-size:48px;animation:spin-load 1s linear infinite}
-@keyframes spin-load{to{transform:rotate(360deg)}}
-.loading-text{font-size:16px;font-weight:800;color:white}
-
-/* ═══ ALL-DONE CELEBRATION ═══ */
-.all-done-banner{display:none;position:fixed;top:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FFD700,#FF6B35);color:white;font-weight:900;font-size:15px;padding:12px 24px;border-radius:30px;z-index:500;box-shadow:0 8px 30px rgba(255,215,0,.4);animation:banner-in .5s cubic-bezier(.34,1.56,.64,1)}
-.all-done-banner.show{display:block}
-@keyframes banner-in{from{top:60px;opacity:0}to{top:80px;opacity:1}}
-
-/* ═══ VIC RACING STRIPE ═══ */
-.vic-stripe{height:4px;background:linear-gradient(90deg,var(--vic-fire),var(--vic),var(--vic-neon),var(--vic));background-size:200%;animation:stripe-move 2s linear infinite;border-radius:2px;margin-bottom:14px}
-@keyframes stripe-move{to{background-position:200%}}
-
-/* ═══ JOY HEARTS ═══ */
-.joy-hearts{text-align:center;font-size:18px;letter-spacing:8px;margin-bottom:10px;animation:hearts-pulse 2s ease infinite}
-@keyframes hearts-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.05)}}
-</style>
-</head>
-<body>
-
-<!-- Floating particles -->
-<div class="particle" style="left:10%;animation-delay:0s;animation-duration:7s">🎮</div>
-<div class="particle" style="left:25%;animation-delay:1s;animation-duration:9s">🌸</div>
-<div class="particle" style="left:45%;animation-delay:2s;animation-duration:6s">⭐</div>
-<div class="particle" style="left:65%;animation-delay:3s;animation-duration:8s">🏎️</div>
-<div class="particle" style="left:80%;animation-delay:1.5s;animation-duration:7s">💊</div>
-<div class="particle" style="left:90%;animation-delay:.5s;animation-duration:10s">💫</div>
-
-<div class="loading-overlay" id="loading">
+}.joy-card .kid-header{background:rgba(232,97,154,0.15);border:1px solid rgba(255,133,194,0.2);border-radius:var(--r-sm)}.joy-card .kid-name{color:var(--joy-heart);text-shadow:0 0 10px rgba(255,133,194,0.5)}.joy-card .kid-age{color:rgba(255,133,194,0.6)}.joy-card .task-item{border-bottom-color:rgba(232,97,154,0.2)}.joy-card .task-label{color:#FFE0EF}.joy-card .task-label.done{color:rgba(255,133,194,0.4)}.joy-card .task-check{background:#1A0A1A;border-color:rgba(232,97,154,0.5)}.joy-card .task-check.done{background:var(--joy);border-color:var(--joy-heart);box-shadow:0 0 12px rgba(232,97,154,0.6)}/* ═══ KID HEADER ═══ */.kid-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;font-weight:800}.kid-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}.vic-avatar{background:linear-gradient(135deg,var(--vic),var(--vic-dark));box-shadow:0 4px 14px rgba(74,108,247,0.5)}.joy-avatar{background:linear-gradient(135deg,var(--joy),var(--joy-accent));box-shadow:0 4px 14px rgba(232,97,154,0.5)}.kid-name{font-size:17px;font-weight:900}.kid-age{font-size:11px;opacity:.7;margin-top:1px}/* ═══ TASKS ═══ */.task-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1.5px dashed var(--border);cursor:pointer;transition:all .2s;position:relative}.task-item:last-child{border-bottom:none}.task-item:active{opacity:.7}.task-check{width:28px;height:28px;border-radius:50%;border:2.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .3s cubic-bezier(.34,1.56,.64,1);background:white}.task-check.done{transform:scale(1.1)}.task-label{font-size:14px;font-weight:700;flex:1;transition:all .3s}.task-label.done{text-decoration:line-through;opacity:.5}/* ═══ CONFETTI BURST ═══ */.burst{position:fixed;pointer-events:none;z-index:9999;font-size:20px;animation:burst-out .8s ease-out forwards}@keyframes burst-out{0%{transform:translate(0,0) scale(0);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(1);opacity:0}}/* ═══ TOGGLE ═══ */.toggle-row{display:flex;align-items:center;gap:12px;background:rgba(255,209,102,0.15);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:12px;border:1.5px solid rgba(255,209,102,0.4)}.toggle-info{flex:1}.toggle-title{font-size:14px;font-weight:800}.toggle-sub{font-size:11px;color:var(--text2)}.switch{position:relative;width:48px;height:28px;flex-shrink:0}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#DDD;border-radius:14px;cursor:pointer;transition:.3s}.slider:before{content:'';position:absolute;width:22px;height:22px;left:3px;top:3px;background:white;border-radius:50%;transition:.3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 6px rgba(0,0,0,.25)}input:checked+.slider{background:var(--green)}input:checked+.slider:before{transform:translateX(20px)}/* ═══ 3C STATUS ═══ */.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.sc-card{border-radius:var(--r-sm);padding:16px;text-align:center;border:2px solid transparent;position:relative;overflow:hidden}.sc-card.vic-sc{background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3)}.sc-card.joy-sc{background:linear-gradient(135deg,#1A0A1A,#2D0A2D);border-color:rgba(232,97,154,0.3)}.sc-icon{font-size:28px;display:block;margin-bottom:4px;animation:bounce-icon 2s ease infinite}@keyframes bounce-icon{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}.sc-val{font-size:18px;font-weight:900;margin:4px 0}.sc-val.earned{color:var(--green);text-shadow:0 0 10px rgba(46,204,138,0.4)}.sc-val.locked{color:var(--red)}.sc-val.maybe{color:var(--yellow)}.sc-note{font-size:11px;color:var(--text3);font-weight:600;line-height:1.4}/* ═══ INFO BAR ═══ */.info-bar{border-radius:var(--r-sm);padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;transition:all .4s}.info-bar.good{background:linear-gradient(135deg,#E8FBF3,#D0F5E8);color:#1A8C60;box-shadow:0 4px 14px rgba(46,204,138,0.2)}.info-bar.pending{background:rgba(255,209,102,0.15);color:#8C6E00}.bar-icon{font-size:24px;flex-shrink:0;animation:spin-star 3s linear infinite}@keyframes spin-star{0%,100%{transform:rotate(0)}25%{transform:rotate(10deg)}75%{transform:rotate(-10deg)}}/* ═══ SPORT ═══ */.sport-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}.sport-card{border-radius:var(--r);box-shadow:var(--shadow-sm);padding:16px;border:2px solid var(--border);text-align:center;transition:all .4s}.sport-card.vic-sport{background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3)}.sport-card.mei-sport{background:linear-gradient(135deg,#1A0A1A,#2D0A2D);border-color:rgba(232,97,154,0.3)}.sport-card.goal-met{border-color:var(--green)!important;box-shadow:0 0 20px rgba(46,204,138,0.3)!important}.ring-wrap{display:flex;flex-direction:column;align-items:center;margin:8px 0 10px}.ring-val{font-size:13px;font-weight:800;margin-top:6px;color:white}.ring-sub{font-size:11px;color:var(--text3);font-weight:600}.sport-log-row{display:flex;gap:6px;margin-top:10px}.sport-log-row input{flex:1;font-size:13px;padding:8px 10px;border:1.5px solid rgba(255,255,255,0.15);border-radius:var(--r-xs);background:rgba(255,255,255,0.08);color:white;font-family:'Nunito',sans-serif;font-weight:700}.sport-log-row input::placeholder{color:rgba(255,255,255,0.35)}.sport-log-row input:focus{outline:none;border-color:var(--vic-neon)}.log-entry{font-size:12px;font-weight:700;color:var(--text3);padding:5px 0;border-bottom:1px dashed rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center}.log-entry:last-child{border-bottom:none}.log-del{cursor:pointer;color:rgba(255,255,255,0.3);font-size:16px;padding:0 4px}/* ═══ WEEKLY DOTS ═══ */.week-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1.5px dashed var(--border)}.week-row:last-child{border-bottom:none}.week-label{flex:1;font-size:13px;font-weight:800}.day-dots{display:flex;gap:4px}.dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;cursor:pointer;border:2px solid var(--border);color:var(--text3);background:white;transition:all .25s cubic-bezier(.34,1.56,.64,1)}.dot.done{background:var(--green);border-color:var(--green);color:white;transform:scale(1.1)}.dot.today{border-color:var(--vic);color:var(--vic)}.dot:active{transform:scale(.9)}/* ═══ CALC ═══ */.calc-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1.5px dashed var(--border);font-size:14px;font-weight:700}.calc-row:last-child{border-bottom:none}.calc-total{font-weight:900;color:var(--vic);font-size:16px}/* ═══ BOOKS ═══ */.book-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1.5px dashed var(--border);animation:slide-in .3s ease}.book-item:last-child{border-bottom:none}.book-emoji{font-size:26px;flex-shrink:0;transition:transform .2s}.book-emoji:hover{transform:rotate(10deg) scale(1.2)}.book-info{flex:1}.book-title{font-size:14px;font-weight:800}.book-who{font-size:11px;font-weight:600;color:var(--text2);margin-top:2px}.book-status{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}.status-借閱中{background:var(--blue-light);color:#1A70CC}.status-已還書{background:var(--green-light);color:#1A8C60}/* ═══ BUTTONS ═══ */.btn{padding:9px 16px;border-radius:var(--r-xs);border:2px solid var(--border);background:white;color:var(--text);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s}.btn:active{transform:scale(.95)}.btn-vic{background:linear-gradient(135deg,var(--vic),#2A3FA0);color:white;border:none;box-shadow:0 4px 14px rgba(74,108,247,0.4)}.btn-vic:hover{box-shadow:0 6px 20px rgba(74,108,247,0.5)}.btn-joy{background:linear-gradient(135deg,var(--joy),var(--joy-accent));color:white;border:none;box-shadow:0 4px 14px rgba(232,97,154,0.4)}.btn-primary{background:linear-gradient(135deg,var(--vic),var(--joy));color:white;border:none;box-shadow:0 4px 14px rgba(124,111,212,0.35)}.btn-green{background:var(--green);color:white;border:none}.btn-sm{padding:5px 11px;font-size:12px}.btn-full{width:100%;padding:14px;font-size:15px;border-radius:var(--r-sm);margin-top:14px}/* ═══ ADD ROW ═══ */.add-row{display:flex;gap:8px;margin-top:12px}.add-row input,.add-row select{flex:1;font-size:14px;padding:10px 12px;border:2px solid var(--border);border-radius:var(--r-xs);background:white;color:var(--text);font-family:'Nunito',sans-serif;font-weight:700}.add-row input:focus,.add-row select:focus{outline:none;border-color:var(--vic)}/* ═══ RECOMMEND ═══ */.rtabs{display:flex;gap:10px;margin-bottom:14px}.rtab{flex:1;padding:12px;border-radius:var(--r-sm);text-align:center;font-size:13px;font-weight:800;cursor:pointer;border:2.5px solid var(--border);background:white;color:var(--text2);transition:all .25s}.rtab.vic-active{background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:var(--vic);color:var(--vic-neon)}.rtab.joy-active{background:linear-gradient(135deg,#1A0A1A,#2D0A2D);border-color:var(--joy);color:var(--joy-heart)}.rec-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1.5px dashed var(--border);animation:slide-in .3s ease}.rec-item:last-child{border-bottom:none}.rec-check{width:26px;height:26px;border-radius:8px;border:2.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);background:white}.rec-check.vic-checked{background:var(--vic);border-color:var(--vic-neon);transform:scale(1.1);box-shadow:0 0 10px rgba(74,108,247,0.4)}.rec-check.joy-checked{background:var(--joy);border-color:var(--joy-heart);transform:scale(1.1);box-shadow:0 0 10px rgba(232,97,154,0.4)}.rec-title{flex:1;font-size:14px;font-weight:700}.rec-tag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px}.rec-tag.vic-tag{background:rgba(74,108,247,0.15);color:var(--vic)}.rec-tag.joy-tag{background:rgba(232,97,154,0.15);color:var(--joy)}.rec-del{cursor:pointer;color:var(--text3);font-size:18px;padding:0 4px}/* ═══ TIP BAR ═══ */.tip-bar{background:rgba(255,140,66,0.12);border-radius:var(--r-sm);padding:12px 14px;font-size:13px;font-weight:700;color:#8C4A00;margin-bottom:14px;border:1.5px solid rgba(255,140,66,0.2);display:flex;align-items:flex-start;gap:8px}/* ═══ SECTION LABEL ═══ */.sec-label{font-size:12px;font-weight:900;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px}/* ═══ LOADING ═══ */.loading-overlay{display:none;position:fixed;inset:0;background:rgba(15,15,30,0.85);backdrop-filter:blur(8px);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:14px}.loading-overlay.show{display:flex}.loading-spinner{font-size:48px;animation:spin-load 1s linear infinite}@keyframes spin-load{to{transform:rotate(360deg)}}.loading-text{font-size:16px;font-weight:800;color:white}/* ═══ ALL-DONE CELEBRATION ═══ */.all-done-banner{display:none;position:fixed;top:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FFD700,#FF6B35);color:white;font-weight:900;font-size:15px;padding:12px 24px;border-radius:30px;z-index:500;box-shadow:0 8px 30px rgba(255,215,0,.4);animation:banner-in .5s cubic-bezier(.34,1.56,.64,1)}.all-done-banner.show{display:block}@keyframes banner-in{from{top:60px;opacity:0}to{top:80px;opacity:1}}/* ═══ VIC RACING STRIPE ═══ */.vic-stripe{height:4px;background:linear-gradient(90deg,var(--vic-fire),var(--vic),var(--vic-neon),var(--vic));background-size:200%;animation:stripe-move 2s linear infinite;border-radius:2px;margin-bottom:14px}@keyframes stripe-move{to{background-position:200%}}/* ═══ JOY HEARTS ═══ */.joy-hearts{text-align:center;font-size:18px;letter-spacing:8px;margin-bottom:10px;animation:hearts-pulse 2s ease infinite}@keyframes hearts-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.05)}}</style></head><body><div class="particle" style="left:10%;animation-delay:0s;animation-duration:7s">🎮</div><div class="particle" style="left:25%;animation-delay:1s;animation-duration:9s">🌸</div><div class="particle" style="left:45%;animation-delay:2s;animation-duration:6s">⭐</div><div class="particle" style="left:65%;animation-delay:3s;animation-duration:8s">🏎️</div><div class="particle" style="left:80%;animation-delay:1.5s;animation-duration:7s">💊</div><div class="particle" style="left:90%;animation-delay:.5s;animation-duration:10s">💫</div><div class="loading-overlay" id="loading">
   <div class="loading-spinner">📚</div>
-  <div class="loading-text">AI 正在選書中...</div>
-</div>
-
-<div class="all-done-banner" id="all-done-banner">🎉 今天全部完成！超棒的！🎉</div>
-
-<div class="header">
+  <div class="loading-text">AI 正在選書中...</div></div><div class="all-done-banner" id="all-done-banner">🎉 今天全部完成！超棒的！🎉</div><div class="header">
   <div class="header-inner">
     <div class="header-title">
       <span class="header-home">🏠</span>
@@ -315,19 +64,12 @@ input:checked+.slider:before{transform:translateX(20px)}
       <span class="sync-dot" id="sync-dot"></span>
       <span id="sync-label">連線中</span>
     </div>
-  </div>
-</div>
-
-<div class="tabs">
+  </div></div><div class="tabs">
   <button class="tab active" onclick="switchTab('daily')"><span class="tab-icon">✅</span>今日</button>
   <button class="tab" onclick="switchTab('sport')"><span class="tab-icon">🏃</span>運動</button>
   <button class="tab" onclick="switchTab('weekly')"><span class="tab-icon">📅</span>本週</button>
   <button class="tab" onclick="switchTab('books')"><span class="tab-icon">📚</span>書單</button>
-  <button class="tab" onclick="switchTab('recommend')"><span class="tab-icon">✨</span>推薦</button>
-</div>
-
-<!-- 今日任務 -->
-<div id="panel-daily" class="panel active">
+  <button class="tab" onclick="switchTab('recommend')"><span class="tab-icon">✨</span>推薦</button></div><div id="panel-daily" class="panel active">
   <div id="ge-ontime-wrap" style="display:none">
     <div class="toggle-row">
       <div class="toggle-info">
@@ -338,7 +80,6 @@ input:checked+.slider:before{transform:translateX(20px)}
     </div>
   </div>
 
-  <!-- VIC CARD -->
   <div class="card vic-card">
     <div class="vic-stripe"></div>
     <div class="kid-header">
@@ -351,9 +92,14 @@ input:checked+.slider:before{transform:translateX(20px)}
     <div id="tasks-ge"></div>
     <div id="ge-login-streak" style="font-size:11px;font-weight:800;color:var(--vic-neon);text-align:right;margin-top:-10px;margin-bottom:4px"></div>
     <div id="ge-read-streak" style="font-size:12px;font-weight:800;color:var(--vic-neon);margin-top:10px;text-align:center;min-height:18px"></div>
+    
+    <div style="margin-top: 14px;">
+      <button class="btn btn-sm" style="background: linear-gradient(135deg, #FFD166 0%, #FF8C42 100%); color: #1A1A2E; width: 100%; font-size: 13px; font-weight: 900; border: none; padding: 8px; border-radius: var(--r-xs);" onclick="addHonorPoints('ge', 2, '🌟 許家榮譽星')">
+        🌟 點亮今日榮譽星 (分享/好表現) +2 點
+      </button>
+    </div>
   </div>
 
-  <!-- JOY CARD -->
   <div class="card joy-card">
     <div class="joy-hearts">🌸 💜 🌸 💜 🌸</div>
     <div class="kid-header">
@@ -366,36 +112,25 @@ input:checked+.slider:before{transform:translateX(20px)}
     <div id="tasks-mei"></div>
     <div id="mei-login-streak" style="font-size:11px;font-weight:800;color:var(--joy-heart);text-align:right;margin-top:-10px;margin-bottom:4px"></div>
     <div id="mei-read-streak" style="font-size:12px;font-weight:800;color:var(--joy-heart);margin-top:10px;text-align:center;min-height:18px"></div>
-  </div>
-
-  <!-- 榮譽解鎖按鈕 -->
-  <div style="margin-bottom:10px">
-    <div style="font-size:11px;color:var(--vic-neon);font-weight:800;margin-bottom:6px;padding:0 2px">✨ Vic 今日榮譽解鎖</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-sm" style="background:#FFD166;color:#1A1A2E;flex:1;font-size:12px;border:none;border-radius:var(--r-xs)" onclick="addHonorPoints('ge',2,'📢 黃金開口',event)">📢 講故事 +2</button>
-      <button class="btn btn-sm" style="background:var(--vic);color:white;flex:1;font-size:12px;border:none;border-radius:var(--r-xs)" onclick="addHonorPoints('ge',3,'🌟 閃亮超人',event)">🌟 好表現 +3</button>
-    </div>
-  </div>
-  <div style="margin-bottom:14px">
-    <div style="font-size:11px;color:var(--joy-heart);font-weight:800;margin-bottom:6px;padding:0 2px">✨ Joy 今日榮譽解鎖</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-sm" style="background:#FFD166;color:#1A1A2E;flex:1;font-size:12px;border:none;border-radius:var(--r-xs)" onclick="addHonorPoints('mei',2,'📢 黃金開口',event)">📢 講故事 +2</button>
-      <button class="btn btn-sm" style="background:var(--joy);color:white;flex:1;font-size:12px;border:none;border-radius:var(--r-xs)" onclick="addHonorPoints('mei',3,'🌟 閃亮超人',event)">🌟 好表現 +3</button>
+    
+    <div style="margin-top: 14px;">
+      <button class="btn btn-sm" style="background: linear-gradient(135deg, #FFD166 0%, #FF8C42 100%); color: #1A1A2E; width: 100%; font-size: 13px; font-weight: 900; border: none; padding: 8px; border-radius: var(--r-xs);" onclick="addHonorPoints('mei', 2, '🌟 許家榮譽星')">
+        🌟 點亮今日榮譽星 (分享/好表現) +2 點
+      </button>
     </div>
   </div>
 
-  <!-- 心情報告牆 -->
   <div class="card" style="background:linear-gradient(135deg,#1A1A2E 0%,#2D0A2D 100%);border-color:rgba(255,209,102,0.3);margin-bottom:14px">
     <div style="font-size:14px;font-weight:900;color:var(--yellow);margin-bottom:10px">💬 許家心情報告牆</div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <select id="share-who" style="width:100%;padding:9px 10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:white;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px">
+      <select id="share-who" style="width:100%;padding:9px 10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:white;font-size:13px">
         <option value="ge" style="color:black">🏎️ Vic（哥哥）</option>
         <option value="mei" style="color:black">🩺 Joy（妹妹）</option>
         <option value="mama" style="color:black">👩 媽媽</option>
         <option value="baba" style="color:black">👨 爸爸</option>
       </select>
-      <textarea id="share-text" placeholder="✍️ 寫下今天的事（學校趣事、心情、畫畫、語音輸入都可以！）" style="width:100%;height:70px;padding:10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;resize:none"></textarea>
-      <button class="btn btn-primary" style="padding:11px;font-size:13px;border-radius:var(--r-xs)" onclick="submitShare(event)">🚀 發送！孩子自動得 +2 點</button>
+      <textarea id="share-text" placeholder="✍️ 寫下今天的事（學校趣事、打字、畫畫拍下來自由分享...）" style="width:100%;height:70px;padding:10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:white;font-size:13px;resize:none"></textarea>
+      <button class="btn btn-primary" style="padding:11px;font-size:13px;border-radius:var(--r-xs)" onclick="submitShare(event)">🚀 發送報告（自動加點 2 點！）</button>
     </div>
     <div style="font-size:11px;color:var(--text3);font-weight:800;margin:12px 0 6px">📌 大家的心情動態</div>
     <div id="share-wall" style="max-height:160px;overflow-y:auto;background:rgba(0,0,0,0.2);border-radius:var(--r-xs);padding:8px">
@@ -419,15 +154,11 @@ input:checked+.slider:before{transform:translateX(20px)}
   </div>
   <div class="info-bar pending" id="reward-bar">
     <span class="bar-icon">⭐</span>
-    <span id="reward-msg"></span>
+    <span id="reward-msg">載入中...</span>
   </div>
-  <div id="fri-bonus-bar" style="display:none;margin-top:10px;background:linear-gradient(135deg,#FFD700,#FF6B35);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;font-weight:800;color:white;text-align:center;animation:hearts-pulse 1.5s ease infinite">
+  <div id="fri-bonus-bar" style="display:none;margin-top:10px;background:linear-gradient(135deg,#FFD700,#FF6B35);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;font-weight:800;color:white;text-align:center;">
     ⭐ 今天是週五！閱讀任務完成可獲得翻倍點數！⭐
-  </div>
-</div>
-
-<!-- 運動 -->
-<div id="panel-sport" class="panel">
+  </div></div><div id="panel-sport" class="panel">
   <div class="tip-bar" id="sport-tip">
     <span style="font-size:20px">💡</span>
     <span id="sport-tip-text">累積制，Vic 回家晚沒關係，週末再補！</span>
@@ -437,760 +168,4 @@ input:checked+.slider:before{transform:translateX(20px)}
       <div style="font-size:12px;font-weight:800;color:var(--vic-neon);margin-bottom:6px">🏎️ Vic</div>
       <div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:4px">目標 90 分鐘 / 週</div>
       <div class="ring-wrap">
-        <svg width="80" height="80" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(74,108,247,0.2)" stroke-width="9"/>
-          <circle cx="40" cy="40" r="32" fill="none" stroke="url(#vic-grad)" stroke-width="9" stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round" transform="rotate(-90 40 40)" id="ge-ring" style="transition:stroke-dashoffset .7s ease"/>
-          <defs><linearGradient id="vic-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7DF9FF"/><stop offset="100%" stop-color="#4A6CF7"/></linearGradient></defs>
-        </svg>
-        <div class="ring-val" id="ge-sport-val">0 / 90 分</div>
-        <div class="ring-sub" id="ge-sport-sub">還差 90 分鐘</div>
-      </div>
-      <div class="sport-log-row">
-        <input type="number" id="ge-min-input" placeholder="分鐘" min="1" max="120" style="width:58px;flex:unset"/>
-        <input type="text" id="ge-act-input" placeholder="活動"/>
-        <button class="btn btn-sm btn-vic" onclick="logSport('ge')">＋</button>
-      </div>
-      <div id="ge-sport-log" style="margin-top:8px"></div>
-    </div>
-    <div class="sport-card mei-sport" id="mei-sport-card">
-      <div style="font-size:12px;font-weight:800;color:var(--joy-heart);margin-bottom:6px">🩺 Joy</div>
-      <div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:4px">目標 60 分鐘 / 週</div>
-      <div class="ring-wrap">
-        <svg width="80" height="80" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(232,97,154,0.2)" stroke-width="9"/>
-          <circle cx="40" cy="40" r="32" fill="none" stroke="url(#joy-grad)" stroke-width="9" stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round" transform="rotate(-90 40 40)" id="mei-ring" style="transition:stroke-dashoffset .7s ease"/>
-          <defs><linearGradient id="joy-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FF85C2"/><stop offset="100%" stop-color="#9B59B6"/></linearGradient></defs>
-        </svg>
-        <div class="ring-val" id="mei-sport-val">0 / 60 分</div>
-        <div class="ring-sub" id="mei-sport-sub">還差 60 分鐘</div>
-      </div>
-      <div class="sport-log-row">
-        <input type="number" id="mei-min-input" placeholder="分鐘" min="1" max="120" style="width:58px;flex:unset"/>
-        <input type="text" id="mei-act-input" placeholder="活動"/>
-        <button class="btn btn-sm btn-joy" onclick="logSport('mei')">＋</button>
-      </div>
-      <div id="mei-sport-log" style="margin-top:8px"></div>
-    </div>
-  </div>
-</div>
-
-<!-- 本週進度 -->
-<div id="panel-weekly" class="panel">
-  <div class="card">
-    <div style="font-size:13px;font-weight:900;color:var(--vic);margin-bottom:12px">🏎️ Vic 本週任務</div>
-    <div id="weekly-ge"></div>
-  </div>
-  <div class="card">
-    <div style="font-size:13px;font-weight:900;color:var(--joy);margin-bottom:12px">🌸 Joy 本週任務</div>
-    <div id="weekly-mei"></div>
-  </div>
-  <div class="card">
-    <div style="font-size:16px;font-weight:900;margin-bottom:12px">🎁 週末 3C 獎勵試算</div>
-    <div id="weekend-calc"></div>
-  </div>
-
-  <!-- 兄妹攜手箱 -->
-  <div class="card" id="teamwork-card" style="background:linear-gradient(135deg,#0D0D1A,#1A0A1A);border:2px solid rgba(255,215,0,0.3)">
-    <div style="font-size:15px;font-weight:900;color:#FFD700;margin-bottom:10px">🤝 兄妹攜手箱</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Vic + Joy 本週運動合計達 150 分鐘 → 兩人各得大禮包 +20 分鐘！</div>
-    <div id="teamwork-bar-wrap" style="background:rgba(255,255,255,0.05);border-radius:30px;height:14px;overflow:hidden;margin-bottom:8px">
-      <div id="teamwork-bar" style="height:100%;border-radius:30px;background:linear-gradient(90deg,#4A6CF7,#E8619A);width:0%;transition:width .6s ease"></div>
-    </div>
-    <div id="teamwork-label" style="font-size:12px;font-weight:800;text-align:center;color:white"></div>
-  </div>
-
-  <!-- 神秘盲盒 -->
-  <div class="card" style="background:linear-gradient(135deg,#1A0A2E,#2E1A0A);border:2px solid rgba(155,89,182,0.4)">
-    <div style="font-size:15px;font-weight:900;color:#DA70D6;margin-bottom:8px">🎲 媽媽神秘盲盒</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">累積夠多閱讀🏆連勝，解鎖盲盒！內有驚喜獎勵由媽媽決定 ✨</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div style="text-align:center">
-        <div style="font-size:12px;font-weight:800;color:var(--vic-neon);margin-bottom:6px">🏎️ Vic 盲盒</div>
-        <div id="ge-blindbox-count" style="font-size:28px;font-weight:900;color:white">0</div>
-        <div style="font-size:11px;color:var(--text3)">個可開盒</div>
-        <button class="btn btn-sm btn-vic" style="margin-top:8px;width:100%" onclick="openBlindbox('ge')">🎲 開盒！</button>
-      </div>
-      <div style="text-align:center">
-        <div style="font-size:12px;font-weight:800;color:var(--joy-heart);margin-bottom:6px">🌸 Joy 盲盒</div>
-        <div id="mei-blindbox-count" style="font-size:28px;font-weight:900;color:white">0</div>
-        <div style="font-size:11px;color:var(--text3)">個可開盒</div>
-        <button class="btn btn-sm btn-joy" style="margin-top:8px;width:100%" onclick="openBlindbox('mei')">🎲 開盒！</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 書單 -->
-<div id="panel-books" class="panel">
-  <div class="card">
-    <div style="font-size:16px;font-weight:900;margin-bottom:14px">📚 借閱書單</div>
-    <div id="book-list"></div>
-    <div class="add-row" style="margin-top:14px">
-      <input id="book-title-input" placeholder="✏️ 書名"/>
-      <select id="book-who-input">
-        <option value="哥哥">🏎️ Vic</option>
-        <option value="妹妹">🌸 Joy</option>
-        <option value="全家">🏠 全家</option>
-      </select>
-      <button class="btn btn-primary btn-sm" onclick="addBook()">＋ 加入</button>
-    </div>
-  </div>
-</div>
-
-<!-- 推薦書單 -->
-<div id="panel-recommend" class="panel">
-  <div class="rtabs">
-    <div class="rtab vic-active" id="rtab-ge" onclick="switchRTab('ge')">🏎️ Vic 的書單</div>
-    <div class="rtab" id="rtab-mei" onclick="switchRTab('mei')">🌸 Joy 的書單</div>
-  </div>
-  <div id="rpanel-ge">
-    <div class="tip-bar"><span style="font-size:20px">💡</span>勾選想借的書，按下面按鈕加入書單！自己想看的也可以直接新增 😊</div>
-    <div class="card" style="background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-size:15px;font-weight:900;color:var(--vic-neon)">✨ 本週推薦</div>
-        <button class="btn btn-sm btn-vic" onclick="generateRecommend('ge')" id="gen-ge-btn">🤖 Claude 推薦</button>
-      </div>
-      <div id="recommend-ge-list"></div>
-      <div class="add-row" style="margin-top:14px">
-        <input id="rec-ge-input" placeholder="✏️ 自己想看的書" style="background:rgba(255,255,255,0.08);border-color:rgba(74,108,247,0.3);color:white"/>
-        <button class="btn btn-sm btn-vic" onclick="addRecommend('ge')">＋ 新增</button>
-      </div>
-    </div>
-    <button class="btn btn-vic btn-full" onclick="addSelectedToBooks('ge')">📚 將勾選的書加入借閱清單</button>
-  </div>
-  <div id="rpanel-mei" style="display:none">
-    <div class="tip-bar"><span style="font-size:20px">💡</span>勾選想借的書，按下面按鈕加入書單！自己想看的也可以直接新增 😊</div>
-    <div class="card" style="background:linear-gradient(135deg,#1A0A1A,#2D0A2D);border-color:rgba(232,97,154,0.3)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-size:15px;font-weight:900;color:var(--joy-heart)">✨ 本週推薦</div>
-        <button class="btn btn-sm btn-joy" onclick="generateRecommend('mei')" id="gen-mei-btn">🤖 Claude 推薦</button>
-      </div>
-      <div id="recommend-mei-list"></div>
-      <div class="add-row" style="margin-top:14px">
-        <input id="rec-mei-input" placeholder="✏️ 自己想看的書" style="background:rgba(255,255,255,0.08);border-color:rgba(232,97,154,0.3);color:white"/>
-        <button class="btn btn-sm btn-joy" onclick="addRecommend('mei')">＋ 新增</button>
-      </div>
-    </div>
-    <button class="btn btn-joy btn-full" onclick="addSelectedToBooks('mei')">📚 將勾選的書加入借閱清單</button>
-  </div>
-</div>
-
-<script>
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyA_dlYEpYnGrJSPLuqRZwp3tvXupCKlKX4",
-  authDomain: "family-dashboard-ea53c.firebaseapp.com",
-  databaseURL: "https://family-dashboard-ea53c-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "family-dashboard-ea53c",
-  storageBucket: "family-dashboard-ea53c.firebasestorage.app",
-  messagingSenderId: "292763446655",
-  appId: "1:292763446655:web:34d8e6ba87300fff1c7e4a"
-};
-let db=null;
-try{
-  firebase.initializeApp(FIREBASE_CONFIG);
-  db=firebase.database();
-}catch(e){
-  console.warn('Firebase init failed:',e);
-  db=null;
-}
-
-// Immediately load from localStorage so UI renders right away
-try{
-  const local=localStorage.getItem('family_backup');
-  if(local){
-    const saved=JSON.parse(local);
-    Object.assign(state,saved);
-  }
-}catch(e){}
-
-function setSyncStatus(s){
-  const dot=document.getElementById('sync-dot'),lbl=document.getElementById('sync-label');
-  if(s==='online'){dot.className='sync-dot online';lbl.textContent='已同步';}
-  else if(s==='syncing'){dot.className='sync-dot syncing';lbl.textContent='同步中';}
-  else{dot.className='sync-dot';lbl.textContent='本機';}
-}
-
-const DAYS=['一','二','三','四','五'];
-const TODAY=new Date().getDay();
-const todayIdx=TODAY===0?4:TODAY===6?4:TODAY-1;
-const isWeekend=TODAY===0||TODAY===6;
-const isFri=TODAY===5;
-const isWeekday14=TODAY>=1&&TODAY<=4;
-
-const GE_TASKS=[
-  {id:'ge1',label:'📝 作業與聯絡簿定位'},
-  {id:'ge2',label:'🚿 20分鐘洗澡刷牙挑戰'},
-  {id:'ge3',label:'🎒 睡前書包制服大點名'},
-  {id:'ge4',label:'🧠 15分鐘大腦快問快答（不拿筆）'},
-  {id:'ge5',label:'📖 睡前黃金閱讀 20 分鐘 ⚡雙倍點數！'},
-];
-const MEI_TASKS=[
-  {id:'mei1',label:'📝 作業與聯絡簿定位'},
-  {id:'mei2',label:'🚿 洗澡刷牙小儀式'},
-  {id:'mei3',label:'🎒 書包制服大點名'},
-  {id:'mei4',label:'🌟 15分鐘知識小老師'},
-  {id:'mei5',label:'📖 睡前閱讀 15 分鐘 ⚡雙倍點數！'},
-];
-const WEEKLY_TASKS={
-  ge:['作業定位','洗澡挑戰','大腦充電','黃金閱讀'],
-  mei:['作業定位','洗澡儀式','知識小老師','睡前閱讀'],
-};
-const SPORT_GOAL={ge:90,mei:60};
-const CIRC=201;
-
-let state={
-  daily:{},geOntime:false,
-  weekly:{ge:{},mei:{}},
-  sport:{ge:[],mei:[]},
-  ontimeDays:0,
-  ontimeDayKeys:{},
-  streaks:{ge:0,mei:0},
-  lastStreakDate:{ge:'',mei:''},
-  blindbox:{ge:0,mei:0},
-  recommend:{
-    ge:[
-      {title:'怪傑佐羅力系列',tag:'幽默冒險',checked:false},
-      {title:'神奇酷科學系列',tag:'爆笑科學',checked:false},
-      {title:'機智小學生100招',tag:'時間管理',checked:false},
-      {title:'達克比辦案系列',tag:'科普偵探',checked:false},
-      {title:'查理九世系列',tag:'懸疑冒險',checked:false},
-      {title:'屁股偵探系列',tag:'幽默推理',checked:false},
-      {title:'湯姆叔叔的小屋',tag:'歷史人文',checked:false},
-      {title:'賽車手的科學',tag:'賽車科技',checked:false},
-      {title:'棒球大聯盟系列',tag:'運動熱血',checked:false},
-      {title:'我的英雄學院漫畫版',tag:'熱血成長',checked:false},
-    ],
-    mei:[
-      {title:'屁屁偵探讀本系列',tag:'觀察解謎',checked:false},
-      {title:'露露與菈菈系列',tag:'溫馨甜點',checked:false},
-      {title:'二年級問題多',tag:'校園生活',checked:false},
-      {title:'什麼都行巫婆',tag:'魔法想像',checked:false},
-      {title:'小醫師大急救系列',tag:'醫學科普',checked:false},
-      {title:'人體大探索',tag:'醫學知識',checked:false},
-      {title:'庫洛魔法使漫畫版',tag:'魔法少女',checked:false},
-      {title:'神奇的人體',tag:'科學醫學',checked:false},
-      {title:'茉莉花開系列',tag:'溫馨成長',checked:false},
-      {title:'大家來玩Roblox',tag:'遊戲創作',checked:false},
-    ],
-  },
-  books:[
-    {id:1,title:'達克比辦案',who:'哥哥',status:'借閱中'},
-    {id:2,title:'神奇樹屋',who:'妹妹',status:'借閱中'},
-  ],
-  bookId:3,
-};
-
-function getWeekKey(){const d=new Date(),mon=new Date(d);mon.setDate(d.getDate()-((d.getDay()+6)%7));return mon.toISOString().slice(0,10);}
-function dbRef(path){return db?db.ref('family/'+path):null;}
-function syncUp(path,value){
-  if(!db){
-    // Save to localStorage as fallback
-    try{localStorage.setItem('family_backup',JSON.stringify(state));}catch(e){}
-    return;
-  }
-  setSyncStatus('syncing');
-  dbRef(path).set(value).then(()=>setSyncStatus('online')).catch((e)=>{
-    console.warn('sync failed',e);
-    setSyncStatus('offline');
-  });
-}
-function startListening(){
-  if(!db){renderAll();return;}
-  setSyncStatus('syncing');
-  // Fallback: render after 4s even if Firebase is slow
-  const fallbackTimer=setTimeout(()=>{
-    setSyncStatus('offline');
-    renderAll();
-  },4000);
-  dbRef('').on('value',snap=>{
-    clearTimeout(fallbackTimer);
-    const data=snap.val();
-    if(data){
-      state.daily=data.daily||{};
-      state.geOntime=data.geOntime||false;
-      state.weekly=data.weekly||{ge:{},mei:{}};
-      state.sport=data.sport||{ge:[],mei:[]};
-      state.recommend=data.recommend||{ge:[],mei:[]};
-      state.ontimeDays=data.ontimeDays||0;
-      state.ontimeDayKeys=data.ontimeDayKeys||{};
-      state.streaks=data.streaks||{ge:0,mei:0};
-      state.lastStreakDate=data.lastStreakDate||{ge:'',mei:''};
-      state.blindbox=data.blindbox||{ge:0,mei:0};
-      state.shares=data.shares||[];
-      state.books=data.books||state.books;
-      state.bookId=data.bookId||state.bookId;
-    }
-    setSyncStatus('online');
-    renderAll();
-  });
-  db.ref('.info/connected').on('value',snap=>{
-    if(!snap.val()){setSyncStatus('offline');renderAll();}
-  });
-  db.ref('family/shares').limitToLast(15).on('value',snap=>{
-    renderShareWallData(snap.val());
-  });
-}
-
-// ── CONFETTI BURST ──
-function burst(x,y,emojis){
-  // Expand to 12 particles for more impact
-  const pool=[...emojis,...emojis,...emojis].slice(0,12);
-  pool.forEach((em,i)=>{
-    const el=document.createElement('div');
-    el.textContent=em;
-    const angle=(i/pool.length)*360+(Math.random()*20-10);
-    const dist=50+Math.random()*60;
-    const size=16+Math.random()*12;
-    el.style.cssText=`left:${x}px;top:${y}px;position:fixed;z-index:9999;pointer-events:none;font-size:${size}px;animation:burst-out ${.6+Math.random()*.4}s ease-out forwards;--tx:${Math.cos(angle*Math.PI/180)*dist}px;--ty:${Math.sin(angle*Math.PI/180)*dist}px`;
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(),1100);
-  });
-}
-
-// ── TASKS ──
-function isChecked(id){
-  return !!(state.daily && state.daily[id]);
-}
-function toggleTask(id,event){
-  const wasChecked=!!state.daily[id];
-  state.daily[id]=!wasChecked;
-  syncUp('daily',state.daily);
-  if(!wasChecked){
-    const isVic=id.startsWith('ge');
-    const emojis=isVic?['🏎️','⚡','🎮','💥','🌟']:['🌸','💜','🩺','💕','✨'];
-    if(event&&event.clientX){
-      burst(event.clientX,event.clientY,emojis);
-    } else {
-      // fallback for touch without coords
-      burst(window.innerWidth/2,window.innerHeight/2,emojis);
-    }
-  }
-  renderDaily();
-}
-function onOntimeChange(){
-  const checked=document.getElementById('ge-ontime').checked;
-  state.geOntime=checked;
-  // Track weekly ontime days
-  if(checked){
-    if(!state.ontimeDays) state.ontimeDays=0;
-    // Only count once per day using todayIdx
-    const dayKey='ontime_'+getWeekKey()+'_'+todayIdx;
-    if(!state.ontimeDayKeys) state.ontimeDayKeys={};
-    if(!state.ontimeDayKeys[dayKey]){
-      state.ontimeDayKeys[dayKey]=true;
-      state.ontimeDays=(state.ontimeDays||0)+1;
-      syncUp('ontimeDays',state.ontimeDays);
-      syncUp('ontimeDayKeys',state.ontimeDayKeys);
-    }
-  }
-  syncUp('geOntime',state.geOntime);
-  renderDaily();
-  renderWeekly();
-}
-
-function renderTasks(tasks,cid){
-  const el=document.getElementById(cid);
-  el.innerHTML='';
-  tasks.forEach(t=>{
-    const done=isChecked(t.id);
-    const row=document.createElement('div');
-    row.className='task-item';
-    row.addEventListener('click',function(e){toggleTask(t.id,e);},{passive:true});
-    row.innerHTML=`<div class="task-check ${done?'done'}">${done?'✓':''}</div><div class="task-label${done?' done':''}">${t.label}</div>`;
-    el.appendChild(row);
-  });
-}
-
-function renderDaily(){
-  document.getElementById('ge-ontime-wrap').style.display=isWeekday14?'block':'none';
-  document.getElementById('ge-ontime').checked=!!state.geOntime;
-  renderTasks(GE_TASKS,'tasks-ge');
-  renderTasks(MEI_TASKS,'tasks-mei');
-  const geAll=GE_TASKS.every(t=>isChecked(t.id));
-  const meiAll=MEI_TASKS.every(t=>isChecked(t.id));
-  // Update daily login streak
-  const todayStr=new Date().toISOString().slice(0,10);
-  ['ge','mei'].forEach(kid=>{
-    const tasks=kid==='ge'?GE_TASKS:MEI_TASKS;
-    const allDone=tasks.every(t=>isChecked(t.id));
-    if(allDone && state.lastStreakDate[kid]!==todayStr){
-      const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
-      const yStr=yesterday.toISOString().slice(0,10);
-      state.streaks[kid]=(state.lastStreakDate[kid]===yStr?(state.streaks[kid]||0)+1:1);
-      state.lastStreakDate[kid]=todayStr;
-      syncUp('streaks',state.streaks);
-      syncUp('lastStreakDate',state.lastStreakDate);
-    }
-  });
-
-  // Show reading streak badge
-  const geStreak=calcReadStreak('ge'),meiStreak=calcReadStreak('mei');
-  const geStreakEl=document.getElementById('ge-read-streak');
-  const meiStreakEl=document.getElementById('mei-read-streak');
-  if(geStreakEl) geStreakEl.textContent=geStreak>=3?`🏆 閱讀小隊長！連勝${geStreak}天`:geStreak>0?`🔥 連勝${geStreak}天，還差${3-geStreak}天觸發！`:'';
-  if(meiStreakEl) meiStreakEl.textContent=meiStreak>=3?`🏆 閱讀小隊長！連勝${meiStreak}天`:meiStreak>0?`🔥 連勝${meiStreak}天，還差${3-meiStreak}天觸發！`:'';
-
-  // Login streak flames
-  const gLS=state.streaks?.ge||0, mLS=state.streaks?.mei||0;
-  const gLSEl=document.getElementById('ge-login-streak');
-  const mLSEl=document.getElementById('mei-login-streak');
-  if(gLSEl) gLSEl.textContent=gLS>=2?`${'🔥'.repeat(Math.min(gLS,5))} 連續${gLS}天全完成！`:'';
-  if(mLSEl) mLSEl.textContent=mLS>=2?`${'🔥'.repeat(Math.min(mLS,5))} 連續${mLS}天全完成！`:'';
-  const ontime=!!state.geOntime;
-  let gt,gn,gC,mt,mn,mC;
-  if(isWeekend){gt='60 分鐘';gn='🎉 週末開放！';gC='earned';}
-  else if(isFri&&geAll){gt='30 分鐘';gn='🎉 週五任務完成！';gC='earned';}
-  else if(isWeekday14){
-    if(geAll&&ontime){gt='週六 +15分';gn='🏆 準時回家＋任務全完成！週六加碼！';gC='earned';}
-    else if(geAll&&!ontime){gt='任務達成！';gn='等媽媽確認準時回家，週六加碼 +15';gC='maybe';}
-    else if(ontime&&!geAll){const l=GE_TASKS.filter(t=>!isChecked(t.id)).length;gt='累積中…';gn=`還差 ${l} 項，完成就加碼！`;gC='maybe';}
-    else{gt='💤 好好休息';gn='平日不開 3C，大腦儲能中！';gC='locked';}
-  }else{gt='💤 好好休息';gn='平日不開 3C，大腦儲能中！';gC='locked';}
-  if(isWeekend){mt='45 分鐘';mn='🎉 週末開放！';mC='earned';}
-  else if(meiAll){mt='30 分鐘';mn='🎉 任務全完成！';mC='earned';}
-  else{const l=MEI_TASKS.filter(t=>!isChecked(t.id)).length;mt='待完成';mn=`還差 ${l} 項任務`;mC='locked';}
-  document.getElementById('ge-time').textContent=gt;
-  document.getElementById('ge-time').className='sc-val '+gC;
-  document.getElementById('ge-time-note').textContent=gn;
-  document.getElementById('mei-time').textContent=mt;
-  document.getElementById('mei-time').className='sc-val '+mC;
-  document.getElementById('mei-time-note').textContent=mn;
-  // Friday bonus bar
-  const friBar=document.getElementById('fri-bonus-bar');
-  if(friBar) friBar.style.display=isFri?'block':'none';
-
-  const bar=document.getElementById('reward-bar');
-  const left=GE_TASKS.filter(t=>!isChecked(t.id)).length+MEI_TASKS.filter(t=>!isChecked(t.id)).length;
-  if(geAll&&meiAll){
-    bar.className='info-bar good';
-    document.getElementById('reward-msg').textContent='今天全部完成！週末可獲得額外獎勵 🎉';
-    const banner=document.getElementById('all-done-banner');
-    banner.classList.add('show');
-    setTimeout(()=>banner.classList.remove('show'),4000);
-  }else{
-    bar.className='info-bar pending';
-    document.getElementById('reward-msg').textContent=`還差 ${left} 項任務，加油！完成後解鎖週末獎勵 ⭐`;
-  }
-}
-
-// ── SPORT ──
-function getWeekSport(kid){return(state.sport[kid]||[]).filter(e=>e.week===getWeekKey());}
-function sumSport(kid){return getWeekSport(kid).reduce((a,e)=>a+e.min,0);}
-function renderSport(){
-  ['ge','mei'].forEach(kid=>{
-    const total=sumSport(kid),goal=SPORT_GOAL[kid];
-    const pct=Math.min(Math.max(total/goal,0),1);
-    const offset=Math.round(CIRC*(1-pct));
-    document.getElementById(kid+'-ring').setAttribute('stroke-dashoffset',offset);
-    document.getElementById(kid+'-sport-val').textContent=`${total} / ${goal} 分`;
-    const left=Math.max(goal-total,0);
-    document.getElementById(kid+'-sport-sub').textContent=left===0?'🎉 本週達標！':`還差 ${left} 分鐘`;
-    document.getElementById(kid+'-sport-card').classList.toggle('goal-met',left===0);
-    document.getElementById(kid+'-sport-log').innerHTML=getWeekSport(kid).slice().reverse().slice(0,4).map(e=>
-      `<div class="log-entry"><span>${e.day} ${e.act} <strong>${e.min}分</strong></span><span class="log-del" onclick="delSport('${kid}','${e.id}')">✕</span></div>`
-    ).join('');
-  });
-  const gL=Math.max(SPORT_GOAL.ge-sumSport('ge'),0),mL=Math.max(SPORT_GOAL.mei-sumSport('mei'),0);
-  document.getElementById('sport-tip-text').textContent=
-    gL===0&&mL===0?'🎉 Vic 和 Joy 本週都達標了！超強的！':
-    gL===0?`Vic 本週達標！Joy 還差 ${mL} 分鐘 💪`:
-    mL===0?`Joy 本週達標！Vic 還差 ${gL} 分鐘 💪`:
-    'Vic 回家晚的平日跳過，週末補！兩個人加油 🏃';
-}
-function logSport(kid){
-  const minEl=document.getElementById(kid+'-min-input'),actEl=document.getElementById(kid+'-act-input');
-  const min=parseInt(minEl.value),act=actEl.value.trim()||'運動';
-  if(!min||min<1)return;
-  const days=['日','一','二','三','四','五','六'];
-  if(!state.sport[kid])state.sport[kid]=[];
-  state.sport[kid].push({id:Date.now()+'',week:getWeekKey(),min,act,day:'週'+days[new Date().getDay()]});
-  minEl.value='';actEl.value='';
-  syncUp('sport',state.sport);renderSport();renderTeamwork();
-}
-function delSport(kid,id){state.sport[kid]=state.sport[kid].filter(e=>e.id!==id);syncUp('sport',state.sport);renderSport();renderTeamwork();}
-
-// ── WEEKLY ──
-function calcReadStreak(kid){
-  // Count consecutive days with reading task checked this week
-  const readKey=kid==='ge'?'ge5':'mei5';
-  let streak=0;
-  for(let i=Math.min(todayIdx,4);i>=0;i--){
-    // Use weekly dots for reading task
-    const taskLabel=kid==='ge'?'黃金閱讀':'睡前閱讀';
-    const key=kid+'_'+taskLabel+'_'+i;
-    if((state.weekly[kid]||{})[key]) streak++;
-    else break;
-  }
-  return streak;
-}
-
-function renderWeekly(){
-  ['ge','mei'].forEach(kid=>{
-    const el=document.getElementById('weekly-'+kid);el.innerHTML='';
-    WEEKLY_TASKS[kid].forEach(t=>{
-      const row=document.createElement('div');row.className='week-row';
-      row.innerHTML=`<span class="week-label">${t}</span><div class="day-dots">${DAYS.map((d,i)=>{
-        const key=kid+'_'+t+'_'+i,done=!!(state.weekly[kid]||{})[key];
-        return`<div class="dot${done?' done':''}${i===todayIdx&&!isWeekend?' today':''}" onclick="toggleWeekly('${kid}','${t}',${i})">${done?'✓':d}</div>`;
-      }).join('')}</div>`;
-      el.appendChild(row);
-    });
-  });
-  const cnt=kid=>{let d=0,t=0;WEEKLY_TASKS[kid].forEach(tk=>DAYS.forEach((_,i)=>{t++;if((state.weekly[kid]||{})[kid+'_'+tk+'_'+i])d++}));return{d,t}};
-  const ge=cnt('ge'),mei=cnt('mei');
-  const gSB=sumSport('ge')>=SPORT_GOAL.ge?15:0,mSB=sumSport('mei')>=SPORT_GOAL.mei?10:0;
-  // Count ontime days this week
-  const geOntimeDays=state.ontimeDays||0;
-  const geOntimeBonus=geOntimeDays*15;
-  // Reading streak bonus
-  const geReadStreak=calcReadStreak('ge'),meiReadStreak=calcReadStreak('mei');
-  const geReadBonus=geReadStreak>=3?20:0,meiReadBonus=meiReadStreak>=3?20:0;
-  const geTotal=Math.round(ge.d/ge.t*60)+gSB+geOntimeBonus+geReadBonus;
-  const meiTotal=Math.round(mei.d/mei.t*45)+mSB+meiReadBonus;
-  document.getElementById('weekend-calc').innerHTML=`
-    <div class="calc-row"><span>🏎️ Vic 任務 ${ge.d}/${ge.t}</span><span>${Math.round(ge.d/ge.t*60)} 分鐘</span></div>
-    <div class="calc-row"><span>🏃 Vic 運動達標${gSB?'':'（未達）'}</span><span style="color:${gSB?'var(--green)':'var(--text3)'}">${gSB?'+'+gSB+' 分鐘':'＋0'}</span></div>
-    <div class="calc-row"><span>🕗 Vic 準時回家（本週 ${geOntimeDays} 天）</span><span style="color:${geOntimeBonus?'var(--green)':'var(--text3)'}">${geOntimeBonus?'+'+geOntimeBonus+' 分鐘':'＋0'}</span></div>
-    <div class="calc-row"><span>📖 Vic 閱讀連勝 ${geReadStreak} 天${geReadBonus?'🏆':'（滿3天觸發）'}</span><span style="color:${geReadBonus?'#FFD700':'var(--text3)'}">${geReadBonus?'+'+geReadBonus+' 分鐘！':'＋0'}</span></div>
-    <div class="calc-row"><span>🏎️ <strong>Vic 週末總計</strong></span><span class="calc-total">${geTotal} 分鐘 🎮</span></div>
-    <div style="height:10px"></div>
-    <div class="calc-row"><span>🌸 Joy 任務 ${mei.d}/${mei.t}</span><span>${Math.round(mei.d/mei.t*45)} 分鐘</span></div>
-    <div class="calc-row"><span>🏃 Joy 運動達標${mSB?'':'（未達）'}</span><span style="color:${mSB?'var(--green)':'var(--text3)'}">${mSB?'+'+mSB+' 分鐘':'＋0'}</span></div>
-    <div class="calc-row"><span>📖 Joy 閱讀連勝 ${meiReadStreak} 天${meiReadBonus?'🏆':'（滿3天觸發）'}</span><span style="color:${meiReadBonus?'#FFD700':'var(--text3)'}">${meiReadBonus?'+'+meiReadBonus+' 分鐘！':'＋0'}</span></div>
-    <div class="calc-row"><span>🌸 <strong>Joy 週末總計</strong></span><span class="calc-total" style="color:var(--joy)">${meiTotal} 分鐘 🎮</span></div>`;
-}
-function toggleWeekly(kid,task,i){
-  if(!state.weekly[kid])state.weekly[kid]={};
-  const key=kid+'_'+task+'_'+i;
-  state.weekly[kid][key]=!state.weekly[kid][key];
-  syncUp('weekly',state.weekly);renderWeekly();
-}
-
-// ── BOOKS ──
-const BOOK_EMOJIS=['📗','📘','📙','📕','📓','📔','📒','📃'];
-function bookEmoji(title){let n=0;for(let c of title)n+=c.charCodeAt(0);return BOOK_EMOJIS[n%BOOK_EMOJIS.length];}
-function renderBooks(){
-  const el=document.getElementById('book-list');
-  if(!state.books||!state.books.length){el.innerHTML='<p style="font-size:14px;color:var(--text3);padding:12px 0;text-align:center">還沒有書，去推薦頁選書吧！📚</p>';return;}
-  el.innerHTML=state.books.map(b=>`
-    <div class="book-item">
-      <span class="book-emoji">${bookEmoji(b.title)}</span>
-      <div class="book-info">
-        <div class="book-title">${b.title}</div>
-        <div class="book-who">${b.who==='哥哥'?'🏎️ Vic':b.who==='妹妹'?'🌸 Joy':'🏠 全家'}</div>
-      </div>
-      <span class="book-status status-${b.status}">${b.status}</span>
-      <button class="btn btn-sm" onclick="toggleBook(${b.id})" style="margin-left:4px">${b.status==='借閱中'?'還書':'重借'}</button>
-      <button class="btn btn-sm" onclick="removeBook(${b.id})" style="color:var(--text3);margin-left:2px">✕</button>
-    </div>`).join('');
-}
-function addBook(){
-  const t=document.getElementById('book-title-input').value.trim(),w=document.getElementById('book-who-input').value;
-  if(!t)return;
-  state.books.push({id:state.bookId++,title:t,who:w,status:'借閱中'});
-  document.getElementById('book-title-input').value='';
-  syncUp('books',state.books);syncUp('bookId',state.bookId);renderBooks();
-}
-function toggleBook(id){const b=state.books.find(x=>x.id===id);if(b)b.status=b.status==='借閱中'?'已還書':'借閱中';syncUp('books',state.books);renderBooks();}
-function removeBook(id){state.books=state.books.filter(x=>x.id!==id);syncUp('books',state.books);renderBooks();}
-
-// ── RECOMMEND ──
-function switchRTab(kid){
-  document.getElementById('rpanel-ge').style.display=kid==='ge'?'block':'none';
-  document.getElementById('rpanel-mei').style.display=kid==='mei'?'block':'none';
-  document.getElementById('rtab-ge').className='rtab'+(kid==='ge'?' vic-active':'');
-  document.getElementById('rtab-mei').className='rtab'+(kid==='mei'?' joy-active':'');
-}
-function renderRecommend(kid){
-  const list=state.recommend[kid]||[],el=document.getElementById('recommend-'+kid+'-list');
-  if(!list.length){el.innerHTML='<p style="font-size:13px;color:var(--text3);padding:12px 0;text-align:center">點「Claude 推薦」產生書單，或直接輸入想看的書！📖</p>';return;}
-  const isJoy=kid==='mei';
-  el.innerHTML=list.map((b,i)=>`
-    <div class="rec-item">
-      <div class="rec-check${b.checked?(isJoy?' joy-checked':' vic-checked'):''}" onclick="toggleRecCheck('${kid}',${i})">${b.checked?'✓':''}</div>
-      <span class="book-emoji">${bookEmoji(b.title)}</span>
-      <div class="rec-title" style="color:white">${b.title}</div>
-      ${b.tag?`<span class="rec-tag ${isJoy?'joy-tag':'vic-tag'}">${b.tag}</span>`:''}
-      <span class="rec-del" onclick="removeRecommend('${kid}',${i})">✕</span>
-    </div>`).join('');
-}
-function toggleRecCheck(kid,i){state.recommend[kid][i].checked=!state.recommend[kid][i].checked;syncUp('recommend',state.recommend);renderRecommend(kid);}
-function addRecommend(kid){
-  const input=document.getElementById('rec-'+kid+'-input'),title=input.value.trim();
-  if(!title)return;
-  if(!state.recommend[kid])state.recommend[kid]=[];
-  state.recommend[kid].push({title,checked:false,tag:'想看的'});
-  input.value='';syncUp('recommend',state.recommend);renderRecommend(kid);
-}
-function removeRecommend(kid,i){state.recommend[kid].splice(i,1);syncUp('recommend',state.recommend);renderRecommend(kid);}
-function addSelectedToBooks(kid){
-  const selected=(state.recommend[kid]||[]).filter(b=>b.checked);
-  if(!selected.length){alert('請先勾選想借的書！☝️');return;}
-  selected.forEach(b=>{state.books.push({id:state.bookId++,title:b.title,who:kid==='ge'?'哥哥':'妹妹',status:'借閱中'});});
-  state.recommend[kid].forEach(b=>b.checked=false);
-  syncUp('books',state.books);syncUp('bookId',state.bookId);syncUp('recommend',state.recommend);
-  renderBooks();renderRecommend(kid);
-  alert(`✅ ${selected.length} 本書已加入借閱清單！`);
-}
-async function generateRecommend(kid){
-  const btn=document.getElementById('gen-'+kid+'-btn');
-  btn.disabled=true;btn.textContent='⏳ 產生中...';
-  document.getElementById('loading').classList.add('show');
-  const isVic=kid==='ge';
-  const prompt=isVic
-    ?`請為台灣10歲男生 Vic 推薦12本繁體中文兒童書籍，他喜歡射擊遊戲和賽車，個性活潑好動，不喜歡太文學性的書。請推薦冒險、科學、偵探、幽默、運動類書籍。只回傳 JSON 陣列，不要有其他文字或 markdown：[{"title":"書名","tag":"類型"},...] 類型用2到4個字。`
-    :`請為台灣8歲女生 Joy 推薦12本繁體中文兒童書籍，她喜歡 Roblox 遊戲、庫洛米、夢想成為醫生。請推薦醫學科普、魔法、解謎、可愛動物、成長類書籍。只回傳 JSON 陣列，不要有其他文字或 markdown：[{"title":"書名","tag":"類型"},...] 類型用2到4個字。`;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    const data=await res.json();
-    const text=data.content[0].text.replace(/```json|```/g,'').trim();
-    const books=JSON.parse(text);
-    if(!state.recommend[kid])state.recommend[kid]=[];
-    const existing=state.recommend[kid].map(b=>b.title);
-    books.forEach(b=>{if(!existing.includes(b.title))state.recommend[kid].push({...b,checked:false});});
-    syncUp('recommend',state.recommend);renderRecommend(kid);
-  }catch(e){alert('推薦產生失敗，請稍後再試 😅');}
-  document.getElementById('loading').classList.remove('show');
-  btn.disabled=false;btn.textContent='🤖 Claude 推薦';
-}
-
-// ── HONOR POINTS ──
-function addHonorPoints(kid, points, reason, evt) {
-  const emojis=kid==='ge'?['👑','🏎️','⚡','🔥','🎉']:['🌸','🩺','💖','✨','🎉'];
-  const x=evt?evt.clientX:window.innerWidth/2;
-  const y=evt?evt.clientY:window.innerHeight/2;
-  burst(x,y,emojis);
-  const honorId=`honor_${kid}_${new Date().toISOString().slice(0,10)}_${reason}`;
-  if(!state.daily[honorId]){
-    state.daily[honorId]=true;
-    syncUp('daily',state.daily);
-    setTimeout(()=>alert(`🎉 ${kid==='ge'?'Vic':'Joy'} 達成【${reason}】！太棒了！`),300);
-  } else {
-    setTimeout(()=>alert(`今天已經拿過【${reason}】囉！明天繼續加油！`),300);
-  }
-}
-
-// ── SHARE WALL ──
-function submitShare(evt) {
-  const who=document.getElementById('share-who').value;
-  const text=document.getElementById('share-text').value.trim();
-  if(!text){alert('請先輸入心情或文字喔！✍️');return;}
-
-  const senderMap={ge:'🏎️ Vic',mei:'🩺 Joy',mama:'👩 媽媽',baba:'👨 爸爸'};
-  const colorMap={ge:'var(--vic-neon)',mei:'var(--joy-heart)',mama:'#FFD166',baba:'#4EAEFF'};
-  const newShare={
-    sender:senderMap[who]||who,
-    color:colorMap[who]||'white',
-    content:text,
-    time:new Date().toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),
-    ts:Date.now(),
-  };
-
-  // Burst effect
-  const bx=evt?evt.clientX:window.innerWidth/2;
-  const by=evt?evt.clientY:window.innerHeight/2;
-  burst(bx,by,['💬','✨','🚀','🎉','💕']);
-
-  // Save to Firebase
-  if(db){
-    db.ref('family/shares').push(newShare);
-  } else {
-    if(!state.shares)state.shares=[];
-    state.shares.unshift(newShare);
-    renderShareWallData(null);
-  }
-
-  // Auto bonus for kids
-  if(who==='ge'||who==='mei') addHonorPoints(who,2,'📢 黃金開口',null);
-
-  document.getElementById('share-text').value='';
-}
-
-function renderShareWallData(data) {
-  const wall=document.getElementById('share-wall');
-  if(!wall) return;
-  const items=data?Object.values(data).sort((a,b)=>(b.ts||0)-(a.ts||0)):
-    (state.shares||[]);
-  if(!items.length){
-    wall.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:10px">還沒有動態，來留下第一則心情吧！💭</div>';
-    return;
-  }
-  wall.innerHTML=items.slice(0,15).map(item=>`
-    <div style="font-size:12px;border-bottom:1px dashed rgba(255,255,255,0.1);padding:7px 0">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-        <span style="font-weight:900;color:${item.color||'var(--vic-neon)'}">${item.sender}</span>
-        <span style="color:rgba(255,255,255,0.3);font-size:10px">${item.time}</span>
-      </div>
-      <div style="color:#E0E8FF;padding-left:4px;line-height:1.5">${item.content}</div>
-    </div>`).join('');
-}
-
-// ── TEAMWORK + BLINDBOX ──
-const BLINDBOX_PRIZES = [
-  '🍟 週末可以自己點一份大薯！',
-  '🛁 媽媽幫你洗頭一次！',
-  '🎮 額外解鎖 3C 15 分鐘！',
-  '🍦 全家一起去吃冰淇淋！',
-  '😴 週末晚上可以晚睡 30 分鐘！',
-  '🎬 全家一起看一部電影！',
-  '🛍️ 可以在便利商店自選一樣點心！',
-  '⏰ 今天的任務媽媽幫你完成一項！',
-];
-
-function renderTeamwork(){
-  const totalSport=sumSport('ge')+sumSport('mei');
-  const goal=150;
-  const pct=Math.min(totalSport/goal,1)*100;
-  const bar=document.getElementById('teamwork-bar');
-  const label=document.getElementById('teamwork-label');
-  if(bar) bar.style.width=pct.toFixed(0)+'%';
-  if(label){
-    if(totalSport>=goal){
-      label.textContent=`🎉 目標達成！${totalSport} 分鐘 — 兩人各得 +20 分鐘大禮包！`;
-      label.style.color='#FFD700';
-    } else {
-      label.textContent=`目前 ${totalSport} / ${goal} 分鐘，還差 ${goal-totalSport} 分鐘！`;
-      label.style.color='var(--text3)';
-    }
-  }
-  // Update blindbox counts (1 per 3-day reading streak)
-  ['ge','mei'].forEach(kid=>{
-    const streak=calcReadStreak(kid);
-    const boxes=Math.floor(streak/3);
-    const el=document.getElementById(kid+'-blindbox-count');
-    if(el) el.textContent=boxes;
-  });
-}
-
-function openBlindbox(kid){
-  const streak=calcReadStreak(kid);
-  const boxes=Math.floor(streak/3);
-  if(boxes<=0){
-    alert('還沒有盲盒可以開喔！閱讀連續 3 天就能解鎖一個 🎲');
-    return;
-  }
-  const prize=BLINDBOX_PRIZES[Math.floor(Math.random()*BLINDBOX_PRIZES.length)];
-  // Burst celebration
-  burst(window.innerWidth/2, window.innerHeight/2,
-    kid==='ge'?['🎲','🏎️','⚡','🎮','🌟']:['🎲','🌸','💜','🩺','✨']);
-  setTimeout(()=>{
-    alert(`🎁 恭喜解鎖神秘盲盒！
-
-獎勵是：${prize}
-
-記得告訴媽媽來兌換！`);
-  },400);
-}
-
-// ── TABS ──
-function switchTab(name){
-  const names=['daily','sport','weekly','books','recommend'];
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+name).classList.add('active');
-}
-function renderAll(){renderDaily();renderSport();renderWeekly();renderTeamwork();renderBooks();renderRecommend('ge');renderRecommend('mei');if(!db)renderShareWallData(null);}
-startListening();
-</script>
-</body>
-</html>
+        <svg width="80" height="80" viewBox="0
