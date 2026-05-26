@@ -586,7 +586,22 @@ const FIREBASE_CONFIG = {
   appId: "1:292763446655:web:34d8e6ba87300fff1c7e4a"
 };
 let db=null;
-try{ firebase.initializeApp(FIREBASE_CONFIG); db=firebase.database(); }catch(e){}
+try{
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db=firebase.database();
+}catch(e){
+  console.warn('Firebase init failed:',e);
+  db=null;
+}
+
+// Immediately load from localStorage so UI renders right away
+try{
+  const local=localStorage.getItem('family_backup');
+  if(local){
+    const saved=JSON.parse(local);
+    Object.assign(state,saved);
+  }
+}catch(e){}
 
 function setSyncStatus(s){
   const dot=document.getElementById('sync-dot'),lbl=document.getElementById('sync-label');
@@ -668,14 +683,27 @@ let state={
 function getWeekKey(){const d=new Date(),mon=new Date(d);mon.setDate(d.getDate()-((d.getDay()+6)%7));return mon.toISOString().slice(0,10);}
 function dbRef(path){return db?db.ref('family/'+path):null;}
 function syncUp(path,value){
-  if(!db)return;
+  if(!db){
+    // Save to localStorage as fallback
+    try{localStorage.setItem('family_backup',JSON.stringify(state));}catch(e){}
+    return;
+  }
   setSyncStatus('syncing');
-  dbRef(path).set(value).then(()=>setSyncStatus('online')).catch(()=>setSyncStatus('offline'));
+  dbRef(path).set(value).then(()=>setSyncStatus('online')).catch((e)=>{
+    console.warn('sync failed',e);
+    setSyncStatus('offline');
+  });
 }
 function startListening(){
   if(!db){renderAll();return;}
   setSyncStatus('syncing');
+  // Fallback: render after 4s even if Firebase is slow
+  const fallbackTimer=setTimeout(()=>{
+    setSyncStatus('offline');
+    renderAll();
+  },4000);
   dbRef('').on('value',snap=>{
+    clearTimeout(fallbackTimer);
     const data=snap.val();
     if(data){
       state.daily=data.daily||{};
@@ -695,8 +723,9 @@ function startListening(){
     setSyncStatus('online');
     renderAll();
   });
-  db.ref('.info/connected').on('value',snap=>{if(!snap.val())setSyncStatus('offline');});
-  // Listen to share wall in realtime
+  db.ref('.info/connected').on('value',snap=>{
+    if(!snap.val()){setSyncStatus('offline');renderAll();}
+  });
   db.ref('family/shares').limitToLast(15).on('value',snap=>{
     renderShareWallData(snap.val());
   });
