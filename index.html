@@ -342,7 +342,7 @@ input:checked+.slider:before{transform:translateX(20px)}
   <div class="card vic-card">
     <div class="vic-stripe"></div>
     <div class="kid-header">
-      <div class="kid-avatar vic-avatar">🎮</div>
+      <div class="kid-avatar vic-avatar" id="vic-avatar">🏎️</div>
       <div>
         <div class="kid-name">Vic</div>
         <div class="kid-age">哥哥 · 10歲 · 未來王者</div>
@@ -357,7 +357,7 @@ input:checked+.slider:before{transform:translateX(20px)}
   <div class="card joy-card">
     <div class="joy-hearts">🌸 💜 🌸 💜 🌸</div>
     <div class="kid-header">
-      <div class="kid-avatar joy-avatar">👩‍⚕️</div>
+      <div class="kid-avatar joy-avatar" id="joy-avatar">👩‍⚕️</div>
       <div>
         <div class="kid-name">Joy</div>
         <div class="kid-age">妹妹 · 8歲 · 未來醫生</div>
@@ -409,7 +409,7 @@ input:checked+.slider:before{transform:translateX(20px)}
       <span class="sc-icon">🏎️</span>
       <div class="sc-val" id="ge-time">—</div>
       <div class="sc-note" id="ge-time-note"></div>
-      <div style="font-size:10px;color:rgba(125,249,255,0.5);margin-top:4px">平日不開 · 週末加碼累積</div>
+      <div style="font-size:10px;color:rgba(125,249,255,0.5);margin-top:4px">平日可用但扣週末額度</div>
     </div>
     <div class="sc-card joy-sc">
       <span class="sc-icon">🩺</span>
@@ -614,19 +614,19 @@ const GE_TASKS=[
   {id:'ge1',label:'📝 作業與聯絡簿定位'},
   {id:'ge2',label:'🚿 20分鐘洗澡刷牙挑戰'},
   {id:'ge3',label:'🎒 睡前書包制服大點名'},
-  {id:'ge4',label:'🧠 15分鐘大腦快問快答（不拿筆）'},
+  {id:'ge4',label:'📚 15分鐘每日英文複習'},
   {id:'ge5',label:'📖 睡前黃金閱讀 20 分鐘 ⚡雙倍點數！'},
 ];
 const MEI_TASKS=[
   {id:'mei1',label:'📝 作業與聯絡簿定位'},
   {id:'mei2',label:'🚿 洗澡刷牙小儀式'},
   {id:'mei3',label:'🎒 書包制服大點名'},
-  {id:'mei4',label:'🌟 15分鐘知識小老師'},
+  {id:'mei4',label:'📚 15分鐘每日英文複習'},
   {id:'mei5',label:'📖 睡前閱讀 15 分鐘 ⚡雙倍點數！'},
 ];
 const WEEKLY_TASKS={
-  ge:['作業定位','洗澡挑戰','大腦充電','黃金閱讀'],
-  mei:['作業定位','洗澡儀式','知識小老師','睡前閱讀'],
+  ge:['作業定位','洗澡挑戰','英文複習','黃金閱讀'],
+  mei:['作業定位','洗澡儀式','英文複習','睡前閱讀'],
 };
 const SPORT_GOAL={ge:90,mei:60};
 const CIRC=201;
@@ -720,6 +720,7 @@ function startListening(){
       state.lastStreakDate=data.lastStreakDate||{ge:'',mei:''};
       state.blindbox=data.blindbox||{ge:0,mei:0};
       state.shares=data.shares||[];
+      state.dadBonus=data.dadBonus||{};
       state.books=data.books||state.books;
       state.bookId=data.bookId||state.bookId;
     }
@@ -807,6 +808,22 @@ function renderTasks(tasks,cid){
 function renderDaily(){
   document.getElementById('ge-ontime-wrap').style.display=isWeekday14?'block':'none';
   document.getElementById('ge-ontime').checked=!!state.geOntime;
+  // Restore dad rescue button states
+  const todayKey2 = new Date().toISOString().slice(0,10);
+  ['sport','hw','story'].forEach(type => {
+    const stateKey = 'dad_' + type + '_' + todayKey2;
+    if(state.daily && state.daily[stateKey]) {
+      const btn = document.getElementById('dad-' + type + '-btn');
+      if(btn){
+        btn.style.background = 'rgba(46,204,138,0.25)';
+        btn.style.borderColor = 'var(--green)';
+        btn.style.color = 'var(--green)';
+        const icon = document.getElementById('dad-' + type + '-icon');
+        if(icon) icon.textContent = '✅';
+      }
+    }
+  });
+
   renderTasks(GE_TASKS,'tasks-ge');
   renderTasks(MEI_TASKS,'tasks-mei');
   const geAll=GE_TASKS.every(t=>isChecked(t.id));
@@ -944,6 +961,9 @@ function renderWeekly(){
   const gSB=sumSport('ge')>=SPORT_GOAL.ge?15:0,mSB=sumSport('mei')>=SPORT_GOAL.mei?10:0;
   // Count ontime days this week
   const geOntimeDays=state.ontimeDays||0;
+  // Dad bonus: sum today's and this week's dad rescue contributions
+  const todayDadKey = new Date().toISOString().slice(0,10);
+  const dadBonusToday = (state.dadBonus&&state.dadBonus[todayDadKey])||0;
   const geOntimeBonus=geOntimeDays*15;
   // Reading streak bonus
   const geReadStreak=calcReadStreak('ge'),meiReadStreak=calcReadStreak('mei');
@@ -1073,6 +1093,48 @@ function addHonorPoints(kid, points, reason, evt) {
   }
 }
 
+
+// ── DAD RESCUE ──
+const DAD_RESCUE_LABELS = {sport:'⚽ 陪運動', hw:'📝 檢查作業', story:'📖 講故事'};
+function dadRescue(type, evt) {
+  const todayKey = new Date().toISOString().slice(0,10);
+  const stateKey = 'dad_' + type + '_' + todayKey;
+  if(state.daily[stateKey]) {
+    setTimeout(()=>alert('今天爸爸已經完成這項了！明天繼續加油 💪'),300);
+    return;
+  }
+  state.daily[stateKey] = true;
+  // bonus stored separately for weekend calc
+  if(!state.dadBonus) state.dadBonus = {};
+  if(!state.dadBonus[todayKey]) state.dadBonus[todayKey] = 0;
+  state.dadBonus[todayKey] += 15;
+  syncUp('daily', state.daily);
+  syncUp('dadBonus', state.dadBonus);
+  // Update button UI
+  const btn = document.getElementById('dad-' + type + '-btn');
+  if(btn){
+    btn.style.background = 'rgba(46,204,138,0.25)';
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+    const icon = document.getElementById('dad-' + type + '-icon');
+    if(icon) icon.textContent = '✅';
+  }
+  burst(evt?evt.clientX:window.innerWidth/2, evt?evt.clientY:window.innerHeight/2, ['👨','⭐','💙','🎉','✨']);
+  setTimeout(()=>alert('🎉 爸爸神救援！Vic 和 Joy 週末各多 +15 分鐘！'),300);
+  renderTasks();
+}
+
+// ── DAILY AVATARS ──
+function initDailyAvatars() {
+  const vicList = ['🏎️','🚀','🦖','🤖','🧑‍🚀','🎮','🦁','⚡'];
+  const joyList = ['👩‍⚕️','🦄','🐱','🌸','🧚','🎀','🐰','🌈'];
+  const day = new Date().getDay();
+  const vicEl = document.getElementById('vic-avatar');
+  const joyEl = document.getElementById('joy-avatar');
+  if(vicEl) vicEl.textContent = vicList[day % vicList.length];
+  if(joyEl) joyEl.textContent = joyList[day % joyList.length];
+}
+
 // ── SHARE WALL ──
 function submitShare(evt) {
   const who=document.getElementById('share-who').value;
@@ -1192,7 +1254,8 @@ function switchTab(name){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
 }
-function renderAll(){renderDaily();renderSport();renderWeekly();renderTeamwork();renderBooks();renderRecommend('ge');renderRecommend('mei');if(!db)renderShareWallData(null);}
+function renderAll(){
+  initDailyAvatars();renderDaily();renderSport();renderWeekly();renderTeamwork();renderBooks();renderRecommend('ge');renderRecommend('mei');if(!db)renderShareWallData(null);}
 startListening();
 </script>
 </body>
