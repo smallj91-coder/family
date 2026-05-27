@@ -326,6 +326,7 @@ input:checked+.slider:before{transform:translateX(20px)}
   <button class="tab" onclick="switchTab('weekly')"><span class="tab-icon">📅</span>本週</button>
   <button class="tab" onclick="switchTab('books')"><span class="tab-icon">📚</span>書單</button>
   <button class="tab" onclick="switchTab('recommend')"><span class="tab-icon">✨</span>推薦</button>
+  <button class="tab" onclick="switchTab('history')"><span class="tab-icon">📋</span>紀錄</button>
 </div>
 
 <!-- 今日任務 -->
@@ -578,6 +579,15 @@ input:checked+.slider:before{transform:translateX(20px)}
   </div>
 </div>
 
+<!-- 歷史紀錄 -->
+<div id="panel-history" class="panel">
+  <div class="card" style="background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3)">
+    <div style="font-size:16px;font-weight:900;color:white;margin-bottom:6px">📋 每日完成紀錄</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px">每天早上 6:00 自動重置，紀錄保留 30 天</div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
 <script>
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA_dlYEpYnGrJSPLuqRZwp3tvXupCKlKX4",
@@ -649,6 +659,8 @@ let state={
   ontimeDayKeys:{},
   streaks:{ge:0,mei:0},
   lastStreakDate:{ge:'',mei:''},
+  lastResetDate:'',
+  dailyHistory:{},
   blindbox:{ge:0,mei:0},
   recommend:{
     ge:[
@@ -698,7 +710,7 @@ function syncUp(path,value){
   });
 }
 function startListening(){
-  if(!db){renderAll();return;}
+  if(!db){checkDailyReset();renderAll();return;}
   setSyncStatus('syncing');
   // Fallback: render after 4s even if Firebase is slow
   const fallbackTimer=setTimeout(()=>{
@@ -718,11 +730,14 @@ function startListening(){
       state.ontimeDayKeys=data.ontimeDayKeys||{};
       state.streaks=data.streaks||{ge:0,mei:0};
       state.lastStreakDate=data.lastStreakDate||{ge:'',mei:''};
+      state.lastResetDate=data.lastResetDate||'';
+      state.dailyHistory=data.dailyHistory||{};
       state.blindbox=data.blindbox||{ge:0,mei:0};
       state.shares=data.shares||[];
       state.books=data.books||state.books;
       state.bookId=data.bookId||state.bookId;
     }
+    checkDailyReset(); // Check if need to reset for new day
     setSyncStatus('online');
     renderAll();
   });
@@ -1091,6 +1106,102 @@ function initShareWhoButtons() {
   if(submitBtn) submitBtn.onclick = function(e){ submitShare(e); };
 }
 
+// ── DAILY RESET (6:00 AM) ──
+function getTodayStr(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function getResetDateStr(){
+  // Returns "today" if current time >= 06:00, else "yesterday"
+  const now = new Date();
+  const reset = new Date();
+  reset.setHours(6,0,0,0);
+  if(now < reset){
+    reset.setDate(reset.getDate()-1);
+  }
+  return reset.toISOString().slice(0,10);
+}
+
+function checkDailyReset(){
+  const resetDate = getResetDateStr();
+  if(state.lastResetDate === resetDate) return; // already reset today
+
+  // Save yesterday's record before clearing
+  const yesterday = state.lastResetDate || resetDate;
+  if(Object.keys(state.daily).length > 0){
+    saveDailyHistory(yesterday, state.daily);
+  }
+
+  // Clear daily tasks
+  state.daily = {};
+  state.lastResetDate = resetDate;
+  syncUp('daily', state.daily);
+  syncUp('lastResetDate', state.lastResetDate);
+}
+
+function saveDailyHistory(dateStr, dailyData){
+  if(!state.dailyHistory) state.dailyHistory = {};
+  // Build readable record
+  const geCompleted = GE_TASKS.filter(t=>!!dailyData[t.id]).map(t=>t.label);
+  const meiCompleted = MEI_TASKS.filter(t=>!!dailyData[t.id]).map(t=>t.label);
+  state.dailyHistory[dateStr] = {
+    date: dateStr,
+    ge: {done: geCompleted, total: GE_TASKS.length},
+    mei: {done: meiCompleted, total: MEI_TASKS.length},
+    ts: Date.now(),
+  };
+  // Keep only last 30 days
+  const keys = Object.keys(state.dailyHistory).sort();
+  if(keys.length > 30){
+    keys.slice(0, keys.length-30).forEach(k=>delete state.dailyHistory[k]);
+  }
+  syncUp('dailyHistory', state.dailyHistory);
+}
+
+function renderHistory(){
+  const el = document.getElementById('history-list');
+  if(!el) return;
+  const history = state.dailyHistory || {};
+  const keys = Object.keys(history).sort().reverse(); // newest first
+
+  if(!keys.length){
+    el.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:20px">還沒有紀錄，完成任務後明天就能看到囉！</div>';
+    return;
+  }
+
+  const dayNames = ['日','一','二','三','四','五','六'];
+  el.innerHTML = keys.map(k=>{
+    const r = history[k];
+    const d = new Date(k);
+    const dayStr = `${k} (週${dayNames[d.getDay()]})`;
+    const geRate = r.ge.done.length;
+    const meiRate = r.mei.done.length;
+    const geColor = geRate===r.ge.total?'var(--green)':geRate>=3?'var(--yellow)':'var(--red)';
+    const meiColor = meiRate===r.mei.total?'var(--green)':meiRate>=3?'var(--yellow)':'var(--red)';
+
+    const geTasks = r.ge.done.length?r.ge.done.map(t=>`<span style="font-size:11px;background:rgba(74,108,247,0.2);border-radius:4px;padding:2px 6px;margin:2px;display:inline-block">${t}</span>`).join('')
+      :'<span style="color:rgba(255,255,255,0.3);font-size:11px">無完成項目</span>';
+    const meiTasks = r.mei.done.length?r.mei.done.map(t=>`<span style="font-size:11px;background:rgba(232,97,154,0.2);border-radius:4px;padding:2px 6px;margin:2px;display:inline-block">${t}</span>`).join('')
+      :'<span style="color:rgba(255,255,255,0.3);font-size:11px">無完成項目</span>';
+
+    return `<div style="border-bottom:1px dashed rgba(255,255,255,0.1);padding:12px 0;margin-bottom:4px">
+      <div style="font-size:13px;font-weight:900;color:white;margin-bottom:8px">📅 ${dayStr}</div>
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;font-weight:800;color:var(--vic-neon);margin-bottom:4px">
+          🏎️ Vic — <span style="color:${geColor}">${geRate}/${r.ge.total} 項完成</span>
+        </div>
+        <div style="flex-wrap:wrap;display:flex;gap:2px">${geTasks}</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:800;color:var(--joy-heart);margin-bottom:4px">
+          🌸 Joy — <span style="color:${meiColor}">${meiRate}/${r.mei.total} 項完成</span>
+        </div>
+        <div style="flex-wrap:wrap;display:flex;gap:2px">${meiTasks}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // Global touch handler for maximum Android compatibility
 function setupGlobalTouch() {
   document.addEventListener('touchstart', function(){}, {passive: true}); // unlock touch
@@ -1229,14 +1340,19 @@ function openBlindbox(kid){
 
 // ── TABS ──
 function switchTab(name){
-  const names=['daily','sport','weekly','books','recommend'];
+  const names=['daily','sport','weekly','books','recommend','history'];
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
+  if(name==='history') renderHistory();
 }
-function renderAll(){renderDaily();renderSport();renderWeekly();renderTeamwork();renderBooks();renderRecommend('ge');renderRecommend('mei');if(!db)renderShareWallData(null);initShareWhoButtons();}
+function renderAll(){renderDaily();renderSport();renderWeekly();renderTeamwork();renderBooks();renderRecommend('ge');renderRecommend('mei');renderHistory();if(!db)renderShareWallData(null);initShareWhoButtons();}
 setupGlobalTouch();
 startListening();
+// Check reset every minute (catches the 6am boundary)
+setInterval(function(){
+  checkDailyReset();
+}, 60000);
 </script>
 </body>
 </html>
