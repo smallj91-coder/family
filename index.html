@@ -506,6 +506,26 @@ input:checked+.slider:before{transform:translateX(20px)}
     <div style="font-size:13px;font-weight:900;color:var(--joy);margin-bottom:12px">🌸 Joy 本週任務</div>
     <div id="weekly-mei"></div>
   </div>
+  <!-- 連勝紀錄卡 -->
+  <div class="card" style="background:linear-gradient(135deg,#1A0D00,#2E1A00);border:1.5px solid rgba(255,165,0,0.4);margin-bottom:14px">
+    <div style="font-size:15px;font-weight:900;color:#FFD166;margin-bottom:12px">🔥 連勝紀錄</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="text-align:center;background:rgba(74,108,247,0.1);border-radius:var(--r-sm);padding:14px">
+        <div style="font-size:11px;color:var(--vic-neon);font-weight:800;margin-bottom:6px">🏎️ Vic</div>
+        <div id="streak-ge-num" style="font-size:36px;font-weight:900;color:white;line-height:1">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">天連勝</div>
+        <div id="streak-ge-title" style="font-size:11px;font-weight:800;margin-top:6px;color:#FFD166"></div>
+      </div>
+      <div style="text-align:center;background:rgba(232,97,154,0.1);border-radius:var(--r-sm);padding:14px">
+        <div style="font-size:11px;color:var(--joy-heart);font-weight:800;margin-bottom:6px">🌸 Joy</div>
+        <div id="streak-mei-num" style="font-size:36px;font-weight:900;color:white;line-height:1">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">天連勝</div>
+        <div id="streak-mei-title" style="font-size:11px;font-weight:800;margin-top:6px;color:#FFD166"></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--text3);text-align:center">每天完成所有任務就累積一天，中斷歸零 💪</div>
+  </div>
+
   <div class="card">
     <div style="font-size:16px;font-weight:900;margin-bottom:12px">🎁 週末 3C 獎勵試算</div>
     <div id="weekend-calc"></div>
@@ -570,7 +590,7 @@ input:checked+.slider:before{transform:translateX(20px)}
     <div class="card" style="background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <div style="font-size:15px;font-weight:900;color:var(--vic-neon)">✨ 本週推薦</div>
-        <button class="btn btn-sm btn-vic" onclick="generateRecommend('ge')" id="gen-ge-btn">🤖 Claude 推薦</button>
+        <button class="btn btn-sm btn-vic" onclick="generateRecommend('ge')" id="gen-ge-btn">🎲 隨機推薦</button>
       </div>
       <div id="recommend-ge-list"></div>
       <div class="add-row" style="margin-top:14px">
@@ -585,7 +605,7 @@ input:checked+.slider:before{transform:translateX(20px)}
     <div class="card" style="background:linear-gradient(135deg,#1A0A1A,#2D0A2D);border-color:rgba(232,97,154,0.3)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <div style="font-size:15px;font-weight:900;color:var(--joy-heart)">✨ 本週推薦</div>
-        <button class="btn btn-sm btn-joy" onclick="generateRecommend('mei')" id="gen-mei-btn">🤖 Claude 推薦</button>
+        <button class="btn btn-sm btn-joy" onclick="generateRecommend('mei')" id="gen-mei-btn">🎲 隨機推薦</button>
       </div>
       <div id="recommend-mei-list"></div>
       <div class="add-row" style="margin-top:14px">
@@ -876,14 +896,18 @@ function renderDaily(){
   const geAll=activeGeTasks.every(t=>isChecked(t.id));
   const meiAll=activeMeiTasks.every(t=>isChecked(t.id));
   // Update daily login streak
-  const todayStr=new Date().toISOString().slice(0,10);
+  const todayStr=getResetDateStr(); // use 6am boundary date
   ['ge','mei'].forEach(kid=>{
-    const tasks=kid==='ge'?GE_TASKS:MEI_TASKS;
-    const allDone=tasks.every(t=>isChecked(t.id));
+    const activeTasks=kid==='ge'?(isWeekend?GE_TASKS_WEEKEND:GE_TASKS):(isWeekend?MEI_TASKS_WEEKEND:MEI_TASKS);
+    const allDone=activeTasks.every(t=>isChecked(t.id));
     if(allDone && state.lastStreakDate[kid]!==todayStr){
-      const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
-      const yStr=yesterday.toISOString().slice(0,10);
-      state.streaks[kid]=(state.lastStreakDate[kid]===yStr?(state.streaks[kid]||0)+1:1);
+      // Calculate yesterday's reset date
+      const yd=new Date();
+      const resetHour=new Date();resetHour.setHours(6,0,0,0);
+      if(new Date()<resetHour) yd.setDate(yd.getDate()-2); else yd.setDate(yd.getDate()-1);
+      const yStr=yd.toISOString().slice(0,10);
+      const prevStreak=typeof state.streaks[kid]==='number'&&state.streaks[kid]<=365?state.streaks[kid]:0;
+      state.streaks[kid]=state.lastStreakDate[kid]===yStr?prevStreak+1:1;
       state.lastStreakDate[kid]=todayStr;
       syncUp('streaks',state.streaks);
       syncUp('lastStreakDate',state.lastStreakDate);
@@ -897,12 +921,25 @@ function renderDaily(){
   if(geStreakEl) geStreakEl.textContent=geStreak>=3?`🏆 閱讀小隊長！連勝${geStreak}天`:geStreak>0?`🔥 連勝${geStreak}天，還差${3-geStreak}天觸發！`:'';
   if(meiStreakEl) meiStreakEl.textContent=meiStreak>=3?`🏆 閱讀小隊長！連勝${meiStreak}天`:meiStreak>0?`🔥 連勝${meiStreak}天，還差${3-meiStreak}天觸發！`:'';
 
-  // Login streak flames
-  const gLS=state.streaks?.ge||0, mLS=state.streaks?.mei||0;
+  // Login streak - auto-fix bad data first
+  if(!state.streaks) state.streaks={ge:0,mei:0};
+  if(typeof state.streaks.ge!=='number'||state.streaks.ge>365){state.streaks.ge=0;syncUp('streaks',state.streaks);}
+  if(typeof state.streaks.mei!=='number'||state.streaks.mei>365){state.streaks.mei=0;syncUp('streaks',state.streaks);}
+  const gLS=state.streaks.ge||0, mLS=state.streaks.mei||0;
+
+  function streakMsg(n, name){
+    if(n<=0) return '';
+    const flames='🔥'.repeat(Math.min(n,7));
+    if(n>=30) return `${flames} ${name} 連續 ${n} 天！🏆 傳說等級！`;
+    if(n>=14) return `${flames} ${name} 連續 ${n} 天！🥇 超強連勝！`;
+    if(n>=7)  return `${flames} ${name} 連續 ${n} 天！💪 整整一週！`;
+    if(n>=3)  return `${flames} ${name} 連續 ${n} 天！`;
+    return `🔥 ${name} 連續 ${n} 天，繼續加油！`;
+  }
   const gLSEl=document.getElementById('ge-login-streak');
   const mLSEl=document.getElementById('mei-login-streak');
-  if(gLSEl) gLSEl.textContent=gLS>=2?`${'🔥'.repeat(Math.min(gLS,5))} 連續${gLS}天全完成！`:'';
-  if(mLSEl) mLSEl.textContent=mLS>=2?`${'🔥'.repeat(Math.min(mLS,5))} 連續${mLS}天全完成！`:'';
+  if(gLSEl) gLSEl.textContent=gLS>=1?streakMsg(gLS,'Vic'):'';
+  if(mLSEl) mLSEl.textContent=mLS>=1?streakMsg(mLS,'Joy'):'';
   const ontime=!!state.geOntime;
   let gt,gn,gC,mt,mn,mC;
   if(isWeekend){gt='60 分鐘';gn='🎉 週末開放！';gC='earned';}
@@ -1009,6 +1046,16 @@ function calcReadStreak(kid){
   return streak;
 }
 
+function getStreakTitle(n){
+  if(n>=30) return '🏆 傳說等級';
+  if(n>=21) return '💎 鑽石連勝';
+  if(n>=14) return '🥇 黃金連勝';
+  if(n>=7)  return '🥈 整整一週';
+  if(n>=3)  return '🔥 連勝中';
+  if(n>=1)  return '✨ 剛起步';
+  return '';
+}
+
 function renderWeekly(){
   ['ge','mei'].forEach(kid=>{
     const el=document.getElementById('weekly-'+kid);el.innerHTML='';
@@ -1023,6 +1070,17 @@ function renderWeekly(){
   });
   const cnt=kid=>{let d=0,t=0;WEEKLY_TASKS[kid].forEach(tk=>DAYS.forEach((_,i)=>{t++;if((state.weekly[kid]||{})[kid+'_'+tk+'_'+i])d++}));return{d,t}};
   const ge=cnt('ge'),mei=cnt('mei');
+  // Update streak display cards
+  const gs=state.streaks?.ge||0, ms=state.streaks?.mei||0;
+  const geNum=document.getElementById('streak-ge-num');
+  const meiNum=document.getElementById('streak-mei-num');
+  const geTitle=document.getElementById('streak-ge-title');
+  const meiTitle=document.getElementById('streak-mei-title');
+  if(geNum) geNum.textContent=gs;
+  if(meiNum) meiNum.textContent=ms;
+  if(geTitle) geTitle.textContent=getStreakTitle(gs);
+  if(meiTitle) meiTitle.textContent=getStreakTitle(ms);
+
   const gSB=sumSport('ge')>=SPORT_GOAL.ge?15:0,mSB=sumSport('mei')>=SPORT_GOAL.mei?10:0;
   // Count ontime days this week
   const geOntimeDays=state.ontimeDays||0;
@@ -1030,18 +1088,23 @@ function renderWeekly(){
   // Reading streak bonus
   const geReadStreak=calcReadStreak('ge'),meiReadStreak=calcReadStreak('mei');
   const geReadBonus=geReadStreak>=3?20:0,meiReadBonus=meiReadStreak>=3?20:0;
-  const geTotal=Math.round(ge.d/ge.t*60)+gSB+geOntimeBonus+geReadBonus;
-  const meiTotal=Math.round(mei.d/mei.t*45)+mSB+meiReadBonus;
+  // Streak bonus: +5 per 7-day milestone
+  const geStreakBonus=Math.floor((state.streaks?.ge||0)/7)*5;
+  const meiStreakBonus=Math.floor((state.streaks?.mei||0)/7)*5;
+  const geTotal=Math.round(ge.d/ge.t*60)+gSB+geOntimeBonus+geReadBonus+geStreakBonus;
+  const meiTotal=Math.round(mei.d/mei.t*45)+mSB+meiReadBonus+meiStreakBonus;
   document.getElementById('weekend-calc').innerHTML=`
     <div class="calc-row"><span>🏎️ Vic 任務 ${ge.d}/${ge.t}</span><span>${Math.round(ge.d/ge.t*60)} 分鐘</span></div>
     <div class="calc-row"><span>🏃 Vic 運動達標${gSB?'':'（未達）'}</span><span style="color:${gSB?'var(--green)':'var(--text3)'}">${gSB?'+'+gSB+' 分鐘':'＋0'}</span></div>
     <div class="calc-row"><span>🕗 Vic 準時回家（本週 ${geOntimeDays} 天）</span><span style="color:${geOntimeBonus?'var(--green)':'var(--text3)'}">${geOntimeBonus?'+'+geOntimeBonus+' 分鐘':'＋0'}</span></div>
     <div class="calc-row"><span>📖 Vic 閱讀連勝 ${geReadStreak} 天${geReadBonus?'🏆':'（滿3天觸發）'}</span><span style="color:${geReadBonus?'#FFD700':'var(--text3)'}">${geReadBonus?'+'+geReadBonus+' 分鐘！':'＋0'}</span></div>
+    <div class="calc-row"><span>🔥 Vic 連勝 ${gs} 天加成${geStreakBonus?'':'（每7天+5分）'}</span><span style="color:${geStreakBonus?'#FF6B35':'var(--text3)'}">${geStreakBonus?'+'+geStreakBonus+' 分鐘！':'＋0'}</span></div>
     <div class="calc-row"><span>🏎️ <strong>Vic 週末總計</strong></span><span class="calc-total">${geTotal} 分鐘 🎮</span></div>
     <div style="height:10px"></div>
     <div class="calc-row"><span>🌸 Joy 任務 ${mei.d}/${mei.t}</span><span>${Math.round(mei.d/mei.t*45)} 分鐘</span></div>
     <div class="calc-row"><span>🏃 Joy 運動達標${mSB?'':'（未達）'}</span><span style="color:${mSB?'var(--green)':'var(--text3)'}">${mSB?'+'+mSB+' 分鐘':'＋0'}</span></div>
     <div class="calc-row"><span>📖 Joy 閱讀連勝 ${meiReadStreak} 天${meiReadBonus?'🏆':'（滿3天觸發）'}</span><span style="color:${meiReadBonus?'#FFD700':'var(--text3)'}">${meiReadBonus?'+'+meiReadBonus+' 分鐘！':'＋0'}</span></div>
+    <div class="calc-row"><span>🔥 Joy 連勝 ${ms} 天加成${meiStreakBonus?'':'（每7天+5分）'}</span><span style="color:${meiStreakBonus?'#FF6B35':'var(--text3)'}">${meiStreakBonus?'+'+meiStreakBonus+' 分鐘！':'＋0'}</span></div>
     <div class="calc-row"><span>🌸 <strong>Joy 週末總計</strong></span><span class="calc-total" style="color:var(--joy)">${meiTotal} 分鐘 🎮</span></div>`;
 }
 function toggleWeekly(kid,task,i){
@@ -1117,26 +1180,252 @@ function addSelectedToBooks(kid){
   renderBooks();renderRecommend(kid);
   alert(`✅ ${selected.length} 本書已加入借閱清單！`);
 }
-async function generateRecommend(kid){
+// Built-in book pools
+const VIC_BOOKS=[
+  // 神奇柑仔店系列
+  {title:'神奇柑仔店1：帶來幸福的錢天堂',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店2：我不想吃鯨魚餅乾',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店3：款待卡的心願',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店4：給我招財貓',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店5：獏的預言之書',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店6：忍耐鉛筆的考驗',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店7：惡魔的罐頭',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店8：黑色招財貓的逆襲',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店9：倒楣堂的陰謀',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店10：錢天堂的危機',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店11：失控的點心',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店12：紅子的挑戰狀',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店13：選中你的魔法零食',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店14：扭轉命運的扭蛋機',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店15：合約書的秘密',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店16：回憶的糖果盒',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店17：紅子的過去',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店18：錢天堂的起源',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店19：命運的黃金糖',tag:'魔幻奇幻'},
+  {title:'神奇柑仔店20：倒轉時間的時鐘糖',tag:'魔幻奇幻'},
+  // 仙靈傳奇系列
+  {title:'仙靈傳奇1：詩魂',tag:'古典奇幻'},
+  {title:'仙靈傳奇2：詞魂',tag:'古典奇幻'},
+  {title:'仙靈傳奇3：畫仙',tag:'古典奇幻'},
+  {title:'仙靈傳奇4：陶妖',tag:'古典奇幻'},
+  {title:'仙靈傳奇5：翻天印',tag:'古典奇幻'},
+  {title:'仙靈傳奇6：祝由師',tag:'古典奇幻'},
+  // 養養系列
+  {title:'養養1：神祕的生物',tag:'奇幻冒險'},
+  {title:'養養2：尋找守護獸',tag:'奇幻冒險'},
+  {title:'養養3：黑暗力量的崛起',tag:'奇幻冒險'},
+  {title:'養養4：泥魔妖的誘惑',tag:'奇幻冒險'},
+  // 三個問號偵探團系列
+  {title:'三個問號偵探團1：神祕鳥怪現身',tag:'燒腦推理'},
+  {title:'三個問號偵探團2：瘋狂的隱形人',tag:'燒腦推理'},
+  {title:'三個問號偵探團3：黑夜中的恐龍',tag:'燒腦推理'},
+  {title:'三個問號偵探團4：幽靈船的詛咒',tag:'燒腦推理'},
+  {title:'三個問號偵探團5：黃金面具之謎',tag:'燒腦推理'},
+  {title:'三個問號偵探團6：被竊取的王冠',tag:'燒腦推理'},
+  {title:'三個問號偵探團7：地下密室的機密',tag:'燒腦推理'},
+  {title:'三個問號偵探團8：魔術師的密碼',tag:'燒腦推理'},
+  {title:'三個問號偵探團9：詛咒的鑽石',tag:'燒腦推理'},
+  {title:'三個問號偵探團10：校園惡作劇事件',tag:'燒腦推理'},
+  // 穿越故宮大冒險系列
+  {title:'穿越故宮大冒險1：翠玉白菜上的螽斯',tag:'歷史解謎'},
+  {title:'穿越故宮大冒險2：肉形石的秘密',tag:'歷史解謎'},
+  {title:'穿越故宮大冒險3：毛公鼎的預言',tag:'歷史解謎'},
+  {title:'穿越故宮大冒險4：蓮花式溫碗的危機',tag:'歷史解謎'},
+  {title:'穿越故宮大冒險5：快雪時晴帖的線索',tag:'歷史解謎'},
+  {title:'穿越故宮大冒險6：散氏盤的封印',tag:'歷史解謎'},
+  {title:'穿越故宮大冒險7：溪山行旅圖的真相',tag:'歷史解謎'},
+  {title:'穿越故宮大冒險8：富春山居圖的拼圖',tag:'歷史解謎'},
+  {title:'穿越故宮大冒險9：青花瓷器的挑戰',tag:'歷史解謎'},
+  {title:'穿越故宮大冒險10：游魚轉心瓶終局之戰',tag:'歷史解謎'},
+  // 貓戰士系列
+  {title:'貓戰士首部曲I：荒野足跡',tag:'史詩冒險'},
+  {title:'貓戰士首部曲II：烈火寒冰',tag:'史詩冒險'},
+  {title:'貓戰士首部曲III：疑雲重重',tag:'史詩冒險'},
+  {title:'貓戰士首部曲IV：風起雲湧',tag:'史詩冒險'},
+  {title:'貓戰士首部曲V：險路驚魂',tag:'史詩冒險'},
+  {title:'貓戰士首部曲VI：力挽狂瀾',tag:'史詩冒險'},
+  {title:'貓戰士二部曲I：預言之子',tag:'史詩冒險'},
+  {title:'貓戰士二部曲II：星光指引',tag:'史詩冒險'},
+  {title:'貓戰士二部曲III：重回荒野',tag:'史詩冒險'},
+  {title:'貓戰士二部曲IV：星光再現',tag:'史詩冒險'},
+  // Roblox系列
+  {title:'有感筆電的Roblox遊戲大冒險1',tag:'遊戲冒險'},
+  {title:'有感筆電的Roblox遊戲大冒險2',tag:'遊戲冒險'},
+  {title:'有感筆電的Roblox遊戲大冒險3',tag:'遊戲冒險'},
+  {title:'有感筆電的Roblox遊戲大冒險4',tag:'遊戲冒險'},
+  {title:'有感筆電的Roblox遊戲大冒險5',tag:'遊戲冒險'},
+  // Minecraft系列
+  {title:'Minecraft突變怪物圖鑑大百科1',tag:'遊戲圖鑑'},
+  {title:'Minecraft突變怪物圖鑑大百科2',tag:'遊戲圖鑑'},
+  {title:'Minecraft突變怪物圖鑑大百科3',tag:'遊戲圖鑑'},
+  {title:'Minecraft突變怪物圖鑑大百科4',tag:'遊戲圖鑑'},
+  {title:'Minecraft突變怪物圖鑑大百科5',tag:'遊戲圖鑑'},
+  // 哆啦A夢學習大進擊
+  {title:'哆啦A夢學習大進擊：手機平板智慧通',tag:'科技漫畫'},
+  {title:'哆啦A夢學習大進擊：AI科技大冒險',tag:'科技漫畫'},
+  {title:'哆啦A夢學習大進擊：物聯網世界大暢遊',tag:'科技漫畫'},
+  {title:'哆啦A夢學習大進擊：社群網路安全指南',tag:'科技漫畫'},
+  {title:'哆啦A夢學習大進擊：未來機器人與我',tag:'科技漫畫'},
+  // AI世代生涯探索
+  {title:'AI世代生涯探索1：認識未來的職業變革',tag:'未來探索'},
+  {title:'AI世代生涯探索2：發掘自己的核心興趣',tag:'未來探索'},
+  {title:'AI世代生涯探索3：培養不被AI取代的能力',tag:'未來探索'},
+  {title:'AI世代生涯探索4：數位時代的創新思維',tag:'未來探索'},
+  {title:'AI世代生涯探索5：設計你的未來行動藍圖',tag:'未來探索'},
+  // 少年讀國學
+  {title:'少年讀國學：少年讀西遊記1',tag:'國學文學'},
+  {title:'少年讀國學：少年讀西遊記2',tag:'國學文學'},
+  {title:'少年讀國學：少年讀西遊記3',tag:'國學文學'},
+  {title:'少年讀國學：少年讀世說新語',tag:'國學文學'},
+  {title:'少年讀國學：少年讀三國演義',tag:'國學文學'},
+  {title:'少年讀國學：少年讀水滸傳',tag:'國學文學'},
+  // 魔術師的接班人
+  {title:'魔術師的接班人1：夜半神祕邀約',tag:'魔術冒險'},
+  {title:'魔術師的接班人2：消失的魔幻之鑰',tag:'魔術冒險'},
+  {title:'魔術師的接班人3：幻影馬戲團的挑戰',tag:'魔術冒險'},
+  {title:'魔術師的接班人4：衝破雷神之水',tag:'魔術冒險'},
+  // 單本熱門
+  {title:'夢想比痛還重：林郁婷的拳擊人生',tag:'運動勵志'},
+  {title:'永遠記得：男孩、鼴鼠、狐狸、馬與風暴',tag:'溫馨勵志'},
+  {title:'怡辰老師的小學生學習診聊室',tag:'學習方法'},
+  {title:'別讓科技偷走你的能力',tag:'科技思辨'},
+  {title:'攻略中國史',tag:'歷史知識'},
+  {title:'地球變熱是誰的錯',tag:'環境科學'},
+  {title:'我的實用財商日記',tag:'財商教育'},
+  {title:'我們叫它粉靈豆 Frindle',tag:'文字冒險'},
+  {title:'Robot Dreams 再見機器人',tag:'科幻友情'},
+  {title:'巧克力冒險工廠前傳：Wonka',tag:'奇幻冒險'},
+];
+const JOY_BOOKS=[
+  // 怪傑佐羅力系列
+  {title:'怪傑佐羅力之打敗噴火龍',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之恐怖的鬼屋',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之魔法師的弟子',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之海盜尋寶記',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之媽媽我愛你',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之邪惡天才科學家',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之大戰外星人',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之神祕飛碟大作戰',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之恐怖的禮物',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之拯救黃金大作戰',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之巧克力大冒險',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之恐怖的遊樂園',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之不好了！大危機',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之大戰怪獸王',tag:'幽默冒險'},
+  {title:'怪傑佐羅力之超級大間諜',tag:'幽默冒險'},
+  // 屁屁偵探系列
+  {title:'屁屁偵探讀本：紫衣夫人的暗號信',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本：消失的便當之謎',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本：黑夜中的怪盜',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本：尋找黃金頭盔',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本：來自未來的委託',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本：世紀大決鬥',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本：好景街的怪盜',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本：被怪盜盯上的新娘',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本：幸運貓落入誰手',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本：怪盜與神祕寶物',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本11：新的怪盜',tag:'觀察解謎'},
+  {title:'屁屁偵探讀本12：大怪盜現身',tag:'觀察解謎'},
+  // 達克比辦案系列
+  {title:'達克比辦案1：誰是聖誕老公公',tag:'科普偵探'},
+  {title:'達克比辦案2：壞蛋追追追',tag:'科普偵探'},
+  {title:'達克比辦案3：放屁者聯盟',tag:'科普偵探'},
+  {title:'達克比辦案4：尋找大胃王',tag:'科普偵探'},
+  {title:'達克比辦案5：救救大笨鳥',tag:'科普偵探'},
+  {title:'達克比辦案6：暴龍也瘋狂',tag:'科普偵探'},
+  {title:'達克比辦案7：末日大作戰',tag:'科普偵探'},
+  {title:'達克比辦案8：驚險大解密',tag:'科普偵探'},
+  {title:'達克比辦案9：時空大冒險',tag:'科普偵探'},
+  {title:'達克比辦案10：孤島時光機',tag:'科普偵探'},
+  // 安心國小系列
+  {title:'安心國小1：我們是最好的朋友',tag:'心理成長'},
+  {title:'安心國小2：吵架也沒關係',tag:'心理成長'},
+  {title:'安心國小3：每個人都有秘密',tag:'心理成長'},
+  {title:'安心國小4：上台不用怕',tag:'心理成長'},
+  {title:'安心國小5：勇敢說不',tag:'心理成長'},
+  {title:'安心國小6：分數不是全部',tag:'心理成長'},
+  {title:'安心國小7：我想幫幫你',tag:'心理成長'},
+  {title:'安心國小8：轉學生的考驗',tag:'心理成長'},
+  {title:'安心國小9：當我們同在一起',tag:'心理成長'},
+  {title:'安心國小10：我不敢告訴老師',tag:'心理成長'},
+  // 紅豆綠豆碰系列
+  {title:'紅豆綠豆碰1：學校好好玩',tag:'生活素養'},
+  {title:'紅豆綠豆碰2：生活好好玩',tag:'生活素養'},
+  {title:'紅豆綠豆碰3：心情好好玩',tag:'生活素養'},
+  {title:'紅豆綠豆碰4：學習好好玩',tag:'生活素養'},
+  {title:'紅豆綠豆碰5：3C大冒險',tag:'生活素養'},
+  {title:'紅豆綠豆碰6：地球保衛戰',tag:'生活素養'},
+  {title:'紅豆綠豆碰7：手機的誘惑',tag:'生活素養'},
+  {title:'紅豆綠豆碰8：綠豆兵想當網紅',tag:'生活素養'},
+  // 麵包小偷系列
+  {title:'麵包小偷1',tag:'溫馨繪本'},
+  {title:'麵包小偷2：誰偷了麵包',tag:'溫馨繪本'},
+  {title:'麵包小偷3：法式法國麵包',tag:'溫馨繪本'},
+  {title:'麵包小偷4：好吃的飯糰店',tag:'溫馨繪本'},
+  {title:'麵包小偷5：熱呼呼的麵包車',tag:'溫馨繪本'},
+  // 汪汪狗數學系列
+  {title:'汪汪狗生活數學1：電梯為什麼沒有0樓',tag:'數學漫畫'},
+  {title:'汪汪狗生活數學2：便利商店的秘密',tag:'數學漫畫'},
+  {title:'汪汪狗生活數學3：地圖上的魔術',tag:'數學漫畫'},
+  {title:'汪汪狗生活數學4：時鐘的數字秘密',tag:'數學漫畫'},
+  {title:'汪汪狗生活數學5：形狀躲貓貓',tag:'數學漫畫'},
+  {title:'汪汪狗生活數學6：大富翁與金錢機密',tag:'數學漫畫'},
+  {title:'汪汪狗生活數學7：遊樂園的排隊學問',tag:'數學漫畫'},
+  {title:'汪汪狗生活數學8：分數蛋糕怎麼分',tag:'數學漫畫'},
+  // 地獄小學 & 小妖怪
+  {title:'地獄小學1：新生報到',tag:'幽默校園'},
+  {title:'地獄小學2：校外教學大危機',tag:'幽默校園'},
+  {title:'地獄小學3：園遊會的惡作劇',tag:'幽默校園'},
+  {title:'地獄小學4：期末考大作戰',tag:'幽默校園'},
+  {title:'小妖怪1：旅行的小妖怪',tag:'奇幻橋梁'},
+  {title:'小妖怪2：學校的小妖怪',tag:'奇幻橋梁'},
+  {title:'小妖怪3：公園的小妖怪',tag:'奇幻橋梁'},
+  {title:'小妖怪4：家裡的小妖怪',tag:'奇幻橋梁'},
+  // 小學生心理學漫畫
+  {title:'小學生心理學漫畫1：社交力，交到好朋友',tag:'心理漫畫'},
+  {title:'小學生心理學漫畫2：自信力，勇敢做自己',tag:'心理漫畫'},
+  {title:'小學生心理學漫畫3：情緒力，做自己的主人',tag:'心理漫畫'},
+  {title:'小學生心理學漫畫4：學習力，越學越有趣',tag:'心理漫畫'},
+  // 單本熱門
+  {title:'我討厭貓',tag:'情緒繪本'},
+  {title:'情緒大飯店',tag:'情緒管理'},
+  {title:'魔法抱抱',tag:'溫馨繪本'},
+  {title:'梅子老師這一班：口罩幫幫忙',tag:'校園生活'},
+  {title:'腦筋急轉彎2電影同名繪本',tag:'情緒認識'},
+  {title:'彩色怪獸：情緒急救箱',tag:'情緒醫生'},
+  {title:'100層樓的家',tag:'想像冒險'},
+  {title:'地下100層樓的家',tag:'想像冒險'},
+  {title:'海底100層樓的家',tag:'想像冒險'},
+  {title:'天空100層樓的家',tag:'想像冒險'},
+  {title:'不跟人比，學會欣賞自己優點',tag:'自信成長'},
+  {title:'我是梅莉莎',tag:'勇氣成長'},
+  {title:'販賣幸福的鴿子先生',tag:'溫馨故事'},
+  {title:'短耳兔',tag:'溫馨繪本'},
+  {title:'沒毛雞',tag:'趣味繪本'},
+  {title:'大吼大叫的獅子國王',tag:'情緒繪本'},
+  {title:'一歲的外公',tag:'親情繪本'},
+  {title:'愛哭公主',tag:'情緒成長'},
+  {title:'生氣王子',tag:'情緒成長'},
+  {title:'威利在哪裡',tag:'趣味尋找'},
+];
+
+function generateRecommend(kid){
   const btn=document.getElementById('gen-'+kid+'-btn');
-  btn.disabled=true;btn.textContent='⏳ 產生中...';
-  document.getElementById('loading').classList.add('show');
-  const isVic=kid==='ge';
-  const prompt=isVic
-    ?`請為台灣10歲男生 Vic 推薦12本繁體中文兒童書籍，他喜歡射擊遊戲和賽車，個性活潑好動，不喜歡太文學性的書。請推薦冒險、科學、偵探、幽默、運動類書籍。只回傳 JSON 陣列，不要有其他文字或 markdown：[{"title":"書名","tag":"類型"},...] 類型用2到4個字。`
-    :`請為台灣8歲女生 Joy 推薦12本繁體中文兒童書籍，她喜歡 Roblox 遊戲、庫洛米、夢想成為醫生。請推薦醫學科普、魔法、解謎、可愛動物、成長類書籍。只回傳 JSON 陣列，不要有其他文字或 markdown：[{"title":"書名","tag":"類型"},...] 類型用2到4個字。`;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    const data=await res.json();
-    const text=data.content[0].text.replace(/```json|```/g,'').trim();
-    const books=JSON.parse(text);
-    if(!state.recommend[kid])state.recommend[kid]=[];
-    const existing=state.recommend[kid].map(b=>b.title);
-    books.forEach(b=>{if(!existing.includes(b.title))state.recommend[kid].push({...b,checked:false});});
-    syncUp('recommend',state.recommend);renderRecommend(kid);
-  }catch(e){alert('推薦產生失敗，請稍後再試 😅');}
-  document.getElementById('loading').classList.remove('show');
-  btn.disabled=false;btn.textContent='🤖 Claude 推薦';
+  btn.disabled=true; btn.textContent='🎲 抽選中...';
+  const pool=kid==='ge'?VIC_BOOKS:JOY_BOOKS;
+  if(!state.recommend[kid]) state.recommend[kid]=[];
+  const existing=state.recommend[kid].map(b=>b.title);
+  // Shuffle and pick 8 not already in list
+  const available=pool.filter(b=>!existing.includes(b.title));
+  const shuffled=available.sort(()=>Math.random()-.5).slice(0,8);
+  if(shuffled.length===0){
+    alert('所有書都已經加入了！可以先清掉一些再抽 😊');
+  } else {
+    shuffled.forEach(b=>state.recommend[kid].push({...b,checked:false}));
+    syncUp('recommend',state.recommend);
+    renderRecommend(kid);
+  }
+  setTimeout(()=>{btn.disabled=false;btn.textContent='🎲 隨機推薦';},500);
 }
 
 // ── DAD MISSIONS ──
