@@ -371,6 +371,21 @@ input:checked+.slider:before{transform:translateX(20px)}
     <div id="mei-read-streak" style="font-size:12px;font-weight:800;color:var(--joy-heart);margin-top:10px;text-align:center;min-height:18px"></div>
   </div>
 
+  <!-- 爸爸神助攻區 -->
+  <div class="card" style="background:linear-gradient(135deg,#0A1628,#1A2E4A);border:1.5px solid rgba(78,174,255,0.4);margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div>
+        <div style="font-size:15px;font-weight:900;color:#4EAEFF">👨 爸爸神助攻區</div>
+        <div style="font-size:11px;color:rgba(78,174,255,0.6);margin-top:2px">今日隨機任務，完成讓孩子加碼點數！</div>
+      </div>
+      <button id="dad-refresh-btn" style="background:rgba(78,174,255,0.2);border:1.5px solid rgba(78,174,255,0.4);border-radius:var(--r-xs);padding:6px 12px;color:#4EAEFF;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;touch-action:manipulation">🎲 換一組</button>
+    </div>
+    <div id="dad-missions"></div>
+    <div id="dad-done-bar" style="display:none;margin-top:10px;background:rgba(46,204,138,0.15);border-radius:var(--r-xs);padding:10px;text-align:center;font-size:13px;font-weight:800;color:var(--green)">
+      🎉 爸爸神助攻成功！孩子各得 +5 點獎勵！
+    </div>
+  </div>
+
   <!-- 榮譽解鎖按鈕 -->
   <div style="margin-bottom:10px">
     <div style="font-size:11px;color:var(--vic-neon);font-weight:800;margin-bottom:6px;padding:0 2px">✨ Vic 今日榮譽解鎖</div>
@@ -413,7 +428,7 @@ input:checked+.slider:before{transform:translateX(20px)}
       <span class="sc-icon">🏎️</span>
       <div class="sc-val" id="ge-time">—</div>
       <div class="sc-note" id="ge-time-note"></div>
-      <div style="font-size:10px;color:rgba(125,249,255,0.5);margin-top:4px">平日不開 · 週末加碼累積</div>
+      <div style="font-size:10px;color:rgba(125,249,255,0.5);margin-top:4px">完成任務 → 解鎖 3C · 週末加碼累積</div>
     </div>
     <div class="sc-card joy-sc">
       <span class="sc-icon">🩺</span>
@@ -427,6 +442,9 @@ input:checked+.slider:before{transform:translateX(20px)}
   </div>
   <div id="fri-bonus-bar" style="display:none;margin-top:10px;background:linear-gradient(135deg,#FFD700,#FF6B35);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;font-weight:800;color:white;text-align:center;animation:hearts-pulse 1.5s ease infinite">
     ⭐ 今天是週五！閱讀任務完成可獲得翻倍點數！⭐
+  </div>
+  <div id="weekend-task-bar" style="display:none;margin-top:10px;background:linear-gradient(135deg,#9B59B6,#4A6CF7);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;font-weight:800;color:white;text-align:center">
+    🎉 週末特別任務：自選科目複習出現了！完成得雙倍點數 📚
   </div>
 </div>
 
@@ -631,22 +649,48 @@ const isFri=TODAY===5;
 const isWeekday14=TODAY>=1&&TODAY<=4;
 
 const GE_TASKS=[
-  {id:'ge1',label:'📝 作業與聯絡簿定位'},
-  {id:'ge2',label:'🚿 20分鐘洗澡刷牙挑戰'},
-  {id:'ge3',label:'🎒 睡前書包制服大點名'},
-  {id:'ge4',label:'🧠 15分鐘大腦快問快答（不拿筆）'},
-  {id:'ge5',label:'📖 睡前黃金閱讀 20 分鐘 ⚡雙倍點數！'},
+  {id:'ge1',label:'📝 作業與聯絡簿檢查'},
+  {id:'ge2',label:'🎒 書包餐具點點名'},
+  {id:'ge4',label:'🔤 英文複習 20 分鐘'},
+  {id:'ge5',label:'🧠 每日閱讀＋快問快答'},
+  {id:'ge_sport',label:'🏋️ 今天運動了沒'},
+  {id:'ge_bath',label:'🚿 洗澡刷牙大挑戰'},
+  {id:'ge6',label:'📖 睡前閱讀 ⚡雙倍點數！'},
+];
+const GE_TASKS_WEEKEND=[
+  {id:'ge1',label:'📝 作業與聯絡簿檢查'},
+  {id:'ge2',label:'🎒 書包餐具點點名'},
+  {id:'ge4',label:'🔤 英文複習 20 分鐘'},
+  {id:'ge5',label:'🧠 每日閱讀＋快問快答'},
+  {id:'ge_sport',label:'🏋️ 今天運動了沒'},
+  {id:'ge_extra1',label:'📚 自選科目複習 第1科（雙倍點數！）'},
+  {id:'ge_extra2',label:'📚 自選科目複習 第2科（雙倍點數！）'},
+  {id:'ge_bath',label:'🚿 洗澡刷牙大挑戰'},
+  {id:'ge6',label:'📖 睡前閱讀 ⚡雙倍點數！'},
 ];
 const MEI_TASKS=[
-  {id:'mei1',label:'📝 作業與聯絡簿定位'},
-  {id:'mei2',label:'🚿 洗澡刷牙小儀式'},
-  {id:'mei3',label:'🎒 書包制服大點名'},
-  {id:'mei4',label:'🌟 15分鐘知識小老師'},
-  {id:'mei5',label:'📖 睡前閱讀 15 分鐘 ⚡雙倍點數！'},
+  {id:'mei1',label:'📝 作業與聯絡簿檢查'},
+  {id:'mei2',label:'🎒 書包餐具點點名'},
+  {id:'mei4',label:'🔤 英文複習 20 分鐘'},
+  {id:'mei5',label:'🧠 每日閱讀＋快問快答'},
+  {id:'mei_sport',label:'🏋️ 今天運動了沒'},
+  {id:'mei_bath',label:'🚿 洗澡刷牙大挑戰'},
+  {id:'mei6',label:'📖 睡前閱讀 ⚡雙倍點數！'},
+];
+const MEI_TASKS_WEEKEND=[
+  {id:'mei1',label:'📝 作業與聯絡簿檢查'},
+  {id:'mei2',label:'🎒 書包餐具點點名'},
+  {id:'mei4',label:'🔤 英文複習 20 分鐘'},
+  {id:'mei5',label:'🧠 每日閱讀＋快問快答'},
+  {id:'mei_sport',label:'🏋️ 今天運動了沒'},
+  {id:'mei_extra1',label:'📚 自選科目複習 第1科（雙倍點數！）'},
+  {id:'mei_extra2',label:'📚 自選科目複習 第2科（雙倍點數！）'},
+  {id:'mei_bath',label:'🚿 洗澡刷牙大挑戰'},
+  {id:'mei6',label:'📖 睡前閱讀 ⚡雙倍點數！'},
 ];
 const WEEKLY_TASKS={
-  ge:['作業定位','洗澡挑戰','大腦充電','黃金閱讀'],
-  mei:['作業定位','洗澡儀式','知識小老師','睡前閱讀'],
+  ge:['作業定位','英文複習','大腦充電','黃金閱讀'],
+  mei:['作業定位','英文複習','知識小老師','睡前閱讀'],
 };
 const SPORT_GOAL={ge:90,mei:60};
 const CIRC=201;
@@ -662,6 +706,7 @@ let state={
   lastResetDate:'',
   dailyHistory:{},
   blindbox:{ge:0,mei:0},
+  dadMissions:[],
   recommend:{
     ge:[
       {title:'怪傑佐羅力系列',tag:'幽默冒險',checked:false},
@@ -733,6 +778,7 @@ function startListening(){
       state.lastResetDate=data.lastResetDate||'';
       state.dailyHistory=data.dailyHistory||{};
       state.blindbox=data.blindbox||{ge:0,mei:0};
+      state.dadMissions=data.dadMissions||[];
       state.shares=data.shares||[];
       state.books=data.books||state.books;
       state.bookId=data.bookId||state.bookId;
@@ -825,8 +871,10 @@ function renderDaily(){
   document.getElementById('ge-ontime').checked=!!state.geOntime;
   renderTasks(GE_TASKS,'tasks-ge');
   renderTasks(MEI_TASKS,'tasks-mei');
-  const geAll=GE_TASKS.every(t=>isChecked(t.id));
-  const meiAll=MEI_TASKS.every(t=>isChecked(t.id));
+  const activeGeTasks = isWeekend ? GE_TASKS_WEEKEND : GE_TASKS;
+  const activeMeiTasks = isWeekend ? MEI_TASKS_WEEKEND : MEI_TASKS;
+  const geAll=activeGeTasks.every(t=>isChecked(t.id));
+  const meiAll=activeMeiTasks.every(t=>isChecked(t.id));
   // Update daily login streak
   const todayStr=new Date().toISOString().slice(0,10);
   ['ge','mei'].forEach(kid=>{
@@ -860,11 +908,25 @@ function renderDaily(){
   if(isWeekend){gt='60 分鐘';gn='🎉 週末開放！';gC='earned';}
   else if(isFri&&geAll){gt='30 分鐘';gn='🎉 週五任務完成！';gC='earned';}
   else if(isWeekday14){
-    if(geAll&&ontime){gt='週六 +15分';gn='🏆 準時回家＋任務全完成！週六加碼！';gC='earned';}
-    else if(geAll&&!ontime){gt='任務達成！';gn='等媽媽確認準時回家，週六加碼 +15';gC='maybe';}
-    else if(ontime&&!geAll){const l=GE_TASKS.filter(t=>!isChecked(t.id)).length;gt='累積中…';gn=`還差 ${l} 項，完成就加碼！`;gC='maybe';}
-    else{gt='💤 好好休息';gn='平日不開 3C，大腦儲能中！';gC='locked';}
-  }else{gt='💤 好好休息';gn='平日不開 3C，大腦儲能中！';gC='locked';}
+    if(geAll&&ontime){
+      gt='10 分鐘 🎮';
+      gn='🏆 準時回家＋全完成！週六再加碼 +15';
+      gC='earned';
+    } else if(geAll&&!ontime){
+      gt='任務達成！';
+      gn='⏳ 等媽媽確認準時回家 → 解鎖 10 分鐘 + 週六 +15';
+      gC='maybe';
+    } else if(ontime&&!geAll){
+      const l=activeGeTasks.filter(t=>!isChecked(t.id)).length;
+      gt='⏳ 還差 '+l+' 項';
+      gn='完成所有任務 → 解鎖 10 分鐘！';
+      gC='locked';
+    } else {
+      gt='🎯 加油！';
+      gn='完成任務＋準時回家 → 解鎖 10 分鐘';
+      gC='locked';
+    }
+  } else {gt='💪 充電中';gn='完成任務 → 解鎖今日 3C！';gC='locked';}
   if(isWeekend){mt='45 分鐘';mn='🎉 週末開放！';mC='earned';}
   else if(meiAll){mt='30 分鐘';mn='🎉 任務全完成！';mC='earned';}
   else{const l=MEI_TASKS.filter(t=>!isChecked(t.id)).length;mt='待完成';mn=`還差 ${l} 項任務`;mC='locked';}
@@ -877,9 +939,12 @@ function renderDaily(){
   // Friday bonus bar
   const friBar=document.getElementById('fri-bonus-bar');
   if(friBar) friBar.style.display=isFri?'block':'none';
+  // Weekend special task bar
+  const wkBar=document.getElementById('weekend-task-bar');
+  if(wkBar) wkBar.style.display=isWeekend?'block':'none';
 
   const bar=document.getElementById('reward-bar');
-  const left=GE_TASKS.filter(t=>!isChecked(t.id)).length+MEI_TASKS.filter(t=>!isChecked(t.id)).length;
+  const left=activeGeTasks.filter(t=>!isChecked(t.id)).length+activeMeiTasks.filter(t=>!isChecked(t.id)).length;
   if(geAll&&meiAll){
     bar.className='info-bar good';
     document.getElementById('reward-msg').textContent='今天全部完成！週末可獲得額外獎勵 🎉';
@@ -1074,6 +1139,98 @@ async function generateRecommend(kid){
   btn.disabled=false;btn.textContent='🤖 Claude 推薦';
 }
 
+// ── DAD MISSIONS ──
+const DAD_MISSIONS_POOL = [
+  {id:'d1', label:'💬 問 Vic 今天學了什麼新東西', reward: '孩子+5'},
+  {id:'d2', label:'📖 陪 Joy 讀一本繪本或故事書', reward: '孩子+5'},
+  {id:'d3', label:'🏃 帶孩子出門運動或散步 15 分鐘', reward: '孩子+5'},
+  {id:'d4', label:'🍽️ 飯後和孩子一起洗碗', reward: '孩子+5'},
+  {id:'d5', label:'🧩 陪玩一局桌遊或益智遊戲', reward: '孩子+5'},
+  {id:'d6', label:'🌙 睡前說一個故事給孩子聽', reward: '孩子+5'},
+  {id:'d7', label:'✏️ 陪 Vic 複習一科功課 10 分鐘', reward: '孩子+5'},
+  {id:'d8', label:'🎨 陪 Joy 畫畫或手作 15 分鐘', reward: '孩子+5'},
+  {id:'d9', label:'💪 和孩子一起做運動挑戰', reward: '孩子+5'},
+  {id:'d10', label:'📱 關掉手機專心陪孩子聊天 10 分鐘', reward: '孩子+5'},
+  {id:'d11', label:'🚴 帶孩子騎腳踏車', reward: '孩子+5'},
+  {id:'d12', label:'🔤 用英文跟孩子對話 5 分鐘', reward: '孩子+5'},
+  {id:'d13', label:'🌟 給每個孩子一個真心讚美', reward: '孩子+5'},
+  {id:'d14', label:'🧠 出三題益智問答考孩子', reward: '孩子+5'},
+  {id:'d15', label:'🗑️ 帶孩子一起倒垃圾或整理環境', reward: '孩子+5'},
+  {id:'d16', label:'🛁 幫孩子準備洗澡用品或吹頭髮', reward: '孩子+5'},
+  {id:'d17', label:'📸 幫孩子拍一張今日特別時刻', reward: '孩子+5'},
+  {id:'d18', label:'🪴 和孩子一起澆花或整理植物', reward: '孩子+5'},
+  {id:'d19', label:'👟 幫孩子整理明天要穿的衣服', reward: '孩子+5'},
+  {id:'d20', label:'🎵 和孩子一起聽一首喜歡的歌', reward: '孩子+5'},
+];
+
+function getDadSeedForToday(){
+  const d = new Date();
+  return d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
+}
+
+function seededRandom(seed, index){
+  const x = Math.sin(seed * 9301 + index * 49297 + 233720) * 1000000;
+  return x - Math.floor(x);
+}
+
+function getTodayDadMissions(){
+  // Use date as seed so missions are same for whole day, change next day
+  const seed = getDadSeedForToday();
+  const count = 1 + Math.floor(seededRandom(seed, 99) * 3); // 1-3 tasks
+  const shuffled = DAD_MISSIONS_POOL.map((m,i)=>({m, sort:seededRandom(seed,i)}))
+    .sort((a,b)=>a.sort-b.sort)
+    .map(x=>x.m);
+  return shuffled.slice(0, count);
+}
+
+function renderDadMissions(forceNew){
+  const el = document.getElementById('dad-missions');
+  if(!el) return;
+  // Get today's missions (or forced new set stored in state)
+  if(forceNew){
+    // Reshuffle using time-based seed
+    const seed = getDadSeedForToday() + Date.now() % 1000;
+    const count = 1 + Math.floor(seededRandom(seed,99)*3);
+    const shuffled = DAD_MISSIONS_POOL.map((m,i)=>({m,sort:seededRandom(seed,i)}))
+      .sort((a,b)=>a.sort-b.sort).map(x=>x.m);
+    state.dadMissions = shuffled.slice(0,count).map(m=>({...m,done:false}));
+    syncUp('dadMissions', state.dadMissions);
+  }
+  if(!state.dadMissions || !state.dadMissions.length){
+    state.dadMissions = getTodayDadMissions().map(m=>({...m,done:false}));
+  }
+  const missions = state.dadMissions;
+  el.innerHTML = missions.map((m,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(78,174,255,0.15)${i===missions.length-1?';border-bottom:none':''}">
+      <div class="dad-check" data-idx="${i}" style="width:26px;height:26px;border-radius:50%;border:2px solid ${m.done?'#4EAEFF':'rgba(78,174,255,0.3)'};background:${m.done?'#4EAEFF':'transparent'};display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;touch-action:manipulation">${m.done?'✓':''}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:${m.done?'rgba(255,255,255,0.4)':'#E0F0FF'};${m.done?'text-decoration:line-through':''}">${m.label}</div>
+        <div style="font-size:11px;color:rgba(78,174,255,0.5);margin-top:2px">完成後 ${m.reward}</div>
+      </div>
+    </div>`).join('');
+
+  // Bind check buttons
+  document.querySelectorAll('.dad-check').forEach(function(btn){
+    btn.onclick = function(){ toggleDadMission(parseInt(btn.dataset.idx)); };
+  });
+
+  // Show done bar if any complete
+  const doneBar = document.getElementById('dad-done-bar');
+  const anyDone = missions.some(m=>m.done);
+  if(doneBar) doneBar.style.display = anyDone ? 'block' : 'none';
+}
+
+function toggleDadMission(idx){
+  if(!state.dadMissions) return;
+  const wasDone = state.dadMissions[idx].done;
+  state.dadMissions[idx].done = !wasDone;
+  syncUp('dadMissions', state.dadMissions);
+  if(!wasDone){
+    burst(window.innerWidth/2, window.innerHeight/2, ['👨','⭐','🎉','💪','🏆','💙']);
+  }
+  renderDadMissions(false);
+}
+
 // ── HONOR POINTS ──
 function addHonorPoints(kid, points, reason, evt) {
   const emojis=kid==='ge'?['👑','🏎️','⚡','🔥','🎉']:['🌸','🩺','💖','✨','🎉'];
@@ -1102,6 +1259,8 @@ function initShareWhoButtons() {
   document.querySelectorAll('.honor-btn').forEach(function(btn) {
     btn.onclick = function(e){ addHonorPoints(btn.dataset.kid, parseInt(btn.dataset.pts), btn.dataset.reason, e); };
   });
+  var dadRefresh = document.getElementById('dad-refresh-btn');
+  if(dadRefresh) dadRefresh.onclick = function(){ renderDadMissions(true); };
   var submitBtn = document.getElementById('share-submit-btn');
   if(submitBtn) submitBtn.onclick = function(e){ submitShare(e); };
 }
@@ -1134,16 +1293,22 @@ function checkDailyReset(){
 
   // Clear daily tasks
   state.daily = {};
+  state.dadMissions = getTodayDadMissions().map(m=>({...m,done:false}));
+
   state.lastResetDate = resetDate;
   syncUp('daily', state.daily);
+  syncUp('dadMissions', state.dadMissions);
+
   syncUp('lastResetDate', state.lastResetDate);
 }
 
 function saveDailyHistory(dateStr, dailyData){
   if(!state.dailyHistory) state.dailyHistory = {};
   // Build readable record
-  const geCompleted = GE_TASKS.filter(t=>!!dailyData[t.id]).map(t=>t.label);
-  const meiCompleted = MEI_TASKS.filter(t=>!!dailyData[t.id]).map(t=>t.label);
+  const allGeTasks = [...GE_TASKS, ...GE_TASKS_WEEKEND].filter((t,i,a)=>a.findIndex(x=>x.id===t.id)===i);
+  const allMeiTasks = [...MEI_TASKS, ...MEI_TASKS_WEEKEND].filter((t,i,a)=>a.findIndex(x=>x.id===t.id)===i);
+  const geCompleted = allGeTasks.filter(t=>!!dailyData[t.id]).map(t=>t.label);
+  const meiCompleted = allMeiTasks.filter(t=>!!dailyData[t.id]).map(t=>t.label);
   state.dailyHistory[dateStr] = {
     date: dateStr,
     ge: {done: geCompleted, total: GE_TASKS.length},
@@ -1346,7 +1511,7 @@ function switchTab(name){
   document.getElementById('panel-'+name).classList.add('active');
   if(name==='history') renderHistory();
 }
-function renderAll(){renderDaily();renderSport();renderWeekly();renderTeamwork();renderBooks();renderRecommend('ge');renderRecommend('mei');renderHistory();if(!db)renderShareWallData(null);initShareWhoButtons();}
+function renderAll(){renderDaily();renderSport();renderWeekly();renderTeamwork();renderBooks();renderRecommend('ge');renderRecommend('mei');renderHistory();renderDadMissions(false);if(!db)renderShareWallData(null);initShareWhoButtons();}
 setupGlobalTouch();
 startListening();
 // Check reset every minute (catches the 6am boundary)
