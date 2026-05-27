@@ -4,12 +4,37 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-title" content="許家任務板"/>
-<title>許家任務板 🏠</title>
+<meta name="apple-mobile-web-app-title" content="許家任務站"/>
+<title>許家任務站 🚀</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
+[data-theme="light"] {
+  --vic:#4A6CF7; --vic-light:#EEF0FF; --vic-dark:#2A3FA0; --vic-neon:#4A6CF7;
+  --joy:#E8619A; --joy-light:#FFF0F6; --joy-dark:#B03070; --joy-heart:#E8619A;
+  --green:#2ECC8A; --green-light:#E8FBF3;
+  --orange:#FF8C42; --yellow:#FFD166; --red:#FF5A5A; --blue:#4EAEFF; --blue-light:#EBF6FF;
+  --bg:#F0F0FF; --card:#FFFFFF; --text:#1A1A2E; --text2:#6B6B8A; --text3:#B0A8C8;
+  --border:rgba(100,80,200,0.12);
+}
+[data-theme="light"] .vic-card{background:#EEF0FF;border-color:rgba(74,108,247,0.3);}
+[data-theme="light"] .joy-card{background:#FFF0F6;border-color:rgba(232,97,154,0.3);}
+[data-theme="light"] .vic-card .task-label{color:#2A3FA0;}
+[data-theme="light"] .joy-card .task-label{color:#B03070;}
+[data-theme="light"] .vic-card .task-check{background:white;border-color:rgba(74,108,247,0.4);}
+[data-theme="light"] .joy-card .task-check{background:white;border-color:rgba(232,97,154,0.4);}
+[data-theme="light"] .sport-card.vic-sport{background:#EEF0FF;}
+[data-theme="light"] .sport-card.mei-sport{background:#FFF0F6;}
+[data-theme="light"] .ring-val{color:#2A3FA0;}
+[data-theme="light"] .log-entry{color:#6B6B8A;}
+[data-theme="light"] .sport-log-row input{background:white;border-color:rgba(74,108,247,0.2);color:#1A1A2E;}
+[data-theme="light"] .sport-log-row input::placeholder{color:#B0A8C8;}
+[data-theme="light"] .sc-card.vic-sc{background:#EEF0FF;}
+[data-theme="light"] .sc-card.joy-sc{background:#FFF0F6;}
+[data-theme="light"] .sc-val.earned{color:var(--green);}
+[data-theme="light"] .sc-val.locked{color:var(--red);}
+
 :root {
   --vic:#4A6CF7; --vic-light:#EEF0FF; --vic-dark:#2A3FA0;
   --vic-neon:#7DF9FF; --vic-fire:#FF6B35;
@@ -61,8 +86,16 @@ button{-webkit-appearance:none;appearance:none;}
 @keyframes pulse-ring{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.3);opacity:.2}}
 .header-inner{display:flex;align-items:center;justify-content:space-between;max-width:600px;margin:0 auto;position:relative;z-index:1}
 .header-title{font-size:20px;font-weight:900;color:white;display:flex;align-items:center;gap:8px}
-.header-home{font-size:26px;animation:bounce-home 2s ease infinite}
-@keyframes bounce-home{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.header-car-wrap{position:relative;height:32px;overflow:hidden;width:180px;flex-shrink:0}
+.header-car{position:absolute;font-size:22px;animation:car-race 3s linear infinite;white-space:nowrap}
+.header-car-dust{position:absolute;font-size:10px;animation:car-race 3s linear infinite;animation-delay:.15s;opacity:0.6;top:16px}
+@keyframes car-race{
+  0%{left:-40px;opacity:0}
+  8%{opacity:1}
+  92%{opacity:1}
+  100%{left:190px;opacity:0}
+}
+.header-title{font-size:20px;font-weight:900;color:white}
 .sync-pill{background:rgba(255,255,255,0.18);backdrop-filter:blur(10px);border-radius:20px;padding:4px 12px;font-size:12px;color:white;font-weight:700;display:flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.25)}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:#666}
 .sync-dot.online{background:#7FFFB8;box-shadow:0 0 6px #7FFFB8}
@@ -293,12 +326,14 @@ input:checked+.slider:before{transform:translateX(20px)}
 <body>
 
 <!-- Floating particles -->
-<div class="particle" style="left:10%;animation-delay:0s;animation-duration:7s">🎮</div>
-<div class="particle" style="left:25%;animation-delay:1s;animation-duration:9s">🌸</div>
-<div class="particle" style="left:45%;animation-delay:2s;animation-duration:6s">⭐</div>
-<div class="particle" style="left:65%;animation-delay:3s;animation-duration:8s">🏎️</div>
-<div class="particle" style="left:80%;animation-delay:1.5s;animation-duration:7s">💊</div>
-<div class="particle" style="left:90%;animation-delay:.5s;animation-duration:10s">💫</div>
+<div class="particle" style="left:5%;animation-delay:0s;animation-duration:7s">🚀</div>
+<div class="particle" style="left:18%;animation-delay:1.2s;animation-duration:9s">⭐</div>
+<div class="particle" style="left:32%;animation-delay:2.4s;animation-duration:6s">🌸</div>
+<div class="particle" style="left:48%;animation-delay:0.6s;animation-duration:8s">🎮</div>
+<div class="particle" style="left:62%;animation-delay:3.1s;animation-duration:7s">🏎️</div>
+<div class="particle" style="left:75%;animation-delay:1.8s;animation-duration:10s">💫</div>
+<div class="particle" style="left:88%;animation-delay:0.3s;animation-duration:8s">🌟</div>
+<div class="particle" style="left:95%;animation-delay:2s;animation-duration:6s">🩺</div>
 
 <div class="loading-overlay" id="loading">
   <div class="loading-spinner">📚</div>
@@ -309,13 +344,24 @@ input:checked+.slider:before{transform:translateX(20px)}
 
 <div class="header">
   <div class="header-inner">
-    <div class="header-title">
-      <span class="header-home">🏠</span>
-      許家任務板
+    <div>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="header-title">🏁 許家任務站</div>
+        </div>
+        <div class="header-car-wrap">
+          <div class="header-car">🏎️</div>
+          <div class="header-car-dust">💨💨</div>
+        </div>
+      </div>
+      <div id="header-date" style="font-size:11px;color:rgba(255,255,255,0.7);font-weight:700;margin-top:2px;letter-spacing:.03em"></div>
     </div>
-    <div class="sync-pill">
-      <span class="sync-dot" id="sync-dot"></span>
-      <span id="sync-label">連線中</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="theme-btn" onclick="toggleTheme()" style="background:rgba(255,255,255,0.15);border:none;border-radius:20px;padding:4px 10px;color:white;font-size:14px;cursor:pointer;touch-action:manipulation">🌙</button>
+      <div class="sync-pill">
+        <span class="sync-dot" id="sync-dot"></span>
+        <span id="sync-label">連線中</span>
+      </div>
     </div>
   </div>
 </div>
@@ -543,8 +589,11 @@ input:checked+.slider:before{transform:translateX(20px)}
 
   <!-- 神秘盲盒 -->
   <div class="card" style="background:linear-gradient(135deg,#1A0A2E,#2E1A0A);border:2px solid rgba(155,89,182,0.4)">
-    <div style="font-size:15px;font-weight:900;color:#DA70D6;margin-bottom:8px">🎲 媽媽神秘盲盒</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">累積夠多閱讀🏆連勝，解鎖盲盒！內有驚喜獎勵由媽媽決定 ✨</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:15px;font-weight:900;color:#DA70D6">🎲 媽媽神秘盲盒</div>
+      <button onclick="editBlindbox()" style="font-size:11px;padding:4px 10px;border-radius:var(--r-xs);border:1px solid rgba(218,112,214,0.4);background:rgba(218,112,214,0.1);color:#DA70D6;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700">✏️ 編輯獎勵</button>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">累積夠多閱讀🏆連勝，解鎖盲盒！內有驚喜獎勵 ✨</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div style="text-align:center">
         <div style="font-size:12px;font-weight:800;color:var(--vic-neon);margin-bottom:6px">🏎️ Vic 盲盒</div>
@@ -596,6 +645,7 @@ input:checked+.slider:before{transform:translateX(20px)}
       <div class="add-row" style="margin-top:14px">
         <input id="rec-ge-input" placeholder="✏️ 自己想看的書" style="background:rgba(255,255,255,0.08);border-color:rgba(74,108,247,0.3);color:white"/>
         <button class="btn btn-sm btn-vic" onclick="addRecommend('ge')">＋ 新增</button>
+        <button class="btn btn-sm" onclick="clearRecommend('ge')" style="background:rgba(255,90,90,0.2);border-color:rgba(255,90,90,0.4);color:#FF8A8A">清空</button>
       </div>
     </div>
     <button class="btn btn-vic btn-full" onclick="addSelectedToBooks('ge')">📚 將勾選的書加入借閱清單</button>
@@ -611,6 +661,7 @@ input:checked+.slider:before{transform:translateX(20px)}
       <div class="add-row" style="margin-top:14px">
         <input id="rec-mei-input" placeholder="✏️ 自己想看的書" style="background:rgba(255,255,255,0.08);border-color:rgba(232,97,154,0.3);color:white"/>
         <button class="btn btn-sm btn-joy" onclick="addRecommend('mei')">＋ 新增</button>
+        <button class="btn btn-sm" onclick="clearRecommend('mei')" style="background:rgba(255,90,90,0.2);border-color:rgba(255,90,90,0.4);color:#FF8A8A">清空</button>
       </div>
     </div>
     <button class="btn btn-joy btn-full" onclick="addSelectedToBooks('mei')">📚 將勾選的書加入借閱清單</button>
@@ -621,7 +672,8 @@ input:checked+.slider:before{transform:translateX(20px)}
 <div id="panel-history" class="panel">
   <div class="card" style="background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3)">
     <div style="font-size:16px;font-weight:900;color:white;margin-bottom:6px">📋 每日完成紀錄</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:14px">每天早上 6:00 自動重置，紀錄保留 30 天</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">每天早上 6:00 自動重置，紀錄保留 30 天</div>
+    <div id="history-week-summary" style="margin-bottom:14px"></div>
     <div id="history-list"></div>
   </div>
 </div>
@@ -712,6 +764,21 @@ const WEEKLY_TASKS={
   ge:['作業定位','英文複習','大腦充電','黃金閱讀'],
   mei:['作業定位','英文複習','知識小老師','睡前閱讀'],
 };
+// Map weekly categories to daily task IDs (for auto-sync)
+const WEEKLY_TASK_MAP={
+  ge:{
+    '作業定位':'ge1',
+    '英文複習':'ge4',
+    '大腦充電':'ge5',
+    '黃金閱讀':'ge6',
+  },
+  mei:{
+    '作業定位':'mei1',
+    '英文複習':'mei4',
+    '知識小老師':'mei5',
+    '睡前閱讀':'mei6',
+  },
+};
 const SPORT_GOAL={ge:90,mei:60};
 const CIRC=201;
 
@@ -726,7 +793,7 @@ let state={
   lastResetDate:'',
   dailyHistory:{},
   blindbox:{ge:0,mei:0},
-  dadMissions:[],
+  dadMissions:null,
   recommend:{
     ge:[
       {title:'怪傑佐羅力系列',tag:'幽默冒險',checked:false},
@@ -798,7 +865,17 @@ function startListening(){
       state.lastResetDate=data.lastResetDate||'';
       state.dailyHistory=data.dailyHistory||{};
       state.blindbox=data.blindbox||{ge:0,mei:0};
-      state.dadMissions=data.dadMissions||[];
+      // Firebase stores arrays as objects - convert back to array
+      var dm = data.dadMissions;
+      if(dm && !Array.isArray(dm)){
+        // Convert object to array
+        dm = Object.values(dm);
+        // Validate each item has required fields
+        dm = dm.filter(function(m){ return m && typeof m.label === 'string'; });
+      }
+      // If empty or invalid after conversion, set to null so it regenerates
+      state.dadMissions = (dm && dm.length > 0) ? dm : null;
+      state.customPrizes=data.customPrizes||null;
       state.shares=data.shares||[];
       state.books=data.books||state.books;
       state.bookId=data.bookId||state.bookId;
@@ -806,6 +883,12 @@ function startListening(){
     checkDailyReset(); // Check if need to reset for new day
     setSyncStatus('online');
     renderAll();
+    // Force regenerate dad missions if still empty after Firebase load
+    if(!state.dadMissions || !state.dadMissions.length){
+      state.dadMissions = getTodayDadMissions().map(function(m){ return Object.assign({},m,{done:false}); });
+      syncUp('dadMissions', state.dadMissions);
+      renderDadMissions(false);
+    }
   });
   db.ref('.info/connected').on('value',snap=>{
     if(!snap.val()){setSyncStatus('offline');renderAll();}
@@ -847,8 +930,38 @@ function toggleTask(id,event){
       const y=event&&event.clientY?event.clientY:window.innerHeight/2;
       burst(x,y,emojis);
     }catch(e){}
+    // Auto-log sport when sport task is checked
+    if(id==='ge_sport'||id==='mei_sport'){
+      const kid=id==='ge_sport'?'ge':'mei';
+      autoLogSport(kid, true);
+    }
+  } else {
+    // Remove auto-log if unchecked
+    if(id==='ge_sport'||id==='mei_sport'){
+      const kid=id==='ge_sport'?'ge':'mei';
+      autoLogSport(kid, false);
+    }
   }
   renderDaily();
+}
+
+function autoLogSport(kid, isChecking){
+  if(!state.sport[kid]) state.sport[kid]=[];
+  const wk=getWeekKey();
+  const days=['日','一','二','三','四','五','六'];
+  const dayStr='週'+days[new Date().getDay()];
+  const autoId='auto_sport_'+kid+'_'+new Date().toISOString().slice(0,10);
+  if(isChecking){
+    // Add auto-log if not already there
+    if(!state.sport[kid].find(e=>e.id===autoId)){
+      state.sport[kid].push({id:autoId,week:wk,min:30,act:'今日運動打卡 ✅',day:dayStr});
+      syncUp('sport',state.sport);
+    }
+  } else {
+    // Remove auto-log
+    state.sport[kid]=state.sport[kid].filter(e=>e.id!==autoId);
+    syncUp('sport',state.sport);
+  }
 }
 function onOntimeChange(){
   const checked=document.getElementById('ge-ontime').checked;
@@ -889,8 +1002,11 @@ function renderTasks(tasks,cid){
 function renderDaily(){
   document.getElementById('ge-ontime-wrap').style.display=isWeekday14?'block':'none';
   document.getElementById('ge-ontime').checked=!!state.geOntime;
-  renderTasks(GE_TASKS,'tasks-ge');
-  renderTasks(MEI_TASKS,'tasks-mei');
+  // Use weekend tasks on weekends
+  var currentGeTasks = isWeekend ? GE_TASKS_WEEKEND : GE_TASKS;
+  var currentMeiTasks = isWeekend ? MEI_TASKS_WEEKEND : MEI_TASKS;
+  renderTasks(currentGeTasks,'tasks-ge');
+  renderTasks(currentMeiTasks,'tasks-mei');
   const activeGeTasks = isWeekend ? GE_TASKS_WEEKEND : GE_TASKS;
   const activeMeiTasks = isWeekend ? MEI_TASKS_WEEKEND : MEI_TASKS;
   const geAll=activeGeTasks.every(t=>isChecked(t.id));
@@ -1056,20 +1172,55 @@ function getStreakTitle(n){
   return '';
 }
 
+function autoSyncWeeklyFromDaily(){
+  // Auto-mark weekly dots based on today's daily task completion
+  if(!state.weekly) state.weekly={ge:{},mei:{}};
+  const weekday = Math.min(todayIdx, 4); // 0-4 for Mon-Fri
+  if(isWeekend) return; // Don't auto-sync on weekends
+  ['ge','mei'].forEach(kid=>{
+    if(!state.weekly[kid]) state.weekly[kid]={};
+    const map = WEEKLY_TASK_MAP[kid];
+    let changed = false;
+    Object.entries(map).forEach(([taskLabel, taskId])=>{
+      const key = kid+'_'+taskLabel+'_'+weekday;
+      const isDone = !!state.daily[taskId];
+      if(state.weekly[kid][key] !== isDone){
+        state.weekly[kid][key] = isDone;
+        changed = true;
+      }
+    });
+    if(changed) syncUp('weekly', state.weekly);
+  });
+}
+
 function renderWeekly(){
   ['ge','mei'].forEach(kid=>{
     const el=document.getElementById('weekly-'+kid);el.innerHTML='';
     WEEKLY_TASKS[kid].forEach(t=>{
       const row=document.createElement('div');row.className='week-row';
-      row.innerHTML=`<span class="week-label">${t}</span><div class="day-dots">${DAYS.map((d,i)=>{
+      const isAutoTask = WEEKLY_TASK_MAP[kid] && WEEKLY_TASK_MAP[kid][t];
+    row.innerHTML=`<span class="week-label">${t}${isAutoTask?'<span style="font-size:9px;color:var(--green);margin-left:4px">⚡自動</span>':''}</span><div class="day-dots">${DAYS.map((d,i)=>{
         const key=kid+'_'+t+'_'+i,done=!!(state.weekly[kid]||{})[key];
-        return`<div class="dot${done?' done':''}${i===todayIdx&&!isWeekend?' today':''}" onclick="toggleWeekly('${kid}','${t}',${i})">${done?'✓':d}</div>`;
+        const isToday=i===todayIdx&&!isWeekend;
+        return`<div class="dot${done?' done':''}${isToday?' today':''}" onclick="toggleWeekly('${kid}','${t}',${i})" title="${done?'已完成':'未完成'}">${done?'✓':d}</div>`;
       }).join('')}</div>`;
       el.appendChild(row);
     });
   });
   const cnt=kid=>{let d=0,t=0;WEEKLY_TASKS[kid].forEach(tk=>DAYS.forEach((_,i)=>{t++;if((state.weekly[kid]||{})[kid+'_'+tk+'_'+i])d++}));return{d,t}};
   const ge=cnt('ge'),mei=cnt('mei');
+  // Update header date
+  const dateEl=document.getElementById('header-date');
+  if(dateEl){
+    const now=new Date();
+    const days=['日','一','二','三','四','五','六'];
+    const months=now.getMonth()+1;
+    dateEl.textContent=`${now.getFullYear()}年${months}月${now.getDate()}日 週${days[now.getDay()]}`;
+  }
+
+  // Auto-sync weekly dots from today's daily completions
+  autoSyncWeeklyFromDaily();
+
   // Update streak display cards
   const gs=state.streaks?.ge||0, ms=state.streaks?.mei||0;
   const geNum=document.getElementById('streak-ge-num');
@@ -1091,19 +1242,23 @@ function renderWeekly(){
   // Streak bonus: +5 per 7-day milestone
   const geStreakBonus=Math.floor((state.streaks?.ge||0)/7)*5;
   const meiStreakBonus=Math.floor((state.streaks?.mei||0)/7)*5;
-  const geTotal=Math.round(ge.d/ge.t*60)+gSB+geOntimeBonus+geReadBonus+geStreakBonus;
-  const meiTotal=Math.round(mei.d/mei.t*45)+mSB+meiReadBonus+meiStreakBonus;
+  // Dad mission bonus - if any mission done, both kids get +5
+  const dadBonus=(state.dadMissions||[]).some(m=>m.done)?5:0;
+  const geTotal=Math.round(ge.d/ge.t*60)+gSB+geOntimeBonus+geReadBonus+geStreakBonus+dadBonus;
+  const meiTotal=Math.round(mei.d/mei.t*45)+mSB+meiReadBonus+meiStreakBonus+dadBonus;
   document.getElementById('weekend-calc').innerHTML=`
     <div class="calc-row"><span>🏎️ Vic 任務 ${ge.d}/${ge.t}</span><span>${Math.round(ge.d/ge.t*60)} 分鐘</span></div>
     <div class="calc-row"><span>🏃 Vic 運動達標${gSB?'':'（未達）'}</span><span style="color:${gSB?'var(--green)':'var(--text3)'}">${gSB?'+'+gSB+' 分鐘':'＋0'}</span></div>
     <div class="calc-row"><span>🕗 Vic 準時回家（本週 ${geOntimeDays} 天）</span><span style="color:${geOntimeBonus?'var(--green)':'var(--text3)'}">${geOntimeBonus?'+'+geOntimeBonus+' 分鐘':'＋0'}</span></div>
     <div class="calc-row"><span>📖 Vic 閱讀連勝 ${geReadStreak} 天${geReadBonus?'🏆':'（滿3天觸發）'}</span><span style="color:${geReadBonus?'#FFD700':'var(--text3)'}">${geReadBonus?'+'+geReadBonus+' 分鐘！':'＋0'}</span></div>
+    <div class="calc-row"><span>👨 爸爸神助攻${dadBonus?'':'（未完成）'}</span><span style="color:${dadBonus?'#4EAEFF':'var(--text3)'}">${dadBonus?'+'+dadBonus+' 分鐘！':'＋0'}</span></div>
     <div class="calc-row"><span>🔥 Vic 連勝 ${gs} 天加成${geStreakBonus?'':'（每7天+5分）'}</span><span style="color:${geStreakBonus?'#FF6B35':'var(--text3)'}">${geStreakBonus?'+'+geStreakBonus+' 分鐘！':'＋0'}</span></div>
     <div class="calc-row"><span>🏎️ <strong>Vic 週末總計</strong></span><span class="calc-total">${geTotal} 分鐘 🎮</span></div>
     <div style="height:10px"></div>
     <div class="calc-row"><span>🌸 Joy 任務 ${mei.d}/${mei.t}</span><span>${Math.round(mei.d/mei.t*45)} 分鐘</span></div>
     <div class="calc-row"><span>🏃 Joy 運動達標${mSB?'':'（未達）'}</span><span style="color:${mSB?'var(--green)':'var(--text3)'}">${mSB?'+'+mSB+' 分鐘':'＋0'}</span></div>
     <div class="calc-row"><span>📖 Joy 閱讀連勝 ${meiReadStreak} 天${meiReadBonus?'🏆':'（滿3天觸發）'}</span><span style="color:${meiReadBonus?'#FFD700':'var(--text3)'}">${meiReadBonus?'+'+meiReadBonus+' 分鐘！':'＋0'}</span></div>
+    <div class="calc-row"><span>👨 爸爸神助攻${dadBonus?'':'（未完成）'}</span><span style="color:${dadBonus?'#4EAEFF':'var(--text3)'}">${dadBonus?'+'+dadBonus+' 分鐘！':'＋0'}</span></div>
     <div class="calc-row"><span>🔥 Joy 連勝 ${ms} 天加成${meiStreakBonus?'':'（每7天+5分）'}</span><span style="color:${meiStreakBonus?'#FF6B35':'var(--text3)'}">${meiStreakBonus?'+'+meiStreakBonus+' 分鐘！':'＋0'}</span></div>
     <div class="calc-row"><span>🌸 <strong>Joy 週末總計</strong></span><span class="calc-total" style="color:var(--joy)">${meiTotal} 分鐘 🎮</span></div>`;
 }
@@ -1163,6 +1318,13 @@ function renderRecommend(kid){
     </div>`).join('');
 }
 function toggleRecCheck(kid,i){state.recommend[kid][i].checked=!state.recommend[kid][i].checked;syncUp('recommend',state.recommend);renderRecommend(kid);}
+function clearRecommend(kid){
+  if(!confirm('確定要清空所有推薦書嗎？')) return;
+  state.recommend[kid]=[];
+  syncUp('recommend',state.recommend);
+  renderRecommend(kid);
+}
+
 function addRecommend(kid){
   const input=document.getElementById('rec-'+kid+'-input'),title=input.value.trim();
   if(!title)return;
@@ -1473,39 +1635,88 @@ function getTodayDadMissions(){
 }
 
 function renderDadMissions(forceNew){
-  const el = document.getElementById('dad-missions');
+  var el = document.getElementById('dad-missions');
   if(!el) return;
-  // Get today's missions (or forced new set stored in state)
+
   if(forceNew){
-    // Reshuffle using time-based seed
-    const seed = getDadSeedForToday() + Date.now() % 1000;
-    const count = 1 + Math.floor(seededRandom(seed,99)*3);
-    const shuffled = DAD_MISSIONS_POOL.map((m,i)=>({m,sort:seededRandom(seed,i)}))
-      .sort((a,b)=>a.sort-b.sort).map(x=>x.m);
-    state.dadMissions = shuffled.slice(0,count).map(m=>({...m,done:false}));
+    var seed2 = getDadSeedForToday() + Date.now() % 1000;
+    var count2 = 1 + Math.floor(seededRandom(seed2,99)*3);
+    var shuffled2 = DAD_MISSIONS_POOL
+      .map(function(m,i){ return {m:m, sort:seededRandom(seed2,i)}; })
+      .sort(function(a,b){ return a.sort-b.sort; })
+      .map(function(x){ return x.m; });
+    state.dadMissions = shuffled2.slice(0,count2).map(function(m){ return Object.assign({},m,{done:false}); });
     syncUp('dadMissions', state.dadMissions);
   }
-  if(!state.dadMissions || !state.dadMissions.length){
-    state.dadMissions = getTodayDadMissions().map(m=>({...m,done:false}));
-  }
-  const missions = state.dadMissions;
-  el.innerHTML = missions.map((m,i)=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(78,174,255,0.15)${i===missions.length-1?';border-bottom:none':''}">
-      <div class="dad-check" data-idx="${i}" style="width:26px;height:26px;border-radius:50%;border:2px solid ${m.done?'#4EAEFF':'rgba(78,174,255,0.3)'};background:${m.done?'#4EAEFF':'transparent'};display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;touch-action:manipulation">${m.done?'✓':''}</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:${m.done?'rgba(255,255,255,0.4)':'#E0F0FF'};${m.done?'text-decoration:line-through':''}">${m.label}</div>
-        <div style="font-size:11px;color:rgba(78,174,255,0.5);margin-top:2px">完成後 ${m.reward}</div>
-      </div>
-    </div>`).join('');
 
-  // Bind check buttons
-  document.querySelectorAll('.dad-check').forEach(function(btn){
-    btn.onclick = function(){ toggleDadMission(parseInt(btn.dataset.idx)); };
+  // Convert Firebase object-array to real array if needed
+  if(state.dadMissions && !Array.isArray(state.dadMissions)){
+    state.dadMissions = Object.values(state.dadMissions);
+  }
+  if(!state.dadMissions || state.dadMissions.length===0){
+    state.dadMissions = getTodayDadMissions().map(function(m){ return Object.assign({},m,{done:false}); });
+    syncUp('dadMissions', state.dadMissions);
+  }
+
+  var missions = state.dadMissions;
+  if(!missions || !missions.length){
+    el.innerHTML = '<div style="color:rgba(78,174,255,0.5);font-size:13px;padding:10px 0;text-align:center">載入任務中... 若長時間未顯示請按「換一組」🎲</div>';
+    return;
+  }
+  el.innerHTML = '';
+
+  missions.forEach(function(m, i){
+    var row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.gap = '12px';
+    row.style.padding = '11px 0';
+    row.style.borderBottom = i === missions.length-1 ? 'none' : '1px dashed rgba(78,174,255,0.15)';
+
+    var check = document.createElement('div');
+    check.style.width = '30px';
+    check.style.height = '30px';
+    check.style.borderRadius = '50%';
+    check.style.flexShrink = '0';
+    check.style.display = 'flex';
+    check.style.alignItems = 'center';
+    check.style.justifyContent = 'center';
+    check.style.fontSize = '16px';
+    check.style.cursor = 'pointer';
+    check.style.touchAction = 'manipulation';
+    check.style.transition = 'all .2s';
+    check.style.border = '2px solid ' + (m.done ? '#4EAEFF' : 'rgba(78,174,255,0.35)');
+    check.style.background = m.done ? '#4EAEFF' : 'transparent';
+    check.textContent = m.done ? '✓' : '';
+    (function(taskIdx){ check.onclick = function(){ toggleDadMission(taskIdx); }; })(i);
+
+    var info = document.createElement('div');
+    info.style.flex = '1';
+
+    var lbl = document.createElement('div');
+    lbl.style.fontSize = '14px';
+    lbl.style.fontWeight = '700';
+    lbl.style.lineHeight = '1.4';
+    lbl.style.color = m.done ? 'rgba(255,255,255,0.35)' : '#E0F0FF';
+    if(m.done) lbl.style.textDecoration = 'line-through';
+    lbl.textContent = m.label;
+
+    var rwd = document.createElement('div');
+    rwd.style.fontSize = '11px';
+    rwd.style.color = 'rgba(78,174,255,0.5)';
+    rwd.style.marginTop = '3px';
+    rwd.style.fontWeight = '700';
+    rwd.textContent = '完成後孩子各 +5 分鐘 🎮';
+
+    info.appendChild(lbl);
+    info.appendChild(rwd);
+    row.appendChild(check);
+    row.appendChild(info);
+    el.appendChild(row);
   });
 
-  // Show done bar if any complete
-  const doneBar = document.getElementById('dad-done-bar');
-  const anyDone = missions.some(m=>m.done);
+  var doneBar = document.getElementById('dad-done-bar');
+  var anyDone = missions.some(function(m){ return m.done; });
   if(doneBar) doneBar.style.display = anyDone ? 'block' : 'none';
 }
 
@@ -1618,6 +1829,43 @@ function renderHistory(){
   const history = state.dailyHistory || {};
   const keys = Object.keys(history).sort().reverse(); // newest first
 
+  // Weekly summary
+  const summEl = document.getElementById('history-week-summary');
+  if(summEl && keys.length > 0){
+    const wk = getWeekKey();
+    const weekKeys = keys.filter(k => k >= wk);
+    if(weekKeys.length > 0){
+      const geRates = weekKeys.map(k => history[k].ge.done.length / history[k].ge.total * 100);
+      const meiRates = weekKeys.map(k => history[k].mei.done.length / history[k].mei.total * 100);
+      const geAvg = Math.round(geRates.reduce((a,b)=>a+b,0)/geRates.length);
+      const meiAvg = Math.round(meiRates.reduce((a,b)=>a+b,0)/meiRates.length);
+      const geBar = Math.round(geAvg/100*80);
+      const meiBar = Math.round(meiAvg/100*80);
+      summEl.innerHTML = `
+        <div style="background:rgba(255,255,255,0.05);border-radius:var(--r-sm);padding:12px">
+          <div style="font-size:12px;font-weight:900;color:#FFD166;margin-bottom:10px">📊 本週平均達成率（${weekKeys.length}天）</div>
+          <div style="margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin-bottom:4px">
+              <span style="color:var(--vic-neon)">🏎️ Vic</span><span style="color:var(--vic-neon)">${geAvg}%</span>
+            </div>
+            <div style="height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden">
+              <div style="height:100%;width:${geBar}px;max-width:100%;background:var(--vic);border-radius:4px;transition:width .5s"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin-bottom:4px">
+              <span style="color:var(--joy-heart)">🌸 Joy</span><span style="color:var(--joy-heart)">${meiAvg}%</span>
+            </div>
+            <div style="height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden">
+              <div style="height:100%;width:${meiBar}px;max-width:100%;background:var(--joy);border-radius:4px;transition:width .5s"></div>
+            </div>
+          </div>
+        </div>`;
+    } else {
+      summEl.innerHTML = '';
+    }
+  }
+
   if(!keys.length){
     el.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:20px">還沒有紀錄，完成任務後明天就能看到囉！</div>';
     return;
@@ -1657,6 +1905,25 @@ function renderHistory(){
 }
 
 // Global touch handler for maximum Android compatibility
+function toggleTheme(){
+  const isLight=document.documentElement.getAttribute('data-theme')==='light';
+  const newTheme=isLight?'dark':'light';
+  document.documentElement.setAttribute('data-theme',newTheme);
+  document.getElementById('theme-btn').textContent=isLight?'🌙':'☀️';
+  try{localStorage.setItem('family_theme',newTheme);}catch(e){}
+}
+// Load saved theme
+try{
+  const saved=localStorage.getItem('family_theme');
+  if(saved==='light'){
+    document.documentElement.setAttribute('data-theme','light');
+    document.addEventListener('DOMContentLoaded',function(){
+      const btn=document.getElementById('theme-btn');
+      if(btn)btn.textContent='☀️';
+    });
+  }
+}catch(e){}
+
 function setupGlobalTouch() {
   document.addEventListener('touchstart', function(){}, {passive: true}); // unlock touch
 }
@@ -1725,14 +1992,22 @@ function renderShareWallData(data) {
     wall.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:10px">還沒有動態，來留下第一則心情吧！💭</div>';
     return;
   }
-  wall.innerHTML=items.slice(0,15).map(item=>`
+  const itemsArr=items.slice(0,15);
+  wall.innerHTML=itemsArr.map((item,idx)=>`
     <div style="font-size:12px;border-bottom:1px dashed rgba(255,255,255,0.1);padding:7px 0">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
         <span style="font-weight:900;color:${item.color||'var(--vic-neon)'}">${item.sender}</span>
         <span style="color:rgba(255,255,255,0.3);font-size:10px">${item.time}</span>
+        ${item.key?`<span class="share-del" data-key="${item.key}" style="margin-left:auto;cursor:pointer;color:rgba(255,255,255,0.2);font-size:14px;padding:0 4px">✕</span>`:''}
       </div>
       <div style="color:#E0E8FF;padding-left:4px;line-height:1.5">${item.content}</div>
     </div>`).join('');
+  // Bind delete buttons
+  document.querySelectorAll('.share-del').forEach(function(btn){
+    btn.onclick=function(){
+      if(db) db.ref('family/shares/'+btn.dataset.key).remove();
+    };
+  });
 }
 
 // ── TEAMWORK + BLINDBOX ──
@@ -1772,6 +2047,16 @@ function renderTeamwork(){
   });
 }
 
+function editBlindbox(){
+  var sep = '\n';
+  var current=(state.customPrizes||BLINDBOX_PRIZES).join(sep);
+  var result=prompt('編輯盲盒獎勵（每行一個）：', current);
+  if(result===null) return;
+  state.customPrizes=result.split(sep).map(function(s){return s.trim();}).filter(function(s){return s.length>0;});
+  syncUp('customPrizes',state.customPrizes);
+  alert('✅ 獎勵已更新！');
+}
+
 function openBlindbox(kid){
   const streak=calcReadStreak(kid);
   const boxes=Math.floor(streak/3);
@@ -1779,7 +2064,8 @@ function openBlindbox(kid){
     alert('還沒有盲盒可以開喔！閱讀連續 3 天就能解鎖一個 🎲');
     return;
   }
-  const prize=BLINDBOX_PRIZES[Math.floor(Math.random()*BLINDBOX_PRIZES.length)];
+  const prizes=state.customPrizes&&state.customPrizes.length?state.customPrizes:BLINDBOX_PRIZES;
+  const prize=prizes[Math.floor(Math.random()*prizes.length)];
   // Burst celebration
   burst(window.innerWidth/2, window.innerHeight/2,
     kid==='ge'?['🎲','🏎️','⚡','🎮','🌟']:['🎲','🌸','💜','🩺','✨']);
