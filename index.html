@@ -31,8 +31,9 @@ textarea:focus,select:focus{outline:none;}
 #share-wall::-webkit-scrollbar{width:4px}
 #share-wall::-webkit-scrollbar-track{background:transparent}
 #share-wall::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:2px}
-.task-item,.btn,.dot,.rec-check,.rtab,.book-emoji,.log-del,.rec-del,.switch{touch-action:manipulation;position:relative;z-index:1;}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.task-item,.btn,.dot,.rec-check,.rtab,.book-emoji,.log-del,.rec-del,.switch{touch-action:manipulation;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-touch-callout:none;}
+button{-webkit-appearance:none;appearance:none;}
 
 /* ═══ FLOATING PARTICLES ═══ */
 .particle{position:fixed;pointer-events:none;z-index:0;font-size:18px;animation:float-up 6s ease-in infinite;opacity:0}
@@ -758,14 +759,13 @@ function toggleTask(id,event){
   state.daily[id]=!wasChecked;
   syncUp('daily',state.daily);
   if(!wasChecked){
-    const isVic=id.startsWith('ge');
-    const emojis=isVic?['🏎️','⚡','🎮','💥','🌟']:['🌸','💜','🩺','💕','✨'];
-    if(event&&event.clientX){
-      burst(event.clientX,event.clientY,emojis);
-    } else {
-      // fallback for touch without coords
-      burst(window.innerWidth/2,window.innerHeight/2,emojis);
-    }
+    try{
+      const isVic=id.startsWith('ge');
+      const emojis=isVic?['🏎️','⚡','🎮','💥','🌟']:['🌸','💜','🩺','💕','✨'];
+      const x=event&&event.clientX?event.clientX:window.innerWidth/2;
+      const y=event&&event.clientY?event.clientY:window.innerHeight/2;
+      burst(x,y,emojis);
+    }catch(e){}
   }
   renderDaily();
 }
@@ -791,17 +791,19 @@ function onOntimeChange(){
 }
 
 function renderTasks(tasks,cid){
-  const el=document.getElementById(cid);
+  var el=document.getElementById(cid);
   el.innerHTML='';
-  tasks.forEach(t=>{
-    const done=isChecked(t.id);
-    const row=document.createElement('div');
+  tasks.forEach(function(t){
+    var done=isChecked(t.id);
+    var row=document.createElement('div');
     row.className='task-item';
-    row.addEventListener('click',function(e){toggleTask(t.id,e);},{passive:true});
-    row.innerHTML=`<div class="task-check ${done?'done'}">${done?'✓':''}</div><div class="task-label${done?' done':''}">${t.label}</div>`;
+    row.innerHTML='<div class="task-check '+(done?'done':'')+'" style="pointer-events:none">'+(done?'&#10003;':'')+'</div>'
+      +'<div class="task-label'+(done?' done':'')+'" style="pointer-events:none">'+t.label+'</div>';
+    (function(id){row.onclick=function(e){toggleTask(id,e);};})(t.id);
     el.appendChild(row);
   });
 }
+
 
 function renderDaily(){
   document.getElementById('ge-ontime-wrap').style.display=isWeekday14?'block':'none';
@@ -1078,35 +1080,20 @@ let _shareWho = 'ge';
 
 // Bind share-who buttons via JS (more reliable than inline onclick on Android)
 function initShareWhoButtons() {
+  // Use event delegation on document - most reliable on all devices
   document.querySelectorAll('.share-who-btn').forEach(function(btn) {
-    btn.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      selectShareWho(btn.dataset.who);
-    }, {passive: false});
-    btn.addEventListener('click', function(e) {
-      selectShareWho(btn.dataset.who);
-    });
+    btn.onclick = function(){ selectShareWho(btn.dataset.who); };
   });
-  // Honor buttons
   document.querySelectorAll('.honor-btn').forEach(function(btn) {
-    btn.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      addHonorPoints(btn.dataset.kid, parseInt(btn.dataset.pts), btn.dataset.reason, e);
-    }, {passive: false});
-    btn.addEventListener('click', function(e) {
-      addHonorPoints(btn.dataset.kid, parseInt(btn.dataset.pts), btn.dataset.reason, e);
-    });
+    btn.onclick = function(e){ addHonorPoints(btn.dataset.kid, parseInt(btn.dataset.pts), btn.dataset.reason, e); };
   });
   var submitBtn = document.getElementById('share-submit-btn');
-  if(submitBtn) {
-    submitBtn.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      submitShare(e);
-    }, {passive: false});
-    submitBtn.addEventListener('click', function(e) {
-      submitShare(e);
-    });
-  }
+  if(submitBtn) submitBtn.onclick = function(e){ submitShare(e); };
+}
+
+// Global touch handler for maximum Android compatibility
+function setupGlobalTouch() {
+  document.addEventListener('touchstart', function(){}, {passive: true}); // unlock touch
 }
 
 function selectShareWho(who) {
@@ -1248,6 +1235,7 @@ function switchTab(name){
   document.getElementById('panel-'+name).classList.add('active');
 }
 function renderAll(){renderDaily();renderSport();renderWeekly();renderTeamwork();renderBooks();renderRecommend('ge');renderRecommend('mei');if(!db)renderShareWallData(null);initShareWhoButtons();}
+setupGlobalTouch();
 startListening();
 </script>
 </body>
