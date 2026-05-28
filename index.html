@@ -369,9 +369,7 @@ input:checked+.slider:before{transform:translateX(20px)}
 <div class="tabs">
   <button class="tab active" onclick="switchTab('daily')"><span class="tab-icon">✅</span>今日</button>
   <button class="tab" onclick="switchTab('sport')"><span class="tab-icon">🏃</span>運動</button>
-  <button class="tab" onclick="switchTab('weekly')"><span class="tab-icon">📅</span>本週</button>
   <button class="tab" onclick="switchTab('books')"><span class="tab-icon">📚</span>書單</button>
-  <button class="tab" onclick="switchTab('recommend')"><span class="tab-icon">✨</span>推薦</button>
   <button class="tab" onclick="switchTab('history')"><span class="tab-icon">📋</span>紀錄</button>
 </div>
 
@@ -492,6 +490,68 @@ input:checked+.slider:before{transform:translateX(20px)}
   <div id="weekend-task-bar" style="display:none;margin-top:10px;background:linear-gradient(135deg,#9B59B6,#4A6CF7);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;font-weight:800;color:white;text-align:center">
     🎉 週末特別任務：自選科目複習出現了！完成得雙倍點數 📚
   </div>
+
+  <!-- 連勝 + 試算 + 攜手箱 + 盲盒 -->
+  <div style="margin-top:4px">
+<!-- 連勝紀錄卡 -->
+  <div class="card" style="background:linear-gradient(135deg,#1A0D00,#2E1A00);border:1.5px solid rgba(255,165,0,0.4);margin-bottom:14px">
+    <div style="font-size:15px;font-weight:900;color:#FFD166;margin-bottom:12px">🔥 連勝紀錄</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="text-align:center;background:rgba(74,108,247,0.1);border-radius:var(--r-sm);padding:14px">
+        <div style="font-size:11px;color:var(--vic-neon);font-weight:800;margin-bottom:6px">🏎️ Vic</div>
+        <div id="streak-ge-num" style="font-size:36px;font-weight:900;color:white;line-height:1">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">天連勝</div>
+        <div id="streak-ge-title" style="font-size:11px;font-weight:800;margin-top:6px;color:#FFD166"></div>
+      </div>
+      <div style="text-align:center;background:rgba(232,97,154,0.1);border-radius:var(--r-sm);padding:14px">
+        <div style="font-size:11px;color:var(--joy-heart);font-weight:800;margin-bottom:6px">🌸 Joy</div>
+        <div id="streak-mei-num" style="font-size:36px;font-weight:900;color:white;line-height:1">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">天連勝</div>
+        <div id="streak-mei-title" style="font-size:11px;font-weight:800;margin-top:6px;color:#FFD166"></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--text3);text-align:center">每天完成所有任務就累積一天，中斷歸零 💪</div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:16px;font-weight:900;margin-bottom:12px">🎁 週末 3C 獎勵試算</div>
+    <div id="weekend-calc"></div>
+  </div>
+
+  <!-- 兄妹攜手箱 -->
+  <div class="card" id="teamwork-card" style="background:linear-gradient(135deg,#0D0D1A,#1A0A1A);border:2px solid rgba(255,215,0,0.3)">
+    <div style="font-size:15px;font-weight:900;color:#FFD700;margin-bottom:10px">🤝 兄妹攜手箱</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Vic + Joy 本週運動合計達 150 分鐘 → 兩人各得大禮包 +20 分鐘！</div>
+    <div id="teamwork-bar-wrap" style="background:rgba(255,255,255,0.05);border-radius:30px;height:14px;overflow:hidden;margin-bottom:8px">
+      <div id="teamwork-bar" style="height:100%;border-radius:30px;background:linear-gradient(90deg,#4A6CF7,#E8619A);width:0%;transition:width .6s ease"></div>
+    </div>
+    <div id="teamwork-label" style="font-size:12px;font-weight:800;text-align:center;color:white"></div>
+  </div>
+
+  <!-- 神秘盲盒 -->
+  <div class="card" style="background:linear-gradient(135deg,#1A0A2E,#2E1A0A);border:2px solid rgba(155,89,182,0.4)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:15px;font-weight:900;color:#DA70D6">🎲 媽媽神秘盲盒</div>
+      <button onclick="editBlindbox()" style="font-size:11px;padding:4px 10px;border-radius:var(--r-xs);border:1px solid rgba(218,112,214,0.4);background:rgba(218,112,214,0.1);color:#DA70D6;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700">✏️ 編輯獎勵</button>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">睡前閱讀每連續 3 天解鎖 1 個盲盒 📖→🎲</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="text-align:center">
+        <div style="font-size:12px;font-weight:800;color:var(--vic-neon);margin-bottom:6px">🏎️ Vic 盲盒</div>
+        <div id="ge-blindbox-count" style="font-size:28px;font-weight:900;color:white">0</div>
+        <div id="ge-blindbox-sub" style="font-size:11px;color:var(--text3);margin-top:2px">個可開盒</div>
+        <button class="btn btn-sm btn-vic" style="margin-top:8px;width:100%" onclick="openBlindbox('ge')">🎲 開盒！</button>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:12px;font-weight:800;color:var(--joy-heart);margin-bottom:6px">🌸 Joy 盲盒</div>
+        <div id="mei-blindbox-count" style="font-size:28px;font-weight:900;color:white">0</div>
+        <div id="mei-blindbox-sub" style="font-size:11px;color:var(--text3);margin-top:2px">個可開盒</div>
+        <button class="btn btn-sm btn-joy" style="margin-top:8px;width:100%" onclick="openBlindbox('mei')">🎲 開盒！</button>
+      </div>
+    </div>
+  </div>
+
+  </div>
 </div>
 
 <!-- 運動 -->
@@ -555,130 +615,77 @@ input:checked+.slider:before{transform:translateX(20px)}
 </div>
 
 <!-- 本週進度 -->
-<div id="panel-weekly" class="panel">
-  <div class="card">
-    <div style="font-size:13px;font-weight:900;color:var(--vic);margin-bottom:12px">🏎️ Vic 本週任務</div>
-    <div id="weekly-ge"></div>
-  </div>
-  <div class="card">
-    <div style="font-size:13px;font-weight:900;color:var(--joy);margin-bottom:12px">🌸 Joy 本週任務</div>
-    <div id="weekly-mei"></div>
-  </div>
-  <!-- 連勝紀錄卡 -->
-  <div class="card" style="background:linear-gradient(135deg,#1A0D00,#2E1A00);border:1.5px solid rgba(255,165,0,0.4);margin-bottom:14px">
-    <div style="font-size:15px;font-weight:900;color:#FFD166;margin-bottom:12px">🔥 連勝紀錄</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div style="text-align:center;background:rgba(74,108,247,0.1);border-radius:var(--r-sm);padding:14px">
-        <div style="font-size:11px;color:var(--vic-neon);font-weight:800;margin-bottom:6px">🏎️ Vic</div>
-        <div id="streak-ge-num" style="font-size:36px;font-weight:900;color:white;line-height:1">0</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px">天連勝</div>
-        <div id="streak-ge-title" style="font-size:11px;font-weight:800;margin-top:6px;color:#FFD166"></div>
-      </div>
-      <div style="text-align:center;background:rgba(232,97,154,0.1);border-radius:var(--r-sm);padding:14px">
-        <div style="font-size:11px;color:var(--joy-heart);font-weight:800;margin-bottom:6px">🌸 Joy</div>
-        <div id="streak-mei-num" style="font-size:36px;font-weight:900;color:white;line-height:1">0</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px">天連勝</div>
-        <div id="streak-mei-title" style="font-size:11px;font-weight:800;margin-top:6px;color:#FFD166"></div>
-      </div>
-    </div>
-    <div style="margin-top:12px;font-size:11px;color:var(--text3);text-align:center">每天完成所有任務就累積一天，中斷歸零 💪</div>
-  </div>
-
-  <div class="card">
-    <div style="font-size:16px;font-weight:900;margin-bottom:12px">🎁 週末 3C 獎勵試算</div>
-    <div id="weekend-calc"></div>
-  </div>
-
-  <!-- 兄妹攜手箱 -->
-  <div class="card" id="teamwork-card" style="background:linear-gradient(135deg,#0D0D1A,#1A0A1A);border:2px solid rgba(255,215,0,0.3)">
-    <div style="font-size:15px;font-weight:900;color:#FFD700;margin-bottom:10px">🤝 兄妹攜手箱</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Vic + Joy 本週運動合計達 150 分鐘 → 兩人各得大禮包 +20 分鐘！</div>
-    <div id="teamwork-bar-wrap" style="background:rgba(255,255,255,0.05);border-radius:30px;height:14px;overflow:hidden;margin-bottom:8px">
-      <div id="teamwork-bar" style="height:100%;border-radius:30px;background:linear-gradient(90deg,#4A6CF7,#E8619A);width:0%;transition:width .6s ease"></div>
-    </div>
-    <div id="teamwork-label" style="font-size:12px;font-weight:800;text-align:center;color:white"></div>
-  </div>
-
-  <!-- 神秘盲盒 -->
-  <div class="card" style="background:linear-gradient(135deg,#1A0A2E,#2E1A0A);border:2px solid rgba(155,89,182,0.4)">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:15px;font-weight:900;color:#DA70D6">🎲 媽媽神秘盲盒</div>
-      <button onclick="editBlindbox()" style="font-size:11px;padding:4px 10px;border-radius:var(--r-xs);border:1px solid rgba(218,112,214,0.4);background:rgba(218,112,214,0.1);color:#DA70D6;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700">✏️ 編輯獎勵</button>
-    </div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">累積夠多閱讀🏆連勝，解鎖盲盒！內有驚喜獎勵 ✨</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div style="text-align:center">
-        <div style="font-size:12px;font-weight:800;color:var(--vic-neon);margin-bottom:6px">🏎️ Vic 盲盒</div>
-        <div id="ge-blindbox-count" style="font-size:28px;font-weight:900;color:white">0</div>
-        <div style="font-size:11px;color:var(--text3)">個可開盒</div>
-        <button class="btn btn-sm btn-vic" style="margin-top:8px;width:100%" onclick="openBlindbox('ge')">🎲 開盒！</button>
-      </div>
-      <div style="text-align:center">
-        <div style="font-size:12px;font-weight:800;color:var(--joy-heart);margin-bottom:6px">🌸 Joy 盲盒</div>
-        <div id="mei-blindbox-count" style="font-size:28px;font-weight:900;color:white">0</div>
-        <div style="font-size:11px;color:var(--text3)">個可開盒</div>
-        <button class="btn btn-sm btn-joy" style="margin-top:8px;width:100%" onclick="openBlindbox('mei')">🎲 開盒！</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 書單 -->
 <div id="panel-books" class="panel">
-  <div class="card">
-    <div style="font-size:16px;font-weight:900;margin-bottom:14px">📚 借閱書單</div>
-    <div id="book-list"></div>
-    <div class="add-row" style="margin-top:14px">
-      <input id="book-title-input" placeholder="✏️ 書名"/>
-      <select id="book-who-input">
-        <option value="哥哥">🏎️ Vic</option>
-        <option value="妹妹">🌸 Joy</option>
-        <option value="全家">🏠 全家</option>
-      </select>
-      <button class="btn btn-primary btn-sm" onclick="addBook()">＋ 加入</button>
-    </div>
-  </div>
-</div>
 
-<!-- 推薦書單 -->
-<div id="panel-recommend" class="panel">
-  <div class="rtabs">
-    <div class="rtab vic-active" id="rtab-ge" onclick="switchRTab('ge')">🏎️ Vic 的書單</div>
-    <div class="rtab" id="rtab-mei" onclick="switchRTab('mei')">🌸 Joy 的書單</div>
-  </div>
-  <div id="rpanel-ge">
-    <div class="tip-bar"><span style="font-size:20px">💡</span>勾選想借的書，按下面按鈕加入書單！自己想看的也可以直接新增 😊</div>
-    <div class="card" style="background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-size:15px;font-weight:900;color:var(--vic-neon)">✨ 本週推薦</div>
-        <button class="btn btn-sm btn-vic" onclick="generateRecommend('ge')" id="gen-ge-btn">🎲 隨機推薦</button>
+  <!-- 推薦選書區 -->
+  <div class="card" style="background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3);margin-bottom:14px">
+    <div style="font-size:15px;font-weight:900;color:white;margin-bottom:12px">✨ 推薦選書</div>
+    <div class="rtabs">
+      <div class="rtab vic-active" id="rtab-ge" onclick="switchRTab('ge')">🏎️ Vic 的書單</div>
+      <div class="rtab" id="rtab-mei" onclick="switchRTab('mei')">🌸 Joy 的書單</div>
+    </div>
+
+    <div id="rpanel-ge">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:var(--text3)">勾選後加入下方書單</div>
+        <button class="btn btn-sm btn-vic" id="gen-ge-btn" onclick="generateRecommend('ge')">🎲 隨機推薦</button>
       </div>
       <div id="recommend-ge-list"></div>
-      <div class="add-row" style="margin-top:14px">
+      <div class="add-row" style="margin-top:12px">
         <input id="rec-ge-input" placeholder="✏️ 自己想看的書" style="background:rgba(255,255,255,0.08);border-color:rgba(74,108,247,0.3);color:white"/>
-        <button class="btn btn-sm btn-vic" onclick="addRecommend('ge')">＋ 新增</button>
-        <button class="btn btn-sm" onclick="clearRecommend('ge')" style="background:rgba(255,90,90,0.2);border-color:rgba(255,90,90,0.4);color:#FF8A8A">清空</button>
+        <button class="btn btn-sm btn-vic" onclick="addRecommend('ge')">＋</button>
+        <button class="btn btn-sm" onclick="clearRecommend('ge')" style="background:rgba(255,90,90,0.15);border-color:rgba(255,90,90,0.3);color:#FF8A8A">清空</button>
       </div>
+      <button class="btn btn-vic btn-full" id="add-ge-btn" onclick="addSelectedToBooks('ge')" style="margin-top:10px">📚 將勾選的書加入借閱清單</button>
     </div>
-    <button class="btn btn-vic btn-full" id="add-ge-btn" onclick="addSelectedToBooks('ge')">📚 將勾選的書加入借閱清單</button>
-  </div>
-  <div id="rpanel-mei" style="display:none">
-    <div class="tip-bar"><span style="font-size:20px">💡</span>勾選想借的書，按下面按鈕加入書單！自己想看的也可以直接新增 😊</div>
-    <div class="card" style="background:linear-gradient(135deg,#1A0A1A,#2D0A2D);border-color:rgba(232,97,154,0.3)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-size:15px;font-weight:900;color:var(--joy-heart)">✨ 本週推薦</div>
-        <button class="btn btn-sm btn-joy" onclick="generateRecommend('mei')" id="gen-mei-btn">🎲 隨機推薦</button>
+
+    <div id="rpanel-mei" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:var(--text3)">勾選後加入下方書單</div>
+        <button class="btn btn-sm btn-joy" id="gen-mei-btn" onclick="generateRecommend('mei')">🎲 隨機推薦</button>
       </div>
       <div id="recommend-mei-list"></div>
-      <div class="add-row" style="margin-top:14px">
+      <div class="add-row" style="margin-top:12px">
         <input id="rec-mei-input" placeholder="✏️ 自己想看的書" style="background:rgba(255,255,255,0.08);border-color:rgba(232,97,154,0.3);color:white"/>
-        <button class="btn btn-sm btn-joy" onclick="addRecommend('mei')">＋ 新增</button>
-        <button class="btn btn-sm" onclick="clearRecommend('mei')" style="background:rgba(255,90,90,0.2);border-color:rgba(255,90,90,0.4);color:#FF8A8A">清空</button>
+        <button class="btn btn-sm btn-joy" onclick="addRecommend('mei')">＋</button>
+        <button class="btn btn-sm" onclick="clearRecommend('mei')" style="background:rgba(255,90,90,0.15);border-color:rgba(255,90,90,0.3);color:#FF8A8A">清空</button>
+      </div>
+      <button class="btn btn-joy btn-full" id="add-mei-btn" onclick="addSelectedToBooks('mei')" style="margin-top:10px">📚 將勾選的書加入借閱清單</button>
+    </div>
+  </div>
+
+  <!-- Vic 借閱書單 -->
+  <div class="card" style="background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3);margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="font-size:15px;font-weight:900;color:var(--vic-neon)">🏎️ Vic 借閱書單</div>
+        <div id="book-count-ge" style="font-size:11px;color:var(--text3);font-weight:700"></div>
       </div>
     </div>
-    <button class="btn btn-joy btn-full" id="add-mei-btn" onclick="addSelectedToBooks('mei')">📚 將勾選的書加入借閱清單</button>
+    <div id="book-list-ge"></div>
+    <div class="add-row" style="margin-top:12px">
+      <input id="book-title-ge-input" placeholder="✏️ 直接新增書名"/>
+      <button class="btn btn-sm btn-vic" onclick="addBookDirect('ge')">＋ 加入</button>
+    </div>
   </div>
+
+  <!-- Joy 借閱書單 -->
+  <div class="card" style="background:linear-gradient(135deg,#1A0A1A,#2D0A2D);border-color:rgba(232,97,154,0.3);margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="font-size:15px;font-weight:900;color:var(--joy-heart)">🌸 Joy 借閱書單</div>
+        <div id="book-count-mei" style="font-size:11px;color:var(--text3);font-weight:700"></div>
+      </div>
+    </div>
+    <div id="book-list-mei"></div>
+    <div class="add-row" style="margin-top:12px">
+      <input id="book-title-mei-input" placeholder="✏️ 直接新增書名"/>
+      <button class="btn btn-sm btn-joy" onclick="addBookDirect('mei')">＋ 加入</button>
+    </div>
+  </div>
+
 </div>
+
 
 <!-- 歷史紀錄 -->
 <div id="panel-history" class="panel">
@@ -1064,24 +1071,7 @@ function renderDaily(){
   // Count bonus tasks completed
   const geBonusDone=activeGeBonusTasks.filter(function(t){return isChecked(t.id);}).length;
   const meiBonusDone=activeMeiBonusTasks.filter(function(t){return isChecked(t.id);}).length;
-  // Update daily login streak
-  const todayStr=getResetDateStr(); // use 6am boundary date
-  ['ge','mei'].forEach(kid=>{
-    const activeTasks=kid==='ge'?(isWeekend?GE_TASKS_WEEKEND:GE_TASKS):(isWeekend?MEI_TASKS_WEEKEND:MEI_TASKS);
-    const allDone=activeTasks.every(t=>isChecked(t.id));
-    if(allDone && state.lastStreakDate[kid]!==todayStr){
-      // Calculate yesterday's reset date
-      const yd=new Date();
-      const resetHour=new Date();resetHour.setHours(6,0,0,0);
-      if(new Date()<resetHour) yd.setDate(yd.getDate()-2); else yd.setDate(yd.getDate()-1);
-      const yStr=yd.toISOString().slice(0,10);
-      const prevStreak=typeof state.streaks[kid]==='number'&&state.streaks[kid]<=365?state.streaks[kid]:0;
-      state.streaks[kid]=state.lastStreakDate[kid]===yStr?prevStreak+1:1;
-      state.lastStreakDate[kid]=todayStr;
-      syncUp('streaks',state.streaks);
-      syncUp('lastStreakDate',state.lastStreakDate);
-    }
-  });
+  // Streak is now calculated dynamically from dailyHistory in calcLoginStreak()
 
   // Show reading streak badge
   const geStreak=calcReadStreak('ge'),meiStreak=calcReadStreak('mei');
@@ -1090,20 +1080,26 @@ function renderDaily(){
   if(geStreakEl) geStreakEl.textContent=geStreak>=3?`🏆 閱讀小隊長！連勝${geStreak}天`:geStreak>0?`🔥 連勝${geStreak}天，還差${3-geStreak}天觸發！`:'';
   if(meiStreakEl) meiStreakEl.textContent=meiStreak>=3?`🏆 閱讀小隊長！連勝${meiStreak}天`:meiStreak>0?`🔥 連勝${meiStreak}天，還差${3-meiStreak}天觸發！`:'';
 
-  // Login streak - auto-fix bad data first
+  // Calculate streak from history (most accurate)
+  const gLS = calcLoginStreak('ge');
+  const mLS = calcLoginStreak('mei');
+
+  // Save to state for use in weekend calc
   if(!state.streaks) state.streaks={ge:0,mei:0};
-  if(typeof state.streaks.ge!=='number'||state.streaks.ge>365){state.streaks.ge=0;syncUp('streaks',state.streaks);}
-  if(typeof state.streaks.mei!=='number'||state.streaks.mei>365){state.streaks.mei=0;syncUp('streaks',state.streaks);}
-  const gLS=state.streaks.ge||0, mLS=state.streaks.mei||0;
+  if(state.streaks.ge !== gLS || state.streaks.mei !== mLS){
+    state.streaks.ge = gLS;
+    state.streaks.mei = mLS;
+    syncUp('streaks', state.streaks);
+  }
 
   function streakMsg(n, name){
     if(n<=0) return '';
     const flames='🔥'.repeat(Math.min(n,7));
-    if(n>=30) return `${flames} ${name} 連續 ${n} 天！🏆 傳說等級！`;
-    if(n>=14) return `${flames} ${name} 連續 ${n} 天！🥇 超強連勝！`;
-    if(n>=7)  return `${flames} ${name} 連續 ${n} 天！💪 整整一週！`;
-    if(n>=3)  return `${flames} ${name} 連續 ${n} 天！`;
-    return `🔥 ${name} 連續 ${n} 天，繼續加油！`;
+    if(n>=30) return flames+' '+name+' 連續 '+n+' 天！🏆 傳說等級！';
+    if(n>=14) return flames+' '+name+' 連續 '+n+' 天！🥇 超強連勝！';
+    if(n>=7)  return flames+' '+name+' 連續 '+n+' 天！💪 整整一週！';
+    if(n>=3)  return flames+' '+name+' 連續 '+n+' 天！';
+    return '🔥 '+name+' 連續 '+n+' 天，繼續加油！';
   }
   const gLSEl=document.getElementById('ge-login-streak');
   const mLSEl=document.getElementById('mei-login-streak');
@@ -1208,18 +1204,30 @@ function delSport(kid,id){state.sport[kid]=state.sport[kid].filter(e=>e.id!==id)
 
 // ── WEEKLY ──
 function calcReadStreak(kid){
-  // Count consecutive days with reading task checked this week
-  const readKey=kid==='ge'?'ge5':'mei5';
-  let streak=0;
-  for(let i=Math.min(todayIdx,4);i>=0;i--){
-    // Use weekly dots for reading task
-    const taskLabel=kid==='ge'?'黃金閱讀':'睡前閱讀';
-    const key=kid+'_'+taskLabel+'_'+i;
-    if((state.weekly[kid]||{})[key]) streak++;
+  // Use dailyHistory to count consecutive days with reading task done
+  const readId = kid==='ge' ? 'ge6' : 'mei6';
+  const history = state.dailyHistory || {};
+  const keys = Object.keys(history).sort().reverse(); // newest first
+  let streak = 0;
+
+  // Also check today's current daily state
+  const todayRead = !!state.daily[readId];
+
+  for(var i=0; i<keys.length; i++){
+    const r = history[keys[i]];
+    if(!r || !r.ge || !r.mei) break;
+    const done = kid==='ge'
+      ? (r.ge.done && r.ge.done.indexOf('📖 睡前閱讀 ⚡+5分加碼！') > -1)
+      : (r.mei.done && r.mei.done.indexOf('📖 睡前閱讀 ⚡+5分加碼！') > -1);
+    if(done) streak++;
     else break;
   }
+
+  // Add today if reading is done
+  if(todayRead) streak++;
   return streak;
 }
+
 
 function getStreakTitle(n){
   if(n>=30) return '🏆 傳說等級';
@@ -1229,6 +1237,37 @@ function getStreakTitle(n){
   if(n>=3)  return '🔥 連勝中';
   if(n>=1)  return '✨ 剛起步';
   return '';
+}
+
+// Calculate streak directly from dailyHistory - most accurate
+function calcLoginStreak(kid){
+  const history = state.dailyHistory || {};
+  const keys = Object.keys(history).sort().reverse(); // newest first
+  const totalTasks = kid==='ge' ? GE_TASKS.length : MEI_TASKS.length;
+  let streak = 0;
+
+  // Check if today's required tasks are all done
+  const activeTasks = kid==='ge' ? GE_TASKS : MEI_TASKS;
+  const todayAllDone = activeTasks.every(function(t){ return !!state.daily[t.id]; });
+  if(todayAllDone) streak = 1;
+
+  // Then check history going backwards
+  for(var i=0; i<keys.length; i++){
+    const r = history[keys[i]];
+    if(!r) break;
+    const kidData = kid==='ge' ? r.ge : r.mei;
+    if(!kidData) break;
+    // Consider streak if completed at least required tasks (done >= total required)
+    const reqTotal = kidData.total || totalTasks;
+    const done = kidData.done ? kidData.done.length : 0;
+    // All required tasks done = streak continues
+    if(done >= reqTotal){
+      streak++;
+    } else {
+      break; // streak broken
+    }
+  }
+  return streak;
 }
 
 function autoSyncWeeklyFromDaily(){
@@ -1283,8 +1322,8 @@ function renderWeekly(){
   // Auto-sync weekly dots from today's daily completions
   autoSyncWeeklyFromDaily();
 
-  // Update streak display cards
-  const gs=state.streaks?.ge||0, ms=state.streaks?.mei||0;
+  // Update streak display cards - recalculate from history
+  const gs=calcLoginStreak('ge'), ms=calcLoginStreak('mei');
   const geNum=document.getElementById('streak-ge-num');
   const meiNum=document.getElementById('streak-mei-num');
   const geTitle=document.getElementById('streak-ge-title');
@@ -1337,22 +1376,70 @@ function toggleWeekly(kid,task,i){
 const BOOK_EMOJIS=['📗','📘','📙','📕','📓','📔','📒','📃'];
 function bookEmoji(title){let n=0;for(let c of title)n+=c.charCodeAt(0);return BOOK_EMOJIS[n%BOOK_EMOJIS.length];}
 function renderBooks(){
-  const el=document.getElementById('book-list');
-  const countEl=document.getElementById('book-count');
-  if(countEl) countEl.textContent='共 '+(state.books?state.books.length:0)+' 本';
-  if(!state.books||!state.books.length){el.innerHTML='<p style="font-size:14px;color:var(--text3);padding:12px 0;text-align:center">還沒有書，去推薦頁選書吧！📚</p>';return;}
-  el.innerHTML=state.books.map(b=>`
-    <div class="book-item">
-      <span class="book-emoji">${bookEmoji(b.title)}</span>
-      <div class="book-info">
-        <div class="book-title">${b.title}</div>
-        <div class="book-who">${b.who==='哥哥'?'🏎️ Vic':b.who==='妹妹'?'🌸 Joy':'🏠 全家'}</div>
-      </div>
-      <span class="book-status status-${b.status}">${b.status}</span>
-      <button class="btn btn-sm" onclick="toggleBook(${b.id})" style="margin-left:4px">${b.status==='借閱中'?'還書':'重借'}</button>
-      <button class="btn btn-sm" onclick="removeBook(${b.id})" style="color:var(--text3);margin-left:2px">✕</button>
-    </div>`).join('');
+  // Separate Vic and Joy books
+  const vicBooks = (state.books||[]).filter(function(b){ return b.who==='哥哥'; });
+  const meiBooks = (state.books||[]).filter(function(b){ return b.who==='妹妹'; });
+  const otherBooks = (state.books||[]).filter(function(b){ return b.who!=='哥哥'&&b.who!=='妹妹'; });
+
+  const geEl = document.getElementById('book-list-ge');
+  const meiEl = document.getElementById('book-list-mei');
+  const geCnt = document.getElementById('book-count-ge');
+  const meiCnt = document.getElementById('book-count-mei');
+
+  // Vic books
+  if(geEl){
+    const allGe = vicBooks.concat(otherBooks);
+    if(geCnt) geCnt.textContent = '共 '+allGe.length+' 本';
+    if(!allGe.length){
+      geEl.innerHTML='<p style="font-size:13px;color:var(--text3);padding:8px 0;text-align:center">還沒有書，從上方推薦區選書吧！📖</p>';
+    } else {
+      geEl.innerHTML = allGe.map(function(b){
+        return '<div class="book-item">'
+          +'<span class="book-emoji">'+bookEmoji(b.title)+'</span>'
+          +'<div class="book-info"><div class="book-title">'+b.title+'</div>'
+          +(b.who==='全家'?'<div class="book-who">👨‍👩‍👧‍👦 全家</div>':'')
+          +'</div>'
+          +'<span class="book-status status-'+b.status+'">'+b.status+'</span>'
+          +'<button class="btn btn-sm" onclick="toggleBook('+b.id+')" style="margin-left:4px">'+( b.status==='借閱中'?'還書':'重借')+'</button>'
+          +'<button class="btn btn-sm" onclick="removeBook('+b.id+')" style="color:var(--text3);margin-left:2px">✕</button>'
+          +'</div>';
+      }).join('');
+    }
+  }
+
+  // Joy books
+  if(meiEl){
+    if(meiCnt) meiCnt.textContent = '共 '+meiBooks.length+' 本';
+    if(!meiBooks.length){
+      meiEl.innerHTML='<p style="font-size:13px;color:var(--text3);padding:8px 0;text-align:center">還沒有書，從上方推薦區選書吧！📖</p>';
+    } else {
+      meiEl.innerHTML = meiBooks.map(function(b){
+        return '<div class="book-item">'
+          +'<span class="book-emoji">'+bookEmoji(b.title)+'</span>'
+          +'<div class="book-info"><div class="book-title">'+b.title+'</div></div>'
+          +'<span class="book-status status-'+b.status+'">'+b.status+'</span>'
+          +'<button class="btn btn-sm" onclick="toggleBook('+b.id+')" style="margin-left:4px">'+(b.status==='借閱中'?'還書':'重借')+'</button>'
+          +'<button class="btn btn-sm" onclick="removeBook('+b.id+')" style="color:var(--text3);margin-left:2px">✕</button>'
+          +'</div>';
+      }).join('');
+    }
+  }
+
+  // book-list-ge and book-list-mei are the primary elements
 }
+
+
+function addBookDirect(kid){
+  var inputId = 'book-title-'+kid+'-input';
+  var t = document.getElementById(inputId).value.trim();
+  if(!t) return;
+  var who = kid==='ge' ? '哥哥' : '妹妹';
+  if(!state.books) state.books=[];
+  state.books.push({id:state.bookId++, title:t, who:who, status:'借閱中'});
+  document.getElementById(inputId).value='';
+  syncUp('books',state.books); syncUp('bookId',state.bookId); renderBooks();
+}
+
 function addBook(){
   const t=document.getElementById('book-title-input').value.trim(),w=document.getElementById('book-who-input').value;
   if(!t)return;
@@ -2085,6 +2172,69 @@ function submitShare(evt) {
   document.getElementById('share-text').value='';
 }
 
+function openReplyBox(key, btn){
+  // Remove any existing reply box
+  var existing = document.getElementById('reply-box-'+key);
+  if(existing){ existing.remove(); return; }
+
+  var senderMap = {ge:'🏎️ Vic', mei:'🩺 Joy', mama:'👩 媽媽', baba:'👨 爸爸'};
+  var colorMap = {ge:'var(--vic-neon)', mei:'var(--joy-heart)', mama:'#FFD166', baba:'#4EAEFF'};
+
+  var box = document.createElement('div');
+  box.id = 'reply-box-'+key;
+  box.style.cssText = 'margin-top:6px;display:flex;flex-direction:column;gap:6px;padding:8px;background:rgba(255,255,255,0.05);border-radius:8px';
+
+  // Who selector
+  var whoRow = document.createElement('div');
+  whoRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:5px';
+  ['ge','mei','mama','baba'].forEach(function(who){
+    var b = document.createElement('button');
+    b.textContent = senderMap[who];
+    b.dataset.who = who;
+    b.className = 'reply-who-btn';
+    b.style.cssText = 'padding:5px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-family:Nunito,sans-serif;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation';
+    b.onclick = function(){
+      document.querySelectorAll('.reply-who-btn').forEach(function(x){ x.style.background='transparent'; x.style.borderColor='rgba(255,255,255,0.15)'; x.style.color='rgba(255,255,255,0.5)'; });
+      b.style.background = colorMap[who]+'33';
+      b.style.borderColor = colorMap[who];
+      b.style.color = colorMap[who];
+      box.dataset.who = who;
+    };
+    whoRow.appendChild(b);
+  });
+  // Default select first
+  whoRow.firstChild.click();
+
+  var input = document.createElement('textarea');
+  input.placeholder = '回覆內容...';
+  input.style.cssText = 'padding:7px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:white;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;resize:none;height:50px';
+
+  var sendBtn = document.createElement('button');
+  sendBtn.textContent = '🚀 送出回覆';
+  sendBtn.style.cssText = 'padding:7px;border-radius:6px;background:linear-gradient(135deg,var(--vic),var(--joy));color:white;border:none;font-family:Nunito,sans-serif;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation';
+  sendBtn.onclick = function(){
+    var text = input.value.trim();
+    var who = box.dataset.who || 'mama';
+    if(!text) return;
+    var reply = {
+      sender: senderMap[who],
+      color: colorMap[who],
+      content: text,
+      time: new Date().toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),
+    };
+    if(db){
+      db.ref('family/shares/'+key+'/replies').push(reply);
+    }
+    box.remove();
+  };
+
+  box.appendChild(whoRow);
+  box.appendChild(input);
+  box.appendChild(sendBtn);
+  btn.parentNode.insertBefore(box, btn.nextSibling);
+  input.focus();
+}
+
 function renderShareWallData(data) {
   const wall=document.getElementById('share-wall');
   if(!wall) return;
@@ -2095,20 +2245,51 @@ function renderShareWallData(data) {
     return;
   }
   const itemsArr=items.slice(0,15);
-  wall.innerHTML=itemsArr.map((item,idx)=>`
-    <div style="font-size:12px;border-bottom:1px dashed rgba(255,255,255,0.1);padding:7px 0">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-        <span style="font-weight:900;color:${item.color||'var(--vic-neon)'}">${item.sender}</span>
-        <span style="color:rgba(255,255,255,0.3);font-size:10px">${item.time}</span>
-        ${item.key?`<span class="share-del" data-key="${item.key}" style="margin-left:auto;cursor:pointer;color:rgba(255,255,255,0.2);font-size:14px;padding:0 4px">✕</span>`:''}
-      </div>
-      <div style="color:#E0E8FF;padding-left:4px;line-height:1.5">${item.content}</div>
-    </div>`).join('');
-  // Bind delete buttons
+  wall.innerHTML = '';
+  itemsArr.forEach(function(item){
+    var div = document.createElement('div');
+    div.style.cssText = 'font-size:12px;border-bottom:1px dashed rgba(255,255,255,0.1);padding:8px 0';
+
+    // Header row
+    var header = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
+      + '<span style="font-weight:900;color:'+(item.color||'var(--vic-neon)')+'">'+item.sender+'</span>'
+      + '<span style="color:rgba(255,255,255,0.3);font-size:10px">'+item.time+'</span>'
+      + (item.key ? '<span class="share-del" data-key="'+item.key+'" style="margin-left:auto;cursor:pointer;color:rgba(255,255,255,0.2);font-size:14px;padding:0 4px">✕</span>' : '')
+      + '</div>';
+
+    // Content
+    var body = '<div style="color:#E0E8FF;padding-left:4px;line-height:1.5;margin-bottom:6px">'+item.content+'</div>';
+
+    // Replies
+    var repliesHtml = '';
+    if(item.replies){
+      var replyArr = Array.isArray(item.replies) ? item.replies : Object.values(item.replies);
+      replyArr.forEach(function(r){
+        repliesHtml += '<div style="margin-left:16px;padding:5px 8px;background:rgba(255,255,255,0.05);border-radius:6px;margin-bottom:3px">'
+          + '<span style="font-weight:900;font-size:11px;color:'+(r.color||'rgba(255,255,255,0.6)')+'">'+r.sender+'</span>'
+          + '<span style="color:rgba(255,255,255,0.25);font-size:10px;margin-left:6px">'+r.time+'</span>'
+          + '<div style="color:#C0C8E0;font-size:12px;margin-top:2px">'+r.content+'</div>'
+          + '</div>';
+      });
+    }
+
+    // Reply button
+    var replyBtn = item.key
+      ? '<button class="share-reply-btn" data-key="'+item.key+'" style="font-size:11px;padding:3px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.4);cursor:pointer;font-family:Nunito,sans-serif;font-weight:700;touch-action:manipulation">💬 回覆</button>'
+      : '';
+
+    div.innerHTML = header + body + repliesHtml + '<div style="margin-top:4px">' + replyBtn + '</div>';
+    wall.appendChild(div);
+  });
+
+  // Bind delete and reply buttons
   document.querySelectorAll('.share-del').forEach(function(btn){
-    btn.onclick=function(){
+    btn.onclick = function(){
       if(db) db.ref('family/shares/'+btn.dataset.key).remove();
     };
+  });
+  document.querySelectorAll('.share-reply-btn').forEach(function(btn){
+    btn.onclick = function(){ openReplyBox(btn.dataset.key, btn); };
   });
 }
 
@@ -2141,11 +2322,23 @@ function renderTeamwork(){
     }
   }
   // Update blindbox counts (1 per 3-day reading streak)
-  ['ge','mei'].forEach(kid=>{
-    const streak=calcReadStreak(kid);
-    const boxes=Math.floor(streak/3);
-    const el=document.getElementById(kid+'-blindbox-count');
-    if(el) el.textContent=boxes;
+  ['ge','mei'].forEach(function(kid){
+    const streak = calcReadStreak(kid);
+    const boxes = Math.floor(streak/3);
+    const el = document.getElementById(kid+'-blindbox-count');
+    if(el){
+      el.textContent = boxes;
+      el.style.color = boxes > 0 ? '#FFD700' : 'white';
+    }
+    // Update subtitle
+    const sub = document.getElementById(kid+'-blindbox-sub');
+    if(sub){
+      if(boxes > 0) sub.textContent = '個可開盒 🎉';
+      else {
+        const remaining = 3 - (streak % 3);
+        sub.textContent = '再連勝 '+remaining+' 天解鎖';
+      }
+    }
   });
 }
 
@@ -2163,7 +2356,8 @@ function openBlindbox(kid){
   const streak=calcReadStreak(kid);
   const boxes=Math.floor(streak/3);
   if(boxes<=0){
-    alert('還沒有盲盒可以開喔！閱讀連續 3 天就能解鎖一個 🎲');
+    const remaining = 3 - (calcReadStreak(kid) % 3);
+    alert('還沒有盲盒！\n\n再連續完成睡前閱讀 '+remaining+' 天就能解鎖一個 🎲');
     return;
   }
   const prizes=state.customPrizes&&state.customPrizes.length?state.customPrizes:BLINDBOX_PRIZES;
@@ -2182,7 +2376,7 @@ function openBlindbox(kid){
 
 // ── TABS ──
 function switchTab(name){
-  const names=['daily','sport','weekly','books','recommend','history'];
+  const names=['daily','sport','books','history'];
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
