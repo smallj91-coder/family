@@ -496,6 +496,18 @@ input:checked+.slider:before{transform:translateX(20px)}
 
 <!-- 運動 -->
 <div id="panel-sport" class="panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+    <div style="background:rgba(74,108,247,0.1);border:1.5px solid rgba(74,108,247,0.2);border-radius:var(--r-sm);padding:12px;text-align:center">
+      <div style="font-size:11px;font-weight:800;color:var(--vic-neon);margin-bottom:4px">🏎️ Vic 本週</div>
+      <div id="vic-sport-summary" style="font-size:20px;font-weight:900;color:white">0分</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px">目標 90 分鐘</div>
+    </div>
+    <div style="background:rgba(232,97,154,0.1);border:1.5px solid rgba(232,97,154,0.2);border-radius:var(--r-sm);padding:12px;text-align:center">
+      <div style="font-size:11px;font-weight:800;color:var(--joy-heart);margin-bottom:4px">🌸 Joy 本週</div>
+      <div id="joy-sport-summary" style="font-size:20px;font-weight:900;color:white">0分</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px">目標 60 分鐘</div>
+    </div>
+  </div>
   <div class="tip-bar" id="sport-tip">
     <span style="font-size:20px">💡</span>
     <span id="sport-tip-text">累積制，Vic 回家晚沒關係，週末再補！</span>
@@ -648,7 +660,7 @@ input:checked+.slider:before{transform:translateX(20px)}
         <button class="btn btn-sm" onclick="clearRecommend('ge')" style="background:rgba(255,90,90,0.2);border-color:rgba(255,90,90,0.4);color:#FF8A8A">清空</button>
       </div>
     </div>
-    <button class="btn btn-vic btn-full" onclick="addSelectedToBooks('ge')">📚 將勾選的書加入借閱清單</button>
+    <button class="btn btn-vic btn-full" id="add-ge-btn" onclick="addSelectedToBooks('ge')">📚 將勾選的書加入借閱清單</button>
   </div>
   <div id="rpanel-mei" style="display:none">
     <div class="tip-bar"><span style="font-size:20px">💡</span>勾選想借的書，按下面按鈕加入書單！自己想看的也可以直接新增 😊</div>
@@ -664,14 +676,17 @@ input:checked+.slider:before{transform:translateX(20px)}
         <button class="btn btn-sm" onclick="clearRecommend('mei')" style="background:rgba(255,90,90,0.2);border-color:rgba(255,90,90,0.4);color:#FF8A8A">清空</button>
       </div>
     </div>
-    <button class="btn btn-joy btn-full" onclick="addSelectedToBooks('mei')">📚 將勾選的書加入借閱清單</button>
+    <button class="btn btn-joy btn-full" id="add-mei-btn" onclick="addSelectedToBooks('mei')">📚 將勾選的書加入借閱清單</button>
   </div>
 </div>
 
 <!-- 歷史紀錄 -->
 <div id="panel-history" class="panel">
   <div class="card" style="background:linear-gradient(135deg,#0D0D1A,#1A1A2E);border-color:rgba(74,108,247,0.3)">
-    <div style="font-size:16px;font-weight:900;color:white;margin-bottom:6px">📋 每日完成紀錄</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:16px;font-weight:900;color:white">📋 每日完成紀錄</div>
+      <button onclick="clearHistory()" style="font-size:11px;padding:4px 10px;border-radius:var(--r-xs);border:1px solid rgba(255,90,90,0.4);background:rgba(255,90,90,0.1);color:#FF8A8A;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700">🗑️ 清除</button>
+    </div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:12px">每天早上 6:00 自動重置，紀錄保留 30 天</div>
     <div id="history-week-summary" style="margin-bottom:14px"></div>
     <div id="history-list"></div>
@@ -721,62 +736,64 @@ const isFri=TODAY===5;
 const isWeekday14=TODAY>=1&&TODAY<=4;
 
 const GE_TASKS=[
-  {id:'ge1',label:'📝 作業與聯絡簿檢查'},
-  {id:'ge2',label:'🎒 書包餐具點點名'},
-  {id:'ge4',label:'🔤 英文複習 20 分鐘'},
-  {id:'ge5',label:'🧠 每日閱讀＋快問快答'},
-  {id:'ge_sport',label:'🏋️ 今天運動了沒'},
-  {id:'ge_bath',label:'🚿 洗澡刷牙大挑戰'},
-  {id:'ge6',label:'📖 睡前閱讀 ⚡雙倍點數！'},
+  {id:'ge1',label:'📝 作業與聯絡簿檢查',required:true},
+  {id:'ge2',label:'🎒 書包餐具點點名',required:true},
+  {id:'ge4',label:'🔤 英文複習 20 分鐘',required:true},
+  {id:'ge_bath',label:'🚿 洗澡刷牙大挑戰',required:true},
+];
+const GE_BONUS_TASKS=[
+  {id:'ge5',label:'🧠 每日閱讀＋快問快答',bonus:5},
+  {id:'ge_sport',label:'🏋️ 今天運動了沒',bonus:5},
+  {id:'ge6',label:'📖 睡前閱讀 ⚡+5分加碼！',bonus:5},
 ];
 const GE_TASKS_WEEKEND=[
-  {id:'ge1',label:'📝 作業與聯絡簿檢查'},
-  {id:'ge2',label:'🎒 書包餐具點點名'},
-  {id:'ge4',label:'🔤 英文複習 20 分鐘'},
-  {id:'ge5',label:'🧠 每日閱讀＋快問快答'},
-  {id:'ge_sport',label:'🏋️ 今天運動了沒'},
-  {id:'ge_extra1',label:'📚 自選科目複習 第1科（雙倍點數！）'},
-  {id:'ge_extra2',label:'📚 自選科目複習 第2科（雙倍點數！）'},
-  {id:'ge_bath',label:'🚿 洗澡刷牙大挑戰'},
-  {id:'ge6',label:'📖 睡前閱讀 ⚡雙倍點數！'},
+  {id:'ge1',label:'📝 作業與聯絡簿檢查',required:true},
+  {id:'ge2',label:'🎒 書包餐具點點名',required:true},
+  {id:'ge4',label:'🔤 英文複習 20 分鐘',required:true},
+  {id:'ge_bath',label:'🚿 洗澡刷牙大挑戰',required:true},
+  {id:'ge5',label:'🧠 每日閱讀＋快問快答',bonus:5},
+  {id:'ge_sport',label:'🏋️ 今天運動了沒',bonus:5},
+  {id:'ge_extra1',label:'📚 自選科目複習 第1科（+5分！）',bonus:5},
+  {id:'ge_extra2',label:'📚 自選科目複習 第2科（+5分！）',bonus:5},
+  {id:'ge6',label:'📖 睡前閱讀 ⚡+5分加碼！',bonus:5},
 ];
 const MEI_TASKS=[
-  {id:'mei1',label:'📝 作業與聯絡簿檢查'},
-  {id:'mei2',label:'🎒 書包餐具點點名'},
-  {id:'mei4',label:'🔤 英文複習 20 分鐘'},
-  {id:'mei5',label:'🧠 每日閱讀＋快問快答'},
-  {id:'mei_sport',label:'🏋️ 今天運動了沒'},
-  {id:'mei_bath',label:'🚿 洗澡刷牙大挑戰'},
-  {id:'mei6',label:'📖 睡前閱讀 ⚡雙倍點數！'},
+  {id:'mei1',label:'📝 作業與聯絡簿檢查',required:true},
+  {id:'mei2',label:'🎒 書包餐具點點名',required:true},
+  {id:'mei4',label:'🔤 英文複習 20 分鐘',required:true},
+  {id:'mei_bath',label:'🚿 洗澡刷牙大挑戰',required:true},
+];
+const MEI_BONUS_TASKS=[
+  {id:'mei5',label:'🧠 每日閱讀＋快問快答',bonus:5},
+  {id:'mei_sport',label:'🏋️ 今天運動了沒',bonus:5},
+  {id:'mei6',label:'📖 睡前閱讀 ⚡+5分加碼！',bonus:5},
 ];
 const MEI_TASKS_WEEKEND=[
-  {id:'mei1',label:'📝 作業與聯絡簿檢查'},
-  {id:'mei2',label:'🎒 書包餐具點點名'},
-  {id:'mei4',label:'🔤 英文複習 20 分鐘'},
-  {id:'mei5',label:'🧠 每日閱讀＋快問快答'},
-  {id:'mei_sport',label:'🏋️ 今天運動了沒'},
-  {id:'mei_extra1',label:'📚 自選科目複習 第1科（雙倍點數！）'},
-  {id:'mei_extra2',label:'📚 自選科目複習 第2科（雙倍點數！）'},
-  {id:'mei_bath',label:'🚿 洗澡刷牙大挑戰'},
-  {id:'mei6',label:'📖 睡前閱讀 ⚡雙倍點數！'},
+  {id:'mei1',label:'📝 作業與聯絡簿檢查',required:true},
+  {id:'mei2',label:'🎒 書包餐具點點名',required:true},
+  {id:'mei4',label:'🔤 英文複習 20 分鐘',required:true},
+  {id:'mei_bath',label:'🚿 洗澡刷牙大挑戰',required:true},
+  {id:'mei5',label:'🧠 每日閱讀＋快問快答',bonus:5},
+  {id:'mei_sport',label:'🏋️ 今天運動了沒',bonus:5},
+  {id:'mei_extra1',label:'📚 自選科目複習 第1科（+5分！）',bonus:5},
+  {id:'mei_extra2',label:'📚 自選科目複習 第2科（+5分！）',bonus:5},
+  {id:'mei6',label:'📖 睡前閱讀 ⚡+5分加碼！',bonus:5},
 ];
 const WEEKLY_TASKS={
-  ge:['作業定位','英文複習','大腦充電','黃金閱讀'],
-  mei:['作業定位','英文複習','知識小老師','睡前閱讀'],
+  ge:['作業定位','英文複習','洗澡挑戰'],
+  mei:['作業定位','英文複習','洗澡挑戰'],
 };
 // Map weekly categories to daily task IDs (for auto-sync)
 const WEEKLY_TASK_MAP={
   ge:{
     '作業定位':'ge1',
     '英文複習':'ge4',
-    '大腦充電':'ge5',
-    '黃金閱讀':'ge6',
+    '洗澡挑戰':'ge_bath',
   },
   mei:{
     '作業定位':'mei1',
     '英文複習':'mei4',
-    '知識小老師':'mei5',
-    '睡前閱讀':'mei6',
+    '洗澡挑戰':'mei_bath',
   },
 };
 const SPORT_GOAL={ge:90,mei:60};
@@ -893,7 +910,7 @@ function startListening(){
   db.ref('.info/connected').on('value',snap=>{
     if(!snap.val()){setSyncStatus('offline');renderAll();}
   });
-  db.ref('family/shares').limitToLast(15).on('value',snap=>{
+  db.ref('family/shares').limitToLast(30).on('value',snap=>{
     renderShareWallData(snap.val());
   });
 }
@@ -954,7 +971,8 @@ function autoLogSport(kid, isChecking){
   if(isChecking){
     // Add auto-log if not already there
     if(!state.sport[kid].find(e=>e.id===autoId)){
-      state.sport[kid].push({id:autoId,week:wk,min:30,act:'今日運動打卡 ✅',day:dayStr});
+      // Use 20 min default for auto-log (can be updated in sport page)
+  state.sport[kid].push({id:autoId,week:wk,min:20,act:'今日運動打卡 ✅',day:dayStr});
       syncUp('sport',state.sport);
     }
   } else {
@@ -984,18 +1002,45 @@ function onOntimeChange(){
   renderWeekly();
 }
 
-function renderTasks(tasks,cid){
-  var el=document.getElementById(cid);
-  el.innerHTML='';
+function renderTasks(tasks, cid, bonusTasks){
+  var el = document.getElementById(cid);
+  el.innerHTML = '';
+
+  // Required tasks header
+  var reqHeader = document.createElement('div');
+  reqHeader.style.cssText = 'font-size:10px;font-weight:900;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin:0 0 6px';
+  reqHeader.textContent = '必做任務';
+  el.appendChild(reqHeader);
+
   tasks.forEach(function(t){
-    var done=isChecked(t.id);
-    var row=document.createElement('div');
-    row.className='task-item';
-    row.innerHTML='<div class="task-check '+(done?'done':'')+'" style="pointer-events:none">'+(done?'&#10003;':'')+'</div>'
-      +'<div class="task-label'+(done?' done':'')+'" style="pointer-events:none">'+t.label+'</div>';
-    (function(id){row.onclick=function(e){toggleTask(id,e);};})(t.id);
+    var done = isChecked(t.id);
+    var row = document.createElement('div');
+    row.className = 'task-item';
+    row.innerHTML = '<div class="task-check '+(done?'done':'')+'" style="pointer-events:none">'+(done?'&#10003;':'')+'</div>'
+      + '<div class="task-label'+(done?' done':'')+'" style="pointer-events:none">'+t.label+'</div>';
+    (function(id){ row.onclick = function(e){ toggleTask(id,e); }; })(t.id);
     el.appendChild(row);
   });
+
+  if(bonusTasks && bonusTasks.length){
+    var bonusHeader = document.createElement('div');
+    bonusHeader.style.cssText = 'font-size:10px;font-weight:900;color:#FFD166;letter-spacing:.06em;text-transform:uppercase;margin:10px 0 6px;display:flex;align-items:center;gap:6px';
+    bonusHeader.innerHTML = '⭐ 選做加分 <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:none">每項 +5 分鐘</span>';
+    el.appendChild(bonusHeader);
+
+    bonusTasks.forEach(function(t){
+      var done = isChecked(t.id);
+      var row = document.createElement('div');
+      row.className = 'task-item';
+      row.style.opacity = done ? '1' : '0.8';
+      var checkStyle = 'pointer-events:none;border-color:#FFD166;' + (done?'background:#FFD166;':'');
+      var labelStyle = 'pointer-events:none;color:' + (done?'var(--text3)':'#FFE0A0');
+      row.innerHTML = '<div class="task-check '+(done?'done':'')+'" style="'+checkStyle+'">'+(done?'&#10003;':'')+'</div>'
+        + '<div class="task-label'+(done?' done':'')+'" style="'+labelStyle+'">'+t.label+'</div>';
+      (function(id){ row.onclick = function(e){ toggleTask(id,e); }; })(t.id);
+      el.appendChild(row);
+    });
+  }
 }
 
 
@@ -1003,14 +1048,22 @@ function renderDaily(){
   document.getElementById('ge-ontime-wrap').style.display=isWeekday14?'block':'none';
   document.getElementById('ge-ontime').checked=!!state.geOntime;
   // Use weekend tasks on weekends
-  var currentGeTasks = isWeekend ? GE_TASKS_WEEKEND : GE_TASKS;
-  var currentMeiTasks = isWeekend ? MEI_TASKS_WEEKEND : MEI_TASKS;
-  renderTasks(currentGeTasks,'tasks-ge');
-  renderTasks(currentMeiTasks,'tasks-mei');
-  const activeGeTasks = isWeekend ? GE_TASKS_WEEKEND : GE_TASKS;
-  const activeMeiTasks = isWeekend ? MEI_TASKS_WEEKEND : MEI_TASKS;
-  const geAll=activeGeTasks.every(t=>isChecked(t.id));
-  const meiAll=activeMeiTasks.every(t=>isChecked(t.id));
+  var currentGeTasks = isWeekend ? GE_TASKS_WEEKEND.filter(function(t){return t.required;}) : GE_TASKS;
+  var currentMeiTasks = isWeekend ? MEI_TASKS_WEEKEND.filter(function(t){return t.required;}) : MEI_TASKS;
+  var currentGeBonusTasks = isWeekend ? GE_TASKS_WEEKEND.filter(function(t){return t.bonus;}) : GE_BONUS_TASKS;
+  var currentMeiBonusTasks = isWeekend ? MEI_TASKS_WEEKEND.filter(function(t){return t.bonus;}) : MEI_BONUS_TASKS;
+  renderTasks(currentGeTasks,'tasks-ge',currentGeBonusTasks);
+  renderTasks(currentMeiTasks,'tasks-mei',currentMeiBonusTasks);
+  // Only required tasks determine 3C unlock
+  const activeGeTasks = isWeekend ? GE_TASKS_WEEKEND.filter(function(t){return t.required;}) : GE_TASKS;
+  const activeMeiTasks = isWeekend ? MEI_TASKS_WEEKEND.filter(function(t){return t.required;}) : MEI_TASKS;
+  const activeGeBonusTasks = isWeekend ? GE_TASKS_WEEKEND.filter(function(t){return t.bonus;}) : GE_BONUS_TASKS;
+  const activeMeiBonusTasks = isWeekend ? MEI_TASKS_WEEKEND.filter(function(t){return t.bonus;}) : MEI_BONUS_TASKS;
+  const geAll=activeGeTasks.every(function(t){return isChecked(t.id);});
+  const meiAll=activeMeiTasks.every(function(t){return isChecked(t.id);});
+  // Count bonus tasks completed
+  const geBonusDone=activeGeBonusTasks.filter(function(t){return isChecked(t.id);}).length;
+  const meiBonusDone=activeMeiBonusTasks.filter(function(t){return isChecked(t.id);}).length;
   // Update daily login streak
   const todayStr=getResetDateStr(); // use 6am boundary date
   ['ge','mei'].forEach(kid=>{
@@ -1085,10 +1138,10 @@ function renderDaily(){
   else{const l=MEI_TASKS.filter(t=>!isChecked(t.id)).length;mt='待完成';mn=`還差 ${l} 項任務`;mC='locked';}
   document.getElementById('ge-time').textContent=gt;
   document.getElementById('ge-time').className='sc-val '+gC;
-  document.getElementById('ge-time-note').textContent=gn;
+  document.getElementById('ge-time-note').textContent=gn+(geBonusDone>0?' ⭐+'+geBonusDone*5+'分':'');
   document.getElementById('mei-time').textContent=mt;
   document.getElementById('mei-time').className='sc-val '+mC;
-  document.getElementById('mei-time-note').textContent=mn;
+  document.getElementById('mei-time-note').textContent=mn+(meiBonusDone>0?' ⭐+'+meiBonusDone*5+'分':'');
   // Friday bonus bar
   const friBar=document.getElementById('fri-bonus-bar');
   if(friBar) friBar.style.display=isFri?'block':'none';
@@ -1097,7 +1150,7 @@ function renderDaily(){
   if(wkBar) wkBar.style.display=isWeekend?'block':'none';
 
   const bar=document.getElementById('reward-bar');
-  const left=activeGeTasks.filter(t=>!isChecked(t.id)).length+activeMeiTasks.filter(t=>!isChecked(t.id)).length;
+  const left=activeGeTasks.filter(function(t){return !isChecked(t.id);}).length+activeMeiTasks.filter(function(t){return !isChecked(t.id);}).length;
   if(geAll&&meiAll){
     bar.className='info-bar good';
     document.getElementById('reward-msg').textContent='今天全部完成！週末可獲得額外獎勵 🎉';
@@ -1128,6 +1181,12 @@ function renderSport(){
       `<div class="log-entry"><span>${e.day} ${e.act} <strong>${e.min}分</strong></span><span class="log-del" onclick="delSport('${kid}','${e.id}')">✕</span></div>`
     ).join('');
   });
+  // Update summary cards at top of sport page
+  const vicSum=document.getElementById('vic-sport-summary');
+  const joySum=document.getElementById('joy-sport-summary');
+  if(vicSum) vicSum.textContent = sumSport('ge')+'分';
+  if(joySum) joySum.textContent = sumSport('mei')+'分';
+
   const gL=Math.max(SPORT_GOAL.ge-sumSport('ge'),0),mL=Math.max(SPORT_GOAL.mei-sumSport('mei'),0);
   document.getElementById('sport-tip-text').textContent=
     gL===0&&mL===0?'🎉 Vic 和 Joy 本週都達標了！超強的！':
@@ -1202,7 +1261,10 @@ function renderWeekly(){
     row.innerHTML=`<span class="week-label">${t}${isAutoTask?'<span style="font-size:9px;color:var(--green);margin-left:4px">⚡自動</span>':''}</span><div class="day-dots">${DAYS.map((d,i)=>{
         const key=kid+'_'+t+'_'+i,done=!!(state.weekly[kid]||{})[key];
         const isToday=i===todayIdx&&!isWeekend;
-        return`<div class="dot${done?' done':''}${isToday?' today':''}" onclick="toggleWeekly('${kid}','${t}',${i})" title="${done?'已完成':'未完成'}">${done?'✓':d}</div>`;
+        // Auto-synced tasks: today's dot is locked, past/future can still be corrected manually
+        const isLockedToday = isAutoTask && isToday;
+        const clickHandler = isLockedToday ? '' : `onclick="toggleWeekly('${kid}','${t}',${i})"`;
+        return`<div class="dot${done?' done':''}${isToday?' today':''}" ${clickHandler} style="${isLockedToday?'cursor:default;opacity:0.8':''}" title="${isLockedToday?'⚡ 自動同步中':done?'已完成（點擊取消）':'未完成（點擊標記）'}">${done?'✓':d}</div>`;
       }).join('')}</div>`;
       el.appendChild(row);
     });
@@ -1233,6 +1295,8 @@ function renderWeekly(){
   if(meiTitle) meiTitle.textContent=getStreakTitle(ms);
 
   const gSB=sumSport('ge')>=SPORT_GOAL.ge?15:0,mSB=sumSport('mei')>=SPORT_GOAL.mei?10:0;
+  // Bonus task points this week
+  const geBonusPoints = (state.streaks && state.streaks.ge ? 0 : 0); // placeholder
   // Count ontime days this week
   const geOntimeDays=state.ontimeDays||0;
   const geOntimeBonus=geOntimeDays*15;
@@ -1274,6 +1338,8 @@ const BOOK_EMOJIS=['📗','📘','📙','📕','📓','📔','📒','📃'];
 function bookEmoji(title){let n=0;for(let c of title)n+=c.charCodeAt(0);return BOOK_EMOJIS[n%BOOK_EMOJIS.length];}
 function renderBooks(){
   const el=document.getElementById('book-list');
+  const countEl=document.getElementById('book-count');
+  if(countEl) countEl.textContent='共 '+(state.books?state.books.length:0)+' 本';
   if(!state.books||!state.books.length){el.innerHTML='<p style="font-size:14px;color:var(--text3);padding:12px 0;text-align:center">還沒有書，去推薦頁選書吧！📚</p>';return;}
   el.innerHTML=state.books.map(b=>`
     <div class="book-item">
@@ -1295,7 +1361,13 @@ function addBook(){
   syncUp('books',state.books);syncUp('bookId',state.bookId);renderBooks();
 }
 function toggleBook(id){const b=state.books.find(x=>x.id===id);if(b)b.status=b.status==='借閱中'?'已還書':'借閱中';syncUp('books',state.books);renderBooks();}
-function removeBook(id){state.books=state.books.filter(x=>x.id!==id);syncUp('books',state.books);renderBooks();}
+function removeBook(id){
+  const b=state.books.find(x=>x.id===id);
+  if(!b) return;
+  if(!confirm('確定移除《'+b.title+'》嗎？')) return;
+  state.books=state.books.filter(x=>x.id!==id);
+  syncUp('books',state.books);renderBooks();
+}
 
 // ── RECOMMEND ──
 function switchRTab(kid){
@@ -1308,6 +1380,13 @@ function renderRecommend(kid){
   const list=state.recommend[kid]||[],el=document.getElementById('recommend-'+kid+'-list');
   if(!list.length){el.innerHTML='<p style="font-size:13px;color:var(--text3);padding:12px 0;text-align:center">點「Claude 推薦」產生書單，或直接輸入想看的書！📖</p>';return;}
   const isJoy=kid==='mei';
+  // Update add button to show selected count
+  const selectedCount = list.filter(b=>b.checked).length;
+  const addBtn = document.getElementById('add-'+kid+'-btn');
+  if(addBtn) addBtn.textContent = selectedCount > 0
+    ? '📚 加入借閱清單（已選 '+selectedCount+' 本）'
+    : '📚 將勾選的書加入借閱清單';
+
   el.innerHTML=list.map((b,i)=>`
     <div class="rec-item">
       <div class="rec-check${b.checked?(isJoy?' joy-checked':' vic-checked'):''}" onclick="toggleRecCheck('${kid}',${i})">${b.checked?'✓':''}</div>
@@ -1783,24 +1862,31 @@ function getResetDateStr(){
 
 function checkDailyReset(){
   const resetDate = getResetDateStr();
-  if(state.lastResetDate === resetDate) return; // already reset today
+  if(state.lastResetDate === resetDate) return;
 
-  // Save yesterday's record before clearing
   const yesterday = state.lastResetDate || resetDate;
   if(Object.keys(state.daily).length > 0){
     saveDailyHistory(yesterday, state.daily);
   }
 
-  // Clear daily tasks
-  state.daily = {};
-  state.dadMissions = getTodayDadMissions().map(m=>({...m,done:false}));
+  // Clear auto sport logs from yesterday
+  ['ge','mei'].forEach(function(kid){
+    if(!state.sport || !state.sport[kid]) return;
+    const autoId = 'auto_sport_' + kid + '_' + yesterday;
+    state.sport[kid] = state.sport[kid].filter(function(e){ return e.id !== autoId; });
+  });
 
+  // Reset daily tasks and dad missions
+  state.daily = {};
+  state.dadMissions = getTodayDadMissions().map(function(m){ return Object.assign({},m,{done:false}); });
   state.lastResetDate = resetDate;
+
+  syncUp('sport', state.sport);
   syncUp('daily', state.daily);
   syncUp('dadMissions', state.dadMissions);
-
   syncUp('lastResetDate', state.lastResetDate);
 }
+
 
 function saveDailyHistory(dateStr, dailyData){
   if(!state.dailyHistory) state.dailyHistory = {};
@@ -1823,24 +1909,39 @@ function saveDailyHistory(dateStr, dailyData){
   syncUp('dailyHistory', state.dailyHistory);
 }
 
+function clearHistory(){
+  if(!confirm('確定清除所有歷史紀錄嗎？此操作無法復原。')) return;
+  state.dailyHistory = {};
+  syncUp('dailyHistory', state.dailyHistory);
+  renderHistory();
+}
+
 function renderHistory(){
   const el = document.getElementById('history-list');
   if(!el) return;
-  const history = state.dailyHistory || {};
-  const keys = Object.keys(history).sort().reverse(); // newest first
+
+  // Safely get history - Firebase might return object
+  let history = state.dailyHistory || {};
+  if(!history || typeof history !== 'object') history = {};
+
+  const keys = Object.keys(history).sort().reverse();
 
   // Weekly summary
   const summEl = document.getElementById('history-week-summary');
   if(summEl && keys.length > 0){
     const wk = getWeekKey();
-    const weekKeys = keys.filter(k => k >= wk);
+    const weekKeys = keys.filter(k => k >= wk && history[k] && history[k].ge && history[k].mei);
     if(weekKeys.length > 0){
-      const geRates = weekKeys.map(k => history[k].ge.done.length / history[k].ge.total * 100);
-      const meiRates = weekKeys.map(k => history[k].mei.done.length / history[k].mei.total * 100);
+      const geRates = weekKeys.map(k => {
+        const r = history[k];
+        return r.ge && r.ge.done ? (r.ge.done.length / (r.ge.total||5) * 100) : 0;
+      });
+      const meiRates = weekKeys.map(k => {
+        const r = history[k];
+        return r.mei && r.mei.done ? (r.mei.done.length / (r.mei.total||5) * 100) : 0;
+      });
       const geAvg = Math.round(geRates.reduce((a,b)=>a+b,0)/geRates.length);
       const meiAvg = Math.round(meiRates.reduce((a,b)=>a+b,0)/meiRates.length);
-      const geBar = Math.round(geAvg/100*80);
-      const meiBar = Math.round(meiAvg/100*80);
       summEl.innerHTML = `
         <div style="background:rgba(255,255,255,0.05);border-radius:var(--r-sm);padding:12px">
           <div style="font-size:12px;font-weight:900;color:#FFD166;margin-bottom:10px">📊 本週平均達成率（${weekKeys.length}天）</div>
@@ -1849,7 +1950,7 @@ function renderHistory(){
               <span style="color:var(--vic-neon)">🏎️ Vic</span><span style="color:var(--vic-neon)">${geAvg}%</span>
             </div>
             <div style="height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden">
-              <div style="height:100%;width:${geBar}px;max-width:100%;background:var(--vic);border-radius:4px;transition:width .5s"></div>
+              <div style="height:100%;width:${Math.min(geAvg,100)}%;background:var(--vic);border-radius:4px;transition:width .5s"></div>
             </div>
           </div>
           <div>
@@ -1857,7 +1958,7 @@ function renderHistory(){
               <span style="color:var(--joy-heart)">🌸 Joy</span><span style="color:var(--joy-heart)">${meiAvg}%</span>
             </div>
             <div style="height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden">
-              <div style="height:100%;width:${meiBar}px;max-width:100%;background:var(--joy);border-radius:4px;transition:width .5s"></div>
+              <div style="height:100%;width:${Math.min(meiAvg,100)}%;background:var(--joy);border-radius:4px;transition:width .5s"></div>
             </div>
           </div>
         </div>`;
@@ -1874,35 +1975,36 @@ function renderHistory(){
   const dayNames = ['日','一','二','三','四','五','六'];
   el.innerHTML = keys.map(k=>{
     const r = history[k];
+    // Defensive: skip invalid entries
+    if(!r || !r.ge || !r.mei) return '';
+    const geDone = Array.isArray(r.ge.done) ? r.ge.done : [];
+    const meiDone = Array.isArray(r.mei.done) ? r.mei.done : [];
+    const geTotal = r.ge.total || 5;
+    const meiTotal = r.mei.total || 5;
     const d = new Date(k);
-    const dayStr = `${k} (週${dayNames[d.getDay()]})`;
-    const geRate = r.ge.done.length;
-    const meiRate = r.mei.done.length;
-    const geColor = geRate===r.ge.total?'var(--green)':geRate>=3?'var(--yellow)':'var(--red)';
-    const meiColor = meiRate===r.mei.total?'var(--green)':meiRate>=3?'var(--yellow)':'var(--red)';
-
-    const geTasks = r.ge.done.length?r.ge.done.map(t=>`<span style="font-size:11px;background:rgba(74,108,247,0.2);border-radius:4px;padding:2px 6px;margin:2px;display:inline-block">${t}</span>`).join('')
-      :'<span style="color:rgba(255,255,255,0.3);font-size:11px">無完成項目</span>';
-    const meiTasks = r.mei.done.length?r.mei.done.map(t=>`<span style="font-size:11px;background:rgba(232,97,154,0.2);border-radius:4px;padding:2px 6px;margin:2px;display:inline-block">${t}</span>`).join('')
-      :'<span style="color:rgba(255,255,255,0.3);font-size:11px">無完成項目</span>';
-
-    return `<div style="border-bottom:1px dashed rgba(255,255,255,0.1);padding:12px 0;margin-bottom:4px">
-      <div style="font-size:13px;font-weight:900;color:white;margin-bottom:8px">📅 ${dayStr}</div>
-      <div style="margin-bottom:8px">
-        <div style="font-size:11px;font-weight:800;color:var(--vic-neon);margin-bottom:4px">
-          🏎️ Vic — <span style="color:${geColor}">${geRate}/${r.ge.total} 項完成</span>
-        </div>
-        <div style="flex-wrap:wrap;display:flex;gap:2px">${geTasks}</div>
-      </div>
-      <div>
-        <div style="font-size:11px;font-weight:800;color:var(--joy-heart);margin-bottom:4px">
-          🌸 Joy — <span style="color:${meiColor}">${meiRate}/${r.mei.total} 項完成</span>
-        </div>
-        <div style="flex-wrap:wrap;display:flex;gap:2px">${meiTasks}</div>
-      </div>
-    </div>`;
-  }).join('');
+    const dayStr = k + ' (週' + dayNames[d.getDay()] + ')';
+    const geColor = geDone.length===geTotal?'var(--green)':geDone.length>=3?'var(--yellow)':'var(--red)';
+    const meiColor = meiDone.length===meiTotal?'var(--green)':meiDone.length>=3?'var(--yellow)':'var(--red)';
+    const geTasks = geDone.length
+      ? geDone.map(t=>'<span style="font-size:11px;background:rgba(74,108,247,0.2);border-radius:4px;padding:2px 6px;margin:2px;display:inline-block">'+t+'</span>').join('')
+      : '<span style="color:rgba(255,255,255,0.3);font-size:11px">無完成項目</span>';
+    const meiTasks = meiDone.length
+      ? meiDone.map(t=>'<span style="font-size:11px;background:rgba(232,97,154,0.2);border-radius:4px;padding:2px 6px;margin:2px;display:inline-block">'+t+'</span>').join('')
+      : '<span style="color:rgba(255,255,255,0.3);font-size:11px">無完成項目</span>';
+    return '<div style="border-bottom:1px dashed rgba(255,255,255,0.1);padding:12px 0;margin-bottom:4px">'
+      +'<div style="font-size:13px;font-weight:900;color:white;margin-bottom:8px">📅 '+dayStr+'</div>'
+      +'<div style="margin-bottom:8px">'
+        +'<div style="font-size:11px;font-weight:800;color:var(--vic-neon);margin-bottom:4px">🏎️ Vic — <span style="color:'+geColor+'">'+geDone.length+'/'+geTotal+' 項完成</span></div>'
+        +'<div style="flex-wrap:wrap;display:flex;gap:2px">'+geTasks+'</div>'
+      +'</div>'
+      +'<div>'
+        +'<div style="font-size:11px;font-weight:800;color:var(--joy-heart);margin-bottom:4px">🌸 Joy — <span style="color:'+meiColor+'">'+meiDone.length+'/'+meiTotal+' 項完成</span></div>'
+        +'<div style="flex-wrap:wrap;display:flex;gap:2px">'+meiTasks+'</div>'
+      +'</div>'
+      +'</div>';
+  }).filter(Boolean).join('');
 }
+
 
 // Global touch handler for maximum Android compatibility
 function toggleTheme(){
