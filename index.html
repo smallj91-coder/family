@@ -909,7 +909,9 @@ function startListening(){
     setSyncStatus('online');
     renderAll();
     // Force regenerate dad missions if still empty after Firebase load
-    if(!state.dadMissions || !state.dadMissions.length){
+    var dmCheck = state.dadMissions;
+    if(dmCheck && !Array.isArray(dmCheck)) dmCheck = Object.values(dmCheck);
+    if(!dmCheck || !dmCheck.length){
       state.dadMissions = getTodayDadMissions().map(function(m){ return Object.assign({},m,{done:false}); });
       syncUp('dadMissions', state.dadMissions);
       renderDadMissions(false);
@@ -1442,12 +1444,10 @@ function addBookDirect(kid){
 }
 
 function addBook(){
-  const t=document.getElementById('book-title-input').value.trim(),w=document.getElementById('book-who-input').value;
-  if(!t)return;
-  state.books.push({id:state.bookId++,title:t,who:w,status:'借閱中'});
-  document.getElementById('book-title-input').value='';
-  syncUp('books',state.books);syncUp('bookId',state.bookId);renderBooks();
+  // Legacy - redirects to ge by default
+  addBookDirect('ge');
 }
+
 function toggleBook(id){const b=state.books.find(x=>x.id===id);if(b)b.status=b.status==='借閱中'?'已還書':'借閱中';syncUp('books',state.books);renderBooks();}
 function removeBook(id){
   const b=state.books.find(x=>x.id===id);
@@ -1816,20 +1816,21 @@ function renderDadMissions(forceNew){
     syncUp('dadMissions', state.dadMissions);
   }
 
-  // Convert Firebase object-array to real array if needed
+  // ✅ null/object 防護
   if(state.dadMissions && !Array.isArray(state.dadMissions)){
     state.dadMissions = Object.values(state.dadMissions);
   }
-  if(!state.dadMissions || state.dadMissions.length===0){
+  // ✅ 空值防護 - 一定要有陣列才繼續
+  var missions = state.dadMissions && Array.isArray(state.dadMissions) && state.dadMissions.length > 0
+    ? state.dadMissions
+    : null;
+
+  if(!missions){
     state.dadMissions = getTodayDadMissions().map(function(m){ return Object.assign({},m,{done:false}); });
     syncUp('dadMissions', state.dadMissions);
+    missions = state.dadMissions;
   }
 
-  var missions = state.dadMissions;
-  if(!missions || !missions.length){
-    el.innerHTML = '<div style="color:rgba(78,174,255,0.5);font-size:13px;padding:10px 0;text-align:center">載入任務中... 若長時間未顯示請按「換一組」🎲</div>';
-    return;
-  }
   el.innerHTML = '';
 
   missions.forEach(function(m, i){
@@ -1851,7 +1852,6 @@ function renderDadMissions(forceNew){
     check.style.fontSize = '16px';
     check.style.cursor = 'pointer';
     check.style.touchAction = 'manipulation';
-    check.style.transition = 'all .2s';
     check.style.border = '2px solid ' + (m.done ? '#4EAEFF' : 'rgba(78,174,255,0.35)');
     check.style.background = m.done ? '#4EAEFF' : 'transparent';
     check.textContent = m.done ? '✓' : '';
@@ -2426,17 +2426,13 @@ function openBlindbox(kid){
     alert('還沒有盲盒！\n\n再連續完成睡前閱讀 '+remaining+' 天就能解鎖一個 🎲');
     return;
   }
-  const prizes=state.customPrizes&&state.customPrizes.length?state.customPrizes:BLINDBOX_PRIZES;
+  var prizes=(state.customPrizes&&Array.isArray(state.customPrizes)&&state.customPrizes.length)?state.customPrizes:BLINDBOX_PRIZES;
   const prize=prizes[Math.floor(Math.random()*prizes.length)];
   // Burst celebration
   burst(window.innerWidth/2, window.innerHeight/2,
     kid==='ge'?['🎲','🏎️','⚡','🎮','🌟']:['🎲','🌸','💜','🩺','✨']);
-  setTimeout(()=>{
-    alert(`🎁 恭喜解鎖神秘盲盒！
-
-獎勵是：${prize}
-
-記得告訴媽媽來兌換！`);
+  setTimeout(function(){
+    alert('🎁 恭喜解鎖神秘盲盒！\n\n獎勵是：'+prize+'\n\n記得告訴媽媽來兌換！');
   },400);
 }
 
@@ -2448,7 +2444,19 @@ function switchTab(name){
   document.getElementById('panel-'+name).classList.add('active');
   if(name==='history') renderHistory();
 }
-function renderAll(){renderDaily();renderSport();renderWeekly();renderTeamwork();renderBooks();renderRecommend('ge');renderRecommend('mei');renderHistory();renderDadMissions(false);if(!db)renderShareWallData(null);initShareWhoButtons();}
+function renderAll(){
+  try{renderDaily();}catch(e){console.warn('renderDaily error:',e);}
+  try{renderSport();}catch(e){console.warn('renderSport error:',e);}
+  try{renderWeekly();}catch(e){console.warn('renderWeekly error:',e);}
+  try{renderTeamwork();}catch(e){console.warn('renderTeamwork error:',e);}
+  try{renderBooks();}catch(e){console.warn('renderBooks error:',e);}
+  try{renderRecommend('ge');}catch(e){console.warn('renderRecommend ge error:',e);}
+  try{renderRecommend('mei');}catch(e){console.warn('renderRecommend mei error:',e);}
+  try{renderHistory();}catch(e){console.warn('renderHistory error:',e);}
+  try{renderDadMissions(false);}catch(e){console.warn('renderDadMissions error:',e);}
+  if(!db){try{renderShareWallData(null);}catch(e){}}
+  try{initShareWhoButtons();}catch(e){}
+}
 setupGlobalTouch();
 startListening();
 // Check reset every minute (catches the 6am boundary)
