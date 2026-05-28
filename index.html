@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="許家任務站"/>
 <title>許家任務站 🚀</title>
@@ -51,7 +51,7 @@
   --r:20px; --r-sm:12px; --r-xs:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-textarea,select{font-family:'Nunito',sans-serif;}
+textarea,select{font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
 textarea:focus,select:focus{outline:none;}
 #share-wall::-webkit-scrollbar{width:4px}
 #share-wall::-webkit-scrollbar-track{background:transparent}
@@ -89,6 +89,7 @@ button{-webkit-appearance:none;appearance:none;}
 .header-car-wrap{position:relative;height:32px;overflow:hidden;width:180px;flex-shrink:0}
 .header-car{position:absolute;font-size:22px;animation:car-race 3s linear infinite;white-space:nowrap}
 .header-car-dust{position:absolute;font-size:10px;animation:car-race 3s linear infinite;animation-delay:.15s;opacity:0.6;top:16px}
+.header-car,.header-car-dust{will-change:transform;}
 @keyframes car-race{
   0%{left:-40px;opacity:0}
   8%{opacity:1}
@@ -103,7 +104,7 @@ button{-webkit-appearance:none;appearance:none;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* ═══ TABS ═══ */
-.tabs{background:var(--card);border-bottom:2px solid var(--border);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:70px;z-index:99;box-shadow:var(--shadow-sm)}
+.tabs{background:var(--card);border-bottom:2px solid var(--border);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;position:-webkit-sticky;position:sticky;top:70px;z-index:99;box-shadow:var(--shadow-sm)}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:1;min-width:64px;padding:10px 4px 8px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--text3);border-bottom:3px solid transparent;white-space:nowrap;transition:all .25s}
 .tab .tab-icon{font-size:20px;display:block;margin-bottom:2px;transition:transform .25s}
@@ -302,7 +303,7 @@ input:checked+.slider:before{transform:translateX(20px)}
 .sec-label{font-size:12px;font-weight:900;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px}
 
 /* ═══ LOADING ═══ */
-.loading-overlay{display:none;position:fixed;inset:0;background:rgba(15,15,30,0.85);backdrop-filter:blur(8px);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:14px;pointer-events:none;}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(15,15,30,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:14px;pointer-events:none;}
 .loading-overlay.show{pointer-events:all;}
 .loading-overlay.show{display:flex}
 .loading-spinner{font-size:48px;animation:spin-load 1s linear infinite}
@@ -457,11 +458,11 @@ input:checked+.slider:before{transform:translateX(20px)}
         <button class="share-who-btn" id="swho-baba" data-who="baba" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text3);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">👨 爸爸</button>
       </div>
       <input type="hidden" id="share-who" value="ge"/>
-      <textarea id="share-text" placeholder="✍️ 寫下今天的事（學校趣事、心情、畫畫、語音輸入都可以！）" style="width:100%;height:70px;padding:10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;resize:none"></textarea>
+      <textarea id="share-text" placeholder="✍️ 寫下今天的事（學校趣事、心情、畫畫、語音輸入都可以！）" style="width:100%;height:70px;padding:10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:white;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;resize:none"></textarea>
       <button class="btn btn-primary" id="share-submit-btn" style="padding:11px;font-size:13px;border-radius:var(--r-xs);touch-action:manipulation">🚀 發送！孩子自動得 +2 點</button>
     </div>
     <div style="font-size:11px;color:var(--text3);font-weight:800;margin:12px 0 6px">📌 大家的心情動態</div>
-    <div id="share-wall" style="max-height:160px;overflow-y:auto;background:rgba(0,0,0,0.2);border-radius:var(--r-xs);padding:8px">
+    <div id="share-wall" style="max-height:160px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:rgba(0,0,0,0.2);border-radius:var(--r-xs);padding:8px">
       <div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:10px">還沒有動態，來留下第一則心情吧！💭</div>
     </div>
   </div>
@@ -2172,126 +2173,191 @@ function submitShare(evt) {
   document.getElementById('share-text').value='';
 }
 
-function openReplyBox(key, btn){
-  // Remove any existing reply box
+function openReplyBox(key, btn, wrapEl){
+  // Remove any existing reply box first
   var existing = document.getElementById('reply-box-'+key);
   if(existing){ existing.remove(); return; }
 
   var senderMap = {ge:'🏎️ Vic', mei:'🩺 Joy', mama:'👩 媽媽', baba:'👨 爸爸'};
   var colorMap = {ge:'var(--vic-neon)', mei:'var(--joy-heart)', mama:'#FFD166', baba:'#4EAEFF'};
+  var selectedWho = 'mama'; // track selection in closure variable
 
   var box = document.createElement('div');
   box.id = 'reply-box-'+key;
-  box.style.cssText = 'margin-top:6px;display:flex;flex-direction:column;gap:6px;padding:8px;background:rgba(255,255,255,0.05);border-radius:8px';
+  box.style.cssText = 'margin-top:8px;display:flex;flex-direction:column;gap:8px;padding:10px;background:rgba(255,255,255,0.06);border-radius:10px;border:1px solid rgba(255,255,255,0.1)';
 
-  // Who selector
+  // Who selector label
+  var label = document.createElement('div');
+  label.style.cssText = 'font-size:10px;font-weight:800;color:rgba(255,255,255,0.4);letter-spacing:.05em';
+  label.textContent = '選擇身份：';
+  box.appendChild(label);
+
+  // Who selector buttons
   var whoRow = document.createElement('div');
   whoRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:5px';
+
+  var whoButtons = {};
   ['ge','mei','mama','baba'].forEach(function(who){
     var b = document.createElement('button');
     b.textContent = senderMap[who];
-    b.dataset.who = who;
-    b.className = 'reply-who-btn';
-    b.style.cssText = 'padding:5px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-family:Nunito,sans-serif;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation';
-    b.onclick = function(){
-      document.querySelectorAll('.reply-who-btn').forEach(function(x){ x.style.background='transparent'; x.style.borderColor='rgba(255,255,255,0.15)'; x.style.color='rgba(255,255,255,0.5)'; });
-      b.style.background = colorMap[who]+'33';
-      b.style.borderColor = colorMap[who];
-      b.style.color = colorMap[who];
-      box.dataset.who = who;
-    };
+    b.style.cssText = 'padding:7px 4px;border-radius:8px;border:2px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.45);font-family:Nunito,sans-serif;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation;transition:all .15s';
+    whoButtons[who] = b;
+
+    function selectWho(w){
+      selectedWho = w;
+      // Reset all buttons
+      Object.keys(whoButtons).forEach(function(k){
+        whoButtons[k].style.background = 'transparent';
+        whoButtons[k].style.borderColor = 'rgba(255,255,255,0.15)';
+        whoButtons[k].style.color = 'rgba(255,255,255,0.45)';
+      });
+      // Highlight selected
+      whoButtons[w].style.background = colorMap[w]+'44';
+      whoButtons[w].style.borderColor = colorMap[w];
+      whoButtons[w].style.color = colorMap[w];
+    }
+
+    b.addEventListener('touchend', function(e){
+      e.preventDefault();
+      selectWho(who);
+    }, {passive:false});
+    b.addEventListener('click', function(){ selectWho(who); });
+
     whoRow.appendChild(b);
   });
-  // Default select first
-  whoRow.firstChild.click();
 
+  // Default select mama
+  whoButtons['mama'].style.background = colorMap['mama']+'44';
+  whoButtons['mama'].style.borderColor = colorMap['mama'];
+  whoButtons['mama'].style.color = colorMap['mama'];
+
+  box.appendChild(whoRow);
+
+  // Text input
   var input = document.createElement('textarea');
-  input.placeholder = '回覆內容...';
-  input.style.cssText = 'padding:7px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:white;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;resize:none;height:50px';
+  input.placeholder = '輸入回覆內容...';
+  input.style.cssText = 'padding:8px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:white;font-family:Nunito,sans-serif;font-size:16px;font-weight:700;resize:none;height:55px;width:100%';
+  box.appendChild(input);
 
+  // Send button
   var sendBtn = document.createElement('button');
   sendBtn.textContent = '🚀 送出回覆';
-  sendBtn.style.cssText = 'padding:7px;border-radius:6px;background:linear-gradient(135deg,var(--vic),var(--joy));color:white;border:none;font-family:Nunito,sans-serif;font-size:12px;font-weight:800;cursor:pointer;touch-action:manipulation';
-  sendBtn.onclick = function(){
+  sendBtn.style.cssText = 'padding:9px;border-radius:8px;background:linear-gradient(135deg,var(--vic),var(--joy));color:white;border:none;font-family:Nunito,sans-serif;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation;width:100%';
+
+  function doSend(){
     var text = input.value.trim();
-    var who = box.dataset.who || 'mama';
-    if(!text) return;
+    if(!text){ input.focus(); return; }
     var reply = {
-      sender: senderMap[who],
-      color: colorMap[who],
+      sender: senderMap[selectedWho],
+      color: colorMap[selectedWho],
       content: text,
       time: new Date().toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),
+      ts: Date.now(),
     };
     if(db){
       db.ref('family/shares/'+key+'/replies').push(reply);
     }
     box.remove();
-  };
+  }
 
-  box.appendChild(whoRow);
-  box.appendChild(input);
+  sendBtn.addEventListener('touchend', function(e){ e.preventDefault(); doSend(); }, {passive:false});
+  sendBtn.addEventListener('click', doSend);
   box.appendChild(sendBtn);
-  btn.parentNode.insertBefore(box, btn.nextSibling);
-  input.focus();
+
+  // Insert after the whole message wrap
+  var insertAfter = wrapEl || btn.closest('div') || btn.parentNode;
+  insertAfter.parentNode.insertBefore(box, insertAfter.nextSibling);
+
+  setTimeout(function(){ input.focus(); }, 100);
 }
 
+
 function renderShareWallData(data) {
-  const wall=document.getElementById('share-wall');
+  var wall = document.getElementById('share-wall');
   if(!wall) return;
-  const items=data?Object.values(data).sort((a,b)=>(b.ts||0)-(a.ts||0)):
-    (state.shares||[]);
+  var items = data
+    ? Object.entries(data).map(function(e){ return Object.assign({},e[1],{key:e[0]}); }).sort(function(a,b){ return (b.ts||0)-(a.ts||0); })
+    : (state.shares||[]);
   if(!items.length){
-    wall.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:10px">還沒有動態，來留下第一則心情吧！💭</div>';
+    wall.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:10px">還沒有動態，來留下第一則心情吧！💭</div>';
     return;
   }
-  const itemsArr=items.slice(0,15);
   wall.innerHTML = '';
-  itemsArr.forEach(function(item){
-    var div = document.createElement('div');
-    div.style.cssText = 'font-size:12px;border-bottom:1px dashed rgba(255,255,255,0.1);padding:8px 0';
+  items.slice(0,30).forEach(function(item){
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'border-bottom:1px dashed rgba(255,255,255,0.1);padding:8px 0';
 
-    // Header row
-    var header = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
-      + '<span style="font-weight:900;color:'+(item.color||'var(--vic-neon)')+'">'+item.sender+'</span>'
-      + '<span style="color:rgba(255,255,255,0.3);font-size:10px">'+item.time+'</span>'
-      + (item.key ? '<span class="share-del" data-key="'+item.key+'" style="margin-left:auto;cursor:pointer;color:rgba(255,255,255,0.2);font-size:14px;padding:0 4px">✕</span>' : '')
-      + '</div>';
+    // Header
+    var header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px';
+
+    var sender = document.createElement('span');
+    sender.style.cssText = 'font-weight:900;font-size:12px;color:'+(item.color||'var(--vic-neon)');
+    sender.textContent = item.sender||'';
+    header.appendChild(sender);
+
+    var time = document.createElement('span');
+    time.style.cssText = 'color:rgba(255,255,255,0.3);font-size:10px';
+    time.textContent = item.time||'';
+    header.appendChild(time);
+
+    if(item.key){
+      var delBtn = document.createElement('span');
+      delBtn.style.cssText = 'margin-left:auto;cursor:pointer;color:rgba(255,255,255,0.2);font-size:14px;padding:0 4px;touch-action:manipulation';
+      delBtn.textContent = '✕';
+      (function(k){
+        delBtn.addEventListener('touchend',function(e){e.preventDefault();if(db)db.ref('family/shares/'+k).remove();},{passive:false});
+        delBtn.addEventListener('click',function(){if(db)db.ref('family/shares/'+k).remove();});
+      })(item.key);
+      header.appendChild(delBtn);
+    }
+    wrap.appendChild(header);
 
     // Content
-    var body = '<div style="color:#E0E8FF;padding-left:4px;line-height:1.5;margin-bottom:6px">'+item.content+'</div>';
+    var body = document.createElement('div');
+    body.style.cssText = 'color:#E0E8FF;padding-left:4px;line-height:1.5;margin-bottom:6px;font-size:13px';
+    body.textContent = item.content||'';
+    wrap.appendChild(body);
 
     // Replies
-    var repliesHtml = '';
     if(item.replies){
-      var replyArr = Array.isArray(item.replies) ? item.replies : Object.values(item.replies);
+      var replyArr = Array.isArray(item.replies)?item.replies:Object.values(item.replies);
       replyArr.forEach(function(r){
-        repliesHtml += '<div style="margin-left:16px;padding:5px 8px;background:rgba(255,255,255,0.05);border-radius:6px;margin-bottom:3px">'
-          + '<span style="font-weight:900;font-size:11px;color:'+(r.color||'rgba(255,255,255,0.6)')+'">'+r.sender+'</span>'
-          + '<span style="color:rgba(255,255,255,0.25);font-size:10px;margin-left:6px">'+r.time+'</span>'
-          + '<div style="color:#C0C8E0;font-size:12px;margin-top:2px">'+r.content+'</div>'
-          + '</div>';
+        var rd = document.createElement('div');
+        rd.style.cssText = 'margin-left:14px;padding:5px 8px;background:rgba(255,255,255,0.05);border-radius:6px;margin-bottom:3px';
+        rd.innerHTML = '<span style="font-weight:900;font-size:11px;color:'+(r.color||'rgba(255,255,255,0.6)')+'">'+r.sender+'</span>'
+          +'<span style="color:rgba(255,255,255,0.25);font-size:10px;margin-left:6px">'+r.time+'</span>'
+          +'<div style="color:#C0C8E0;font-size:12px;margin-top:2px">'+r.content+'</div>';
+        wrap.appendChild(rd);
       });
     }
 
-    // Reply button
-    var replyBtn = item.key
-      ? '<button class="share-reply-btn" data-key="'+item.key+'" style="font-size:11px;padding:3px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.4);cursor:pointer;font-family:Nunito,sans-serif;font-weight:700;touch-action:manipulation">💬 回覆</button>'
-      : '';
+    // Reply button row
+    if(item.key){
+      var btnRow = document.createElement('div');
+      btnRow.style.marginTop = '4px';
 
-    div.innerHTML = header + body + repliesHtml + '<div style="margin-top:4px">' + replyBtn + '</div>';
-    wall.appendChild(div);
-  });
+      var replyBtn = document.createElement('button');
+      replyBtn.textContent = '💬 回覆';
+      replyBtn.style.cssText = 'font-size:11px;padding:4px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.5);font-family:Nunito,sans-serif;font-weight:700;cursor:pointer;touch-action:manipulation';
 
-  // Bind delete and reply buttons
-  document.querySelectorAll('.share-del').forEach(function(btn){
-    btn.onclick = function(){
-      if(db) db.ref('family/shares/'+btn.dataset.key).remove();
-    };
-  });
-  document.querySelectorAll('.share-reply-btn').forEach(function(btn){
-    btn.onclick = function(){ openReplyBox(btn.dataset.key, btn); };
+      (function(k, btn, wrapEl){
+        function handler(e){
+          if(e.type==='touchend') e.preventDefault();
+          openReplyBox(k, btn, wrapEl);
+        }
+        btn.addEventListener('touchend', handler, {passive:false});
+        btn.addEventListener('click', handler);
+      })(item.key, replyBtn, wrap);
+
+      btnRow.appendChild(replyBtn);
+      wrap.appendChild(btnRow);
+    }
+
+    wall.appendChild(wrap);
   });
 }
+
 
 // ── TEAMWORK + BLINDBOX ──
 const BLINDBOX_PRIZES = [
