@@ -462,7 +462,7 @@ input:checked+.slider:before{transform:translateX(20px)}
       <button class="btn btn-primary" id="share-submit-btn" style="padding:11px;font-size:13px;border-radius:var(--r-xs);touch-action:manipulation">🚀 發送！孩子自動得 +2 點</button>
     </div>
     <div style="font-size:11px;color:var(--text3);font-weight:800;margin:12px 0 6px">📌 大家的心情動態</div>
-    <div id="share-wall" style="max-height:160px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:rgba(0,0,0,0.2);border-radius:var(--r-xs);padding:8px">
+    <div id="share-wall" style="max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;overscroll-behavior-y:contain;background:rgba(0,0,0,0.2);border-radius:var(--r-xs);padding:8px">
       <div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:10px">還沒有動態，來留下第一則心情吧！💭</div>
     </div>
   </div>
@@ -2116,6 +2116,29 @@ try{
 
 function setupGlobalTouch() {
   document.addEventListener('touchstart', function(){}, {passive: true}); // unlock touch
+
+  // Prevent share-wall scroll from bubbling to page
+  var wall = document.getElementById('share-wall');
+  if(wall){
+    wall.addEventListener('touchstart', function(e){
+      // Allow scroll inside wall only
+      wall._startY = e.touches[0].clientY;
+    }, {passive:true});
+
+    wall.addEventListener('touchmove', function(e){
+      var startY = wall._startY || 0;
+      var deltaY = e.touches[0].clientY - startY;
+      var scrollTop = wall.scrollTop;
+      var scrollHeight = wall.scrollHeight;
+      var clientHeight = wall.clientHeight;
+      var atTop = scrollTop === 0 && deltaY > 0;
+      var atBottom = scrollTop + clientHeight >= scrollHeight && deltaY < 0;
+      // Only prevent default when we're at boundary (would otherwise scroll page)
+      if(atTop || atBottom){
+        e.preventDefault();
+      }
+    }, {passive:false});
+  }
 }
 
 function selectShareWho(who) {
@@ -2283,6 +2306,8 @@ function renderShareWallData(data) {
     return;
   }
   wall.innerHTML = '';
+  // Re-apply scroll containment after rebuild
+  wall.style.overscrollBehavior = 'contain';
   items.slice(0,30).forEach(function(item){
     var wrap = document.createElement('div');
     wrap.style.cssText = 'border-bottom:1px dashed rgba(255,255,255,0.1);padding:8px 0';
