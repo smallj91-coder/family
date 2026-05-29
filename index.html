@@ -448,22 +448,33 @@ input:checked+.slider:before{transform:translateX(20px)}
   </div>
 
   <!-- 心情報告牆 -->
-  <div class="card" style="background:linear-gradient(135deg,#1A1A2E 0%,#2D0A2D 100%);border-color:rgba(255,209,102,0.3);margin-bottom:14px">
-    <div style="font-size:14px;font-weight:900;color:var(--yellow);margin-bottom:10px">💬 許家心情報告牆</div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="share-who-btns">
+  <div class="card" style="background:linear-gradient(135deg,#1A1A2E,#2D0A2D);border-color:rgba(255,209,102,0.3);margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:14px;font-weight:900;color:var(--yellow);margin-bottom:3px">💬 許家心情報告牆</div>
+        <div id="wall-preview" style="font-size:11px;color:var(--text3)">點擊開啟留言</div>
+      </div>
+      <button id="open-wall-btn" style="padding:10px 16px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--vic),var(--joy));color:white;border:none;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">💬 留言</button>
+    </div>
+  </div>
+
+  <!-- 心情牆全螢幕 Modal -->
+  <div id="wall-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);flex-direction:column;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#1A1A2E,#4A6CF7 70%,#E8619A);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-size:16px;font-weight:900;color:white">💬 許家心情報告牆</div>
+      <button id="close-wall-btn" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 14px;color:white;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">✕ 關閉</button>
+    </div>
+    <div id="share-wall" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:14px;"></div>
+    <div style="flex-shrink:0;background:var(--card);border-top:1px solid var(--border);padding:12px 14px;padding-bottom:max(12px,env(safe-area-inset-bottom))">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px" id="share-who-btns">
         <button class="share-who-btn" id="swho-ge" data-who="ge" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid var(--vic);background:rgba(74,108,247,0.2);color:var(--vic-neon);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">🏎️ Vic</button>
         <button class="share-who-btn" id="swho-mei" data-who="mei" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text3);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">🩺 Joy</button>
         <button class="share-who-btn" id="swho-mama" data-who="mama" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text3);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">👩 媽媽</button>
         <button class="share-who-btn" id="swho-baba" data-who="baba" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text3);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">👨 爸爸</button>
       </div>
       <input type="hidden" id="share-who" value="ge"/>
-      <textarea id="share-text" placeholder="✍️ 寫下今天的事（學校趣事、心情、畫畫、語音輸入都可以！）" style="width:100%;height:70px;padding:10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:white;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;resize:none"></textarea>
-      <button class="btn btn-primary" id="share-submit-btn" style="padding:11px;font-size:13px;border-radius:var(--r-xs);touch-action:manipulation">🚀 發送！孩子自動得 +2 點</button>
-    </div>
-    <div style="font-size:11px;color:var(--text3);font-weight:800;margin:12px 0 6px">📌 大家的心情動態</div>
-    <div id="share-wall" style="max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;overscroll-behavior-y:contain;background:rgba(0,0,0,0.2);border-radius:var(--r-xs);padding:8px">
-      <div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:10px">還沒有動態，來留下第一則心情吧！💭</div>
+      <textarea id="share-text" placeholder="✏️ 寫下今天的心情、趣事，語音輸入也可以！" style="width:100%;height:72px;padding:10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:white;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;resize:none;box-sizing:border-box;-webkit-appearance:none"></textarea>
+      <button id="share-submit-btn" style="width:100%;margin-top:8px;padding:13px;border-radius:var(--r-xs);background:linear-gradient(135deg,var(--vic),var(--joy));color:white;border:none;font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;touch-action:manipulation">🚀 發送！孩子自動得 +2 點</button>
     </div>
   </div>
 
@@ -2114,6 +2125,23 @@ try{
   }
 }catch(e){}
 
+function openWallModal(){
+  var modal = document.getElementById('wall-modal');
+  if(!modal) return;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden'; // 鎖定背景不滾動
+  initShareWhoButtons();
+  // Scroll to bottom of messages
+  var wall = document.getElementById('share-wall');
+  if(wall) setTimeout(function(){ wall.scrollTop = wall.scrollHeight; }, 100);
+}
+
+function closeWallModal(){
+  var modal = document.getElementById('wall-modal');
+  if(modal) modal.style.display = 'none';
+  document.body.style.overflow = ''; // 解鎖背景
+}
+
 function setupGlobalTouch() {
   document.addEventListener('touchstart', function(){}, {passive: true}); // unlock touch
 
@@ -2298,6 +2326,10 @@ function openReplyBox(key, btn, wrapEl){
 function renderShareWallData(data) {
   var wall = document.getElementById('share-wall');
   if(!wall) return;
+  // Update preview text
+  var preview = document.getElementById('wall-preview');
+  var items = data ? Object.values(data) : (state.shares||[]);
+  if(preview) preview.textContent = items.length > 0 ? '共 '+items.length+' 則留言，點擊查看' : '點擊留言，大家都能看到 💬';
   var items = data
     ? Object.entries(data).map(function(e){ return Object.assign({},e[1],{key:e[0]}); }).sort(function(a,b){ return (b.ts||0)-(a.ts||0); })
     : (state.shares||[]);
@@ -2488,6 +2520,27 @@ startListening();
 setInterval(function(){
   checkDailyReset();
 }, 60000);
+
+// Bind wall modal buttons
+document.addEventListener('DOMContentLoaded', function(){
+  var openBtn = document.getElementById('open-wall-btn');
+  var closeBtn = document.getElementById('close-wall-btn');
+  if(openBtn){
+    openBtn.addEventListener('touchend', function(e){ e.preventDefault(); openWallModal(); }, {passive:false});
+    openBtn.addEventListener('click', openWallModal);
+  }
+  if(closeBtn){
+    closeBtn.addEventListener('touchend', function(e){ e.preventDefault(); closeWallModal(); }, {passive:false});
+    closeBtn.addEventListener('click', closeWallModal);
+  }
+  // Prevent wall scroll from bubbling
+  var wall = document.getElementById('share-wall');
+  if(wall){
+    wall.addEventListener('touchmove', function(e){
+      if(wall.scrollHeight > wall.clientHeight) e.stopPropagation();
+    }, {passive:false});
+  }
+});
 </script>
 </body>
 </html>
