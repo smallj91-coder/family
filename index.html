@@ -459,21 +459,21 @@ input:checked+.slider:before{transform:translateX(20px)}
   </div>
 
   <!-- 心情牆全螢幕 Modal -->
-  <div id="wall-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);flex-direction:column;overflow:hidden">
+  <div id="wall-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:#0F0F1E;flex-direction:column;overflow:hidden;color:white">
     <div style="background:linear-gradient(135deg,#1A1A2E,#4A6CF7 70%,#E8619A);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
       <div style="font-size:16px;font-weight:900;color:white">💬 許家心情報告牆</div>
       <button id="close-wall-btn" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 14px;color:white;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">✕ 關閉</button>
     </div>
-    <div id="share-wall" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:14px;"></div>
-    <div style="flex-shrink:0;background:var(--card);border-top:1px solid var(--border);padding:12px 14px;padding-bottom:max(12px,env(safe-area-inset-bottom))">
+    <div id="share-wall" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:14px;background:#0F0F1E;"></div>
+    <div style="flex-shrink:0;background:#1A1A2E;border-top:1px solid rgba(255,255,255,0.1);padding:12px 14px;padding-bottom:max(12px,env(safe-area-inset-bottom))">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px" id="share-who-btns">
         <button class="share-who-btn" id="swho-ge" data-who="ge" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid var(--vic);background:rgba(74,108,247,0.2);color:var(--vic-neon);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">🏎️ Vic</button>
-        <button class="share-who-btn" id="swho-mei" data-who="mei" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text3);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">🩺 Joy</button>
-        <button class="share-who-btn" id="swho-mama" data-who="mama" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text3);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">👩 媽媽</button>
-        <button class="share-who-btn" id="swho-baba" data-who="baba" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text3);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">👨 爸爸</button>
+        <button class="share-who-btn" id="swho-mei" data-who="mei" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.6);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">🩺 Joy</button>
+        <button class="share-who-btn" id="swho-mama" data-who="mama" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.6);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">👩 媽媽</button>
+        <button class="share-who-btn" id="swho-baba" data-who="baba" style="padding:9px 6px;border-radius:var(--r-xs);border:2px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.6);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation">👨 爸爸</button>
       </div>
       <input type="hidden" id="share-who" value="ge"/>
-      <textarea id="share-text" placeholder="✏️ 寫下今天的心情、趣事，語音輸入也可以！" style="width:100%;height:72px;padding:10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:white;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;resize:none;box-sizing:border-box;-webkit-appearance:none"></textarea>
+      <textarea id="share-text" placeholder="✏️ 寫下今天的心情、趣事，語音輸入也可以！" style="width:100%;height:72px;padding:10px;border-radius:var(--r-xs);border:1.5px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:white;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;resize:none;box-sizing:border-box;-webkit-appearance:none;-webkit-text-fill-color:white"></textarea>
       <button id="share-submit-btn" style="width:100%;margin-top:8px;padding:13px;border-radius:var(--r-xs);background:linear-gradient(135deg,var(--vic),var(--joy));color:white;border:none;font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;touch-action:manipulation">🚀 發送！孩子自動得 +2 點</button>
     </div>
   </div>
@@ -2342,7 +2342,7 @@ function renderShareWallData(data) {
   wall.style.overscrollBehavior = 'contain';
   items.slice(0,30).forEach(function(item){
     var wrap = document.createElement('div');
-    wrap.style.cssText = 'border-bottom:1px dashed rgba(255,255,255,0.1);padding:8px 0';
+    wrap.style.cssText = 'border-bottom:1px dashed rgba(255,255,255,0.12);padding:10px 0';
 
     // Header
     var header = document.createElement('div');
@@ -2354,7 +2354,7 @@ function renderShareWallData(data) {
     header.appendChild(sender);
 
     var time = document.createElement('span');
-    time.style.cssText = 'color:rgba(255,255,255,0.3);font-size:10px';
+    time.style.cssText = 'color:rgba(200,210,255,0.5);font-size:10px';
     time.textContent = item.time||'';
     header.appendChild(time);
 
@@ -2372,7 +2372,7 @@ function renderShareWallData(data) {
 
     // Content
     var body = document.createElement('div');
-    body.style.cssText = 'color:#E0E8FF;padding-left:4px;line-height:1.5;margin-bottom:6px;font-size:13px';
+    body.style.cssText = 'color:#DDEEFF;padding-left:4px;line-height:1.5;margin-bottom:6px;font-size:13px;font-weight:600';
     body.textContent = item.content||'';
     wrap.appendChild(body);
 
@@ -2381,7 +2381,7 @@ function renderShareWallData(data) {
       var replyArr = Array.isArray(item.replies)?item.replies:Object.values(item.replies);
       replyArr.forEach(function(r){
         var rd = document.createElement('div');
-        rd.style.cssText = 'margin-left:14px;padding:5px 8px;background:rgba(255,255,255,0.05);border-radius:6px;margin-bottom:3px';
+        rd.style.cssText = 'margin-left:14px;padding:5px 8px;background:rgba(255,255,255,0.08);border-radius:6px;margin-bottom:3px';
         rd.innerHTML = '<span style="font-weight:900;font-size:11px;color:'+(r.color||'rgba(255,255,255,0.6)')+'">'+r.sender+'</span>'
           +'<span style="color:rgba(255,255,255,0.25);font-size:10px;margin-left:6px">'+r.time+'</span>'
           +'<div style="color:#C0C8E0;font-size:12px;margin-top:2px">'+r.content+'</div>';
@@ -2396,7 +2396,7 @@ function renderShareWallData(data) {
 
       var replyBtn = document.createElement('button');
       replyBtn.textContent = '💬 回覆';
-      replyBtn.style.cssText = 'font-size:11px;padding:4px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.5);font-family:Nunito,sans-serif;font-weight:700;cursor:pointer;touch-action:manipulation';
+      replyBtn.style.cssText = 'font-size:11px;padding:4px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);font-family:Nunito,sans-serif;font-weight:700;cursor:pointer;touch-action:manipulation';
 
       (function(k, btn, wrapEl){
         function handler(e){
